@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
+
+.formBody {
+    height: 85%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 292px;
+
+}
+
+.formContainer input {
+    width: 250px;
+    padding: 12px 20px;
+    margin: 8px 0;
+    outline: none;
+    border: 1px solid black;
+    border-radius: 0px;
+    box-shadow: 5px 5px #ffc3ae;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.formContainer input:focus {
+    box-shadow: 6.5px 6.5px #ffc3ae;
+    transition-duration: 300ms;
+    transition-property: box-shadow;
+}
+
+.formContainer button {
+    width: 50px;
+    padding: 5px 5px;
+    margin: 8px 0;
+    outline: none;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 0px;
+    box-shadow: 5px 5px #ffc3ae;
+    cursor: pointer;
+    margin-left: auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+}
+
+.formContainer button:hover {
+    box-shadow: 7px 7px #ffc3ae;
+    transition-duration: 300ms;
+    transition-property: box-shadow;
+}
+
+.formContainer h2 {
+    font-family: Abril Fatface;
+    font-size: 1.3em;
+    margin-right: auto;
+    margin-bottom: 8px;
+
+}
+
+.formBody p {
+    font-size: 0.9em;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.formNames{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    width: 100%;
+}
+
+.formNames input{
+    width:95px;
+    
+}

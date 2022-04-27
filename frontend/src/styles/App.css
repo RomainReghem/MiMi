@@ -1,0 +1,32 @@
+ul {
+    display: flex;
+    padding: 0;
+}
+
+li {
+    list-style-type: none;
+    margin-right: 20px;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    height:7%;
+    font-family: Abril Fatface;
+    
+}
+
+a {
+    text-decoration: none;
+    color: black;
+    
+}
+
+nav>button {
+    background: transparent;
+    color: var(--white);
+    border: none;
+}
