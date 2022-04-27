@@ -1,0 +1,24 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "partie back-end de l'application MIMI.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RomainReghem/MiMi.git#main"
+  },
+  "author": "CHL",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RomainReghem/MiMi/issues"
+  },
+  "homepage": "https://github.com/RomainReghem/MiMi/tree/main#readme",
+  "dependencies": {
+    "express": "^4.18.0",
+    "express-session": "^1.17.2",
+    "mysql": "^2.18.1"
+  }
+}
