@@ -1,8 +1,13 @@
+//import { Connexion } from './routes/connexion';
+
 const mysql = require('mysql');
 const express = require('express');
 const session = require('express-session');
 const cors = require("cors");
-const path = require('path');
+
+// pour les routes
+/*const connexion = require("./controllers/connexion")
+const inscription = require("./controllers/inscription")*/
 
 // Pour le hashage du mot de passe
 const bcrypt = require('bcrypt');
@@ -11,12 +16,26 @@ const bcrypt = require('bcrypt');
  On rentre le nom d'utilisateur et le mot de passe
  Puis le nom de la base de données
 */
-const connexion = mysql.createConnection({
+const db = mysql.createConnection({
     host: 'localhost',
     user: 'projetmimi',
     password: 'mdpmimi!',
     database: 'db_mimi'
 });
+/* Plutot que d'avoir les données confidentielles de la bd : les stocker dans un fichier caché et les récupérer :
+require("dotenv").config()
+const DB_HOST = process.env.DB_HOST
+const DB_USER = process.env.DB_USER
+const DB_PASSWORD = process.env.DB_PASSWORD
+const DB_DATABASE = process.env.DB_DATABASE
+const db = mysql.createConnection({
+   host: DB_HOST,
+   user: DB_USER,
+   password: DB_PASSWORD,
+   database: DB_DATABASE,
+})*/
+
+
 const app = express();
 
 app.use(session({
@@ -26,8 +45,6 @@ app.use(session({
 }));
 
 app.use(express.json());
-/*app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'static')));*/
 
 app.use(
     cors({
@@ -39,15 +56,17 @@ app.use(
 
 // CONNEXION
 app.post("/connexion", (req, res) => {
-   /* const pseudo = "eleve8";
+   /* données de test qui fonctionnent 
+    const pseudo = "eleve8";
     const mdp = "testor";*/
+   
     const pseudo = req.body.user;
     const mdp = req.body.pwd;
     console.log("connexion "+mdp+ " "+pseudo )
     if(mdp=="" || pseudo==""){
         res.sendStatus(402)
     }
-    connexion.query('SELECT * FROM eleve WHERE pseudo = ? OR courriel = ?', [pseudo, pseudo], function (error, results, fields) {
+    db.query('SELECT * FROM eleve WHERE pseudo = ? OR courriel = ?', [pseudo, pseudo], function (error, results, fields) {
         // En cas d'erreur, l'affiche
         if (error) throw error;
         // Si le compte existe
@@ -65,7 +84,7 @@ app.post("/connexion", (req, res) => {
                 }
             });
         } else {
-            console.log("UTILISATEUR NOT FOUND")
+            console.log("Utilisateur pas trouvé")
 
             // si pour le pseudo donné, aucun utilisateur ne correspond 
             res.sendStatus(401);
@@ -74,58 +93,83 @@ app.post("/connexion", (req, res) => {
 });
 
 // INSCRIPTION
-app.post("/inscription", (req, res) => {
-    const pseudo = "eleve9";
-    const prenom = "t";
-    const nom = "";
-    const email = "eleve9@test.fr";
-    const mdp = "testor";
+app.post("/register", (req, res) => {
+    /*données de test valides
+    const pseudo = "eleve10";
+    const prenom = "test";
+    const nom = "test";
+    const email = "eleve10@test.fr";
+    const mdp = "testoror";*/
 
+    const pseudo = req.body.user;
+    const prenom =  req.body.firstName;
+    const nom =  req.body.name;
+    const email =  req.body.mail;
+    const mdp =  req.body.pwd;
+
+    console.log(pseudo+prenom+nom+email+mdp)
     // Prenom doit etre compris entre 1 et 45 exclus 
-    if (45 <= prenom.length || 1 >= prenom.length) {
+    if (!(prenom.match("^[A-z-àâçéèêëîïôûùüÿñ]{2,24}$"))) {
         console.log("taille prenom pas bonne")
+        res.sendStatus(403)
     }
+    console.log("prenom ok")
     // Nom doit être compris entre 1 et 44 inclus 
-    if (44 < nom.length) {
-        console.log("taille nol trop longue")
+    if (!(nom.match("^[A-z-àâçéèêëîïôûùüÿñ]{2,24}$"))) {
+        console.log("nom incorrect")
+        res.sendStatus(404)
     }
-    if (3 > pseudo.length || 45 <= pseudo.length) {
-        console.log("taille pseudo pas ok")
+    console.log("nom ok")
+
+    if (!(pseudo.match("^[A-z0-9-_]{3,24}$"))) {
+        console.log("pseudo pas ok")
+        res.sendStatus(405)
     }
-    if (6 > mdp.length || 100 <= mdp.length) {
+    console.log("pseudo ok")
+
+    if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
+        res.sendStatus(406)
     }
+    console.log("mdp")
+
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
+        res.sendStatus(407)
     }
+    console.log("email ok")
 
+
+    // Hashage du mot de passe
     bcrypt.hash(mdp, 10, (err, hash) => {
         if (err) {
             console.log(err)
         }
-
         // On fait des vérifications sur les insertions avant d'insérer dans BD
         // La base de données a déjà des contraintes
         // Verification d'unicité du pseudo 
-        connexion.query('SELECT * FROM eleve WHERE pseudo = ?', [pseudo], (error, results) => {
-            let valide = true;
+        db.query('SELECT * FROM eleve WHERE pseudo = ?', [pseudo], (error, results) => {
             if (results.length > 0) {
                 console.log("Pseudo pas unique");
+                res.sendStatus(408)
             } else {
                 console.log("pseudo valide")
-                // Verificat
-                connexion.query('SELECT * FROM eleve WHERE courriel = ?', [email], (error, results) => {
+                // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
+                db.query('SELECT * FROM eleve WHERE courriel = ?', [email], (error, results) => {
                     if (results.length > 0) {
                         console.log("Mail pas unique");
+                        res.sendStatus(409)
                     } else {
                         console.log("Mail unique parmi les élèves")
-                        connexion.query('SELECT * FROM classe WHERE courriel = ?', [email], (error, results) => {
+                        //  On vérifie que l'email n'est pas possèdé par une classe 
+                        db.query('SELECT * FROM classe WHERE courriel = ?', [email], (error, results) => {
                             if (results.length > 0) {
                                 console.log("Mail existant pour la classe");
+                                res.sendStatus(410)
                             } else {
                                 console.log("mdp" + hash)
                                 console.log("Mail valide (unique dans la bd)");
-                                connexion.query("INSERT INTO eleve(pseudo, prenom, nom, courriel, motdepasse) VALUES (?, ?, ?, ?, ?)", [pseudo, prenom, nom, email, hash],
+                                db.query("INSERT INTO eleve(pseudo, prenom, nom, courriel, motdepasse) VALUES (?, ?, ?, ?, ?)", [pseudo, prenom, nom, email, hash],
                                     function (error, results, fields) {
                                         if (error) {
                                             /*if (error.sqlState == '50001') {
@@ -136,6 +180,7 @@ app.post("/inscription", (req, res) => {
                                             console.log(error)
                                         } else {
                                             console.log("création de compte réussie")
+                                            res.send(results)
                                         }
                                     }
                                 );
@@ -153,6 +198,7 @@ app.post("/inscription", (req, res) => {
     )
 });
 
+// adresse du serveur, pour faire des tests
 app.listen(3500, () => {
     console.log("Serveur en marche")
 }
