@@ -99,7 +99,7 @@ const Connexion = () => {
                         </form>
                     </div>
 
-                    <p>Pas encore de compte ? <Link to="/inscription" style={{ color: '#ab9471' }}>Inscrivez-vous.</Link></p>
+                    <p>Pas encore de compte ? <Link to="/choix" style={{ color: '#ab9471' }}>Inscrivez-vous.</Link></p>
                 </div>
             )}
         </>
