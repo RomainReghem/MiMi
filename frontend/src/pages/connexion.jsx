@@ -43,13 +43,12 @@ const Connexion = () => {
         } catch (err) { 
             if(!err?.response){
                 setErrMsg('No Server Response')
-            } /*else if (err.response?.status === 400){
+            } else if (err.response?.status === 400){
                 setErrMsg('Missing Username or Password');
             } else if (err.response?.status === 401){
                 setErrMsg('Missing Username or Password');
-            }*/
-            else {
-                setErrMsg(err.response?.message);
+            } else {
+                setErrMsg('Login Failed');
             }
 
             errRef.current.focus();
@@ -87,7 +86,7 @@ const Connexion = () => {
                             />
                             <input
                                 type="password"
-                                id="passord"
+                                id="password"
                                 placeholder="Mot de passe"
                                 onChange={(e) => setPwd(e.target.value)}
                                 value={pwd}
