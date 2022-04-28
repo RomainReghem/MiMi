@@ -9,12 +9,13 @@ li {
 }
 
 nav {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-left: 20px;
     padding-right: 20px;
-    height:7%;
+    height:50px;
     font-family: Abril Fatface;
     
 }

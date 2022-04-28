@@ -11,6 +11,7 @@ import useAuth from "../utils/hooks/useAuth";
 import Protected from "./protected";
 import Connexion from "./connexion";
 import Inscription from "./inscription";
+import InscriptionClasse from "./inscriptionClasse"
 import Home from "./home"
 import '../styles/App.css'
 import '../styles/connexion.css'
@@ -38,13 +39,15 @@ function Nav() {
 
 export default function App() {
   return (
-    <div style={{height: "100%"}}>
+    <div style={{height: "100%", width:"100%", display:"flex", flexDirection:"column"}}>
+      <div className="top-border"/>
       <Nav />
 
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/connexion" element={<Connexion />} />
         <Route path="/inscription" element={<Inscription />} />
+        <Route path="/inscriptionClasse" element={<InscriptionClasse/>}/>
 
         <Route
           path="/protected"

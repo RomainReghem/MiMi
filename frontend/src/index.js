@@ -10,7 +10,7 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <div className="top-border"/>
+    
     <div className="container">
       <Router>
         <AuthProvider>

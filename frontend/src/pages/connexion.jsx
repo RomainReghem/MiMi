@@ -3,7 +3,7 @@ import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/AuthProvider';
 import axios from '../api/axios'
 
-const LOGIN_URL = '/connexion';
+const LOGIN_URL = '/login';
 
 const Connexion = () => {
 
@@ -82,7 +82,7 @@ const Connexion = () => {
                                 id="mail"
                                 ref={userRef}
                                 autoComplete="off"
-                                placeholder="Adresse e-mail"
+                                placeholder="E-mail élève ou classe"
                                 onChange={(e) => setUser(e.target.value)}
                                 value={user}
                                 required
@@ -95,7 +95,6 @@ const Connexion = () => {
                                 value={pwd}
                                 required
                             />
-                            {/*<button onClick={() => props.log()}>→</button>*/}
                             <button>→</button>
                         </form>
                     </div>
