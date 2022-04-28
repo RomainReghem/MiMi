@@ -75,7 +75,7 @@ const Connexion = () => {
 
 
                         <h2>Connectez-vous</h2>
-                        <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+                        <p ref={errRef} className={errMsg ? "errmsg" : "hide"} aria-live="assertive">{errMsg}</p>
                         <form onSubmit={handleSubmit}>
                             <input
                                 type="text"

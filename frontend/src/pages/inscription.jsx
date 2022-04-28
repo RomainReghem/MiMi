@@ -6,7 +6,7 @@ const USER_REGEX = /^[A-z0-9-_]{3,24}$/;
 const NAME_REGEX = /^[A-z-àâçéèêëîïôûùüÿñ]{2,24}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-const REGISTER_URL = '/register';
+const REGISTER_URL = '/registerStudent';
 
 const Inscription = () => {
 
