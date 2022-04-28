@@ -74,7 +74,7 @@ const InscriptionClasse = () => {
                 setErrMsg('Un compte est déjà associé à cette adresse mail');
             } 
             else if (err.response?.status === 411) {
-                setErrMsg('Ce mail est utilisé par un compte de classe');
+                setErrMsg("Ce mail est utilisé par un compte d'élève");
             } else {
                 setErrMsg('Registration Failed')
             }
