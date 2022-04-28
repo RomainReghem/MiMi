@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useRef, useState, useEffect } from 'react';
+import axios from '../api/axios'
 
 const USER_REGEX = /^[A-z0-9-_]{3,24}$/;
-const NAME_REGEX = /^[A-z-]{2,24}$/;
+const NAME_REGEX = /^[A-z-àâçéèêëîïôûùüÿñ]{2,24}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const REGISTER_URL = '/register';
@@ -69,12 +70,63 @@ const Inscription = () => {
         setErrMsg('');
     }, [user, pwd, matchPwd])
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // recheck les pwd et user in case of JS hack
+        const v1 = USER_REGEX.test(user);
+        const v2 = PWD_REGEX.test(pwd);
+        const v3 = MAIL_REGEX.test(mail);
+        const v4 = NAME_REGEX.test(name)
+        const v5 = NAME_REGEX.test(firstName)
+        if (!v1 || !v2 || !v3 || !v4 || !v5) {
+            setErrMsg("Invalid Entry");
+            return;
+        }
+        setSuccess(true);
+
+        try {
+            const response = await axios.post(REGISTER_URL,
+                JSON.stringify({ user, firstName, name, mail, pwd }),
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                }
+            );
+            console.log(response?.data);
+            console.log(response?.accessToken);
+            console.log(JSON.stringify(response))
+            setSuccess(true);
+            setUser('');
+            setPwd('');
+            setMatchPwd('');
+        } catch (err) {
+            if (!err?.response) {
+                setErrMsg('No Server Response');
+            } else if (err.response?.status === 409) {
+                setErrMsg('Username Taken');
+            } else {
+                setErrMsg('Registration Failed')
+            }
+            errRef.current.focus();
+        }
+    }
+
     return (
+        <>
+            {success ? (
+                <div>
+                    <h1>Inscription réussie !</h1>
+                    <p>
+                        <Link to="/connexion" style={{ color: '#ab9471' }}>Connectez-vous.</Link>
+                    </p>
+                </div>
+            ) : (
         <div className="formBody">
             <div className="formContainer">
                 <h2>Inscrivez-vous</h2>
                 <p ref={errRef} className={errMsg ? "errmsg" : "hide"} aria-live="assertive">{errMsg}</p>
-                <form>
+                <form onSubmit={handleSubmit}>
                     <div className="formNames">
                         <input
                             type="text"
@@ -129,7 +181,7 @@ const Inscription = () => {
                             transitionProperty: "box-shadow"
                         }}
                     />
-                    <p id="uidnote" className={userFocus && user && !validUser ? "instructions" : "hide"}>entre 4 et 24 caractères (A-Z, 0-9, _ et - )</p>
+                    <p id="uidnote" className={userFocus && user && !validUser ? "instructions" : "hide"}>Entre 4 et 24 caractères alphanumériques</p>
 
                     <input
                             type="text"
@@ -165,7 +217,7 @@ const Inscription = () => {
                             transitionProperty: "box-shadow"
                         }}
                     />
-                    <p id="pwdnote" className={pwdFocus && pwd && !validPwd ? "instructions" : "hide"}>entre 8 et 24 caractères (A-Z, 0-9, _ et - )</p>
+                    <p id="pwdnote" className={pwdFocus && pwd && !validPwd ? "instructions" : "hide"}>Entre 8 et 24 caractères, majuscule et caractère spécial (!@#$%) obligatoires</p>
                     
                     <input
                         type="password"
@@ -185,14 +237,21 @@ const Inscription = () => {
                             transitionProperty: "box-shadow"
                         }}
                     />
-                    <p id="confirmnote" className={matchFocus && !validMatch ? "instructions" : "hide"}>Les mots de passe ne correspondent pas !</p>
-                    <button>→</button>
+                    <p id="confirmnote" className={!matchFocus && matchPwd && !validMatch ? "instructions" : "hide"}>Les mots de passe ne correspondent pas !</p>
+                    <button disabled = {!validMatch || !validName || !validPwd ? true : false} style={validMatch && validName && validPwd ? {
+                            boxShadow: "5px 5px #4cf579", transitionDuration: "300ms",
+                            transitionProperty: "box-shadow"
+                        } : {
+                            boxShadow: "5px 5px #ffc3ae", transitionDuration: "300ms",
+                            transitionProperty: "box-shadow"
+                        }}>→</button>
                 </form>
             </div>
 
 
             <p>Déjà un compte ? <Link to="/connexion" style={{ color: '#ab9471' }}>Connectez-vous.</Link></p>
         </div>
+            )}</>
     )
 }
 
