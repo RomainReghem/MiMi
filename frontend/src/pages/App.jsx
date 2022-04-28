@@ -16,7 +16,7 @@ import '../styles/App.css'
 import '../styles/connexion.css'
 
 
-const Login = () => {
+/*const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { state } = useLocation();
@@ -30,9 +30,10 @@ const Login = () => {
   return (
     <Connexion log = {() => handleLogin()} />
   );
-};
+};*/
 
 function Nav() {
+  /*
   const { authed, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -40,6 +41,7 @@ function Nav() {
     logout();
     navigate("/");
   };
+  */
 
   return (
     <nav>
@@ -56,12 +58,12 @@ function Nav() {
           <Link to="/protected">Page réservée aux connectés</Link>
         </li>
       </ul>
-      {authed && <button onClick={handleLogout}>Logout</button>}
+      {/*{authed && <button onClick={handleLogout}>Logout</button>}*/}
     </nav>
   );
 }
 
-function RequireAuth({ children }) {
+/*function RequireAuth({ children }) {
   const { authed } = useAuth();
   const location = useLocation();
 
@@ -70,7 +72,7 @@ function RequireAuth({ children }) {
   ) : (
     <Navigate to="/connexion" replace state={{ path: location.pathname }} />
   );
-}
+}*/
 
 export default function App() {
   return (
@@ -79,18 +81,16 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/connexion" element={<Login />} />
+        <Route path="/connexion" element={<Connexion />} />
         <Route path="/inscription" element={<Inscription />} />
 
         <Route
           path="/protected"
           element={
-            <RequireAuth>
               <Protected />
-            </RequireAuth>
           }
         />
-        <Route path="/connexion" element={<Login />} />
+        <Route path="/connexion" element={<Connexion />} />
       </Routes>
     </div>
   );
