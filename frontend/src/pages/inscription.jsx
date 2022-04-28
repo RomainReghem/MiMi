@@ -84,7 +84,6 @@ const Inscription = () => {
             setErrMsg("Invalid Entry");
             return;
         }
-        setSuccess(true);
 
         try {
             const response = await axios.post(REGISTER_URL,
@@ -105,7 +104,13 @@ const Inscription = () => {
             if (!err?.response) {
                 setErrMsg('No Server Response');
             } else if (err.response?.status === 409) {
-                setErrMsg('Username Taken');
+                setErrMsg('Un compte est déjà associé à cette adresse mail');
+            }
+            else if (err.response?.status === 408) {
+                setErrMsg('Le pseudo est déjà pris');
+            }
+            else if (err.response?.status === 410) {
+                setErrMsg('Ce mail est utilisé par un compte de classe');
             } else {
                 setErrMsg('Registration Failed')
             }

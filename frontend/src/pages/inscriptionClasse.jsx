@@ -6,7 +6,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const REGISTER_URL = '/registerClass';
 
-const Inscription = () => {
+const InscriptionClasse = () => {
 
     const errRef = useRef();
     const mailRef = useRef();
@@ -23,7 +23,6 @@ const Inscription = () => {
     const [matchFocus, setMatchFocus] = useState(false);
 
     const [errMsg, setErrMsg] = useState('');
-    const [errUser, setErrUser] = useState('');
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
@@ -53,8 +52,7 @@ const Inscription = () => {
             setErrMsg("Invalid Entry");
             return;
         }
-        setSuccess(true);
-
+        
         try {
             const response = await axios.post(REGISTER_URL,
                 JSON.stringify({ mail, pwd }),
@@ -73,7 +71,10 @@ const Inscription = () => {
             if (!err?.response) {
                 setErrMsg('No Server Response');
             } else if (err.response?.status === 409) {
-                setErrMsg('Username Taken');
+                setErrMsg('Un compte est déjà associé à cette adresse mail');
+            } 
+            else if (err.response?.status === 411) {
+                setErrMsg('Ce mail est utilisé par un compte de classe');
             } else {
                 setErrMsg('Registration Failed')
             }
@@ -168,4 +169,4 @@ const Inscription = () => {
     )
 }
 
-export default Inscription;
+export default InscriptionClasse;

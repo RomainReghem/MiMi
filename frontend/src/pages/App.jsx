@@ -12,6 +12,7 @@ import Protected from "./protected";
 import Connexion from "./connexion";
 import Inscription from "./inscription";
 import InscriptionClasse from "./inscriptionClasse"
+import Choix from "./choix"
 import Home from "./home"
 import '../styles/App.css'
 import '../styles/connexion.css'
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/connexion" element={<Connexion />} />
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/inscriptionClasse" element={<InscriptionClasse/>}/>
+        <Route path="/choix" element={<Choix/>}/>
 
         <Route
           path="/protected"
