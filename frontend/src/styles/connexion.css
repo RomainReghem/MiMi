@@ -79,3 +79,24 @@
     width:95px;
     
 }
+
+.inputValid{
+    box-shadow: 5px 5px #4cf579;
+    transition-duration: 300ms;
+    transition-property: box-shadow;
+}
+
+.inputInvalid{
+    box-shadow: 5px 5px #ffc3ae;
+    transition-duration: 300ms;
+    transition-property: box-shadow;
+}
+
+.hide {
+    display: none;
+}
+
+.instructions {
+    color: #ab9471;
+    margin-top: 0;
+}

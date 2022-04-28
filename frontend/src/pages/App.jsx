@@ -15,34 +15,7 @@ import Home from "./home"
 import '../styles/App.css'
 import '../styles/connexion.css'
 
-
-/*const Login = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
-  const { state } = useLocation();
-
-  const handleLogin = () => {
-    login().then(() => {
-      navigate(state?.path || "/");
-    });
-  };
-
-  return (
-    <Connexion log = {() => handleLogin()} />
-  );
-};*/
-
 function Nav() {
-  /*
-  const { authed, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-  */
-
   return (
     <nav>
       <ul>
@@ -62,17 +35,6 @@ function Nav() {
     </nav>
   );
 }
-
-/*function RequireAuth({ children }) {
-  const { authed } = useAuth();
-  const location = useLocation();
-
-  return authed === true ? (
-    children
-  ) : (
-    <Navigate to="/connexion" replace state={{ path: location.pathname }} />
-  );
-}*/
 
 export default function App() {
   return (
