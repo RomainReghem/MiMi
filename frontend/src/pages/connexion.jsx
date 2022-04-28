@@ -44,8 +44,11 @@ const Connexion = () => {
             if(!err?.response){
                 setErrMsg('No Server Response')
             } else if (err.response?.status === 400){
-                setErrMsg('Missing Username or Password');
+                setErrMsg('Wrong Password');
             } else if (err.response?.status === 401){
+                setErrMsg('User not found');
+            } 
+            else if (err.response?.status === 402){
                 setErrMsg('Missing Username or Password');
             } else {
                 setErrMsg('Login Failed');
