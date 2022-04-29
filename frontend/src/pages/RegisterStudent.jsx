@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, createSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { useRef, useState, useEffect } from 'react';
 import axios from '../api/axios'
 
@@ -9,6 +9,8 @@ const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const REGISTER_URL = '/registerStudent';
 
 const Inscription = () => {
+
+    const navigate = useNavigate();
 
     const userRef = useRef();
     const errRef = useRef();
@@ -96,10 +98,16 @@ const Inscription = () => {
             console.log(response?.data);
             console.log(response?.accessToken);
             console.log(JSON.stringify(response))
-            setSuccess(true);
             setUser('');
             setPwd('');
             setMatchPwd('');
+            navigate({
+                pathname: "success",
+                search: createSearchParams({
+                    from: 2
+                }).toString()
+            });
+
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('No Server Response');
@@ -124,13 +132,13 @@ const Inscription = () => {
                 <div>
                     <h1>Inscription élève réussie !</h1>
                     <p>
-                        <Link to="/connexion" style={{ color: '#ab9471' }}>Connectez-vous.</Link>
+                        <Link to="/login" style={{ color: '#ab9471' }}>Connectez-vous.</Link>
                     </p>
                 </div>
             ) : (
         <div className="formBody">
             <div className="formContainer">
-                <h2>Inscription élève</h2><p className="infoProfs">Etablissements, enregistrez vos classes <Link to="/inscriptionClasse" style={{ color: '#ab9471', display:"inline"}}><b>ici</b>.</Link></p>
+                <h2>Inscription élève</h2><p className="infoProfs">Etablissements, enregistrez vos classes <Link to="/register-class" style={{ color: '#ab9471', display:"inline"}}><b>ici</b>.</Link></p>
                 <p ref={errRef} className={errMsg ? "errmsg" : "hide"} aria-live="assertive">{errMsg}</p>
                 <form onSubmit={handleSubmit}>
                     <div className="formNames">
@@ -255,7 +263,7 @@ const Inscription = () => {
             </div>
 
 
-            <p>Déjà un compte ? <Link to="/connexion" style={{ color: '#ab9471' }}>Connectez-vous.</Link></p>
+            <p>Déjà un compte ? <Link to="/login" style={{ color: '#ab9471' }}>Connectez-vous.</Link></p>
         </div>
             )}</>
     )

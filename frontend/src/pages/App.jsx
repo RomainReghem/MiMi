@@ -1,63 +1,49 @@
 import * as React from "react";
-import {
-  Link,
-  Routes,
-  Route,
-  useNavigate,
-  Navigate,
-  useLocation
-} from "react-router-dom";
-import useAuth from "../utils/hooks/useAuth";
-import Protected from "./protected";
-import Connexion from "./connexion";
-import Inscription from "./inscription";
-import InscriptionClasse from "./inscriptionClasse"
-import Choix from "./choix"
-import Home from "./home"
+import { Routes, Route, } from "react-router-dom";
+
+// Hooks
+import useAuth from "../hooks/useAuth";
+// Composants
+import Nav from "../components/Nav"
+import RequireAuth from "../components/RequireAuth"
+
+// Pages
+import Dashboard from "./Dashboard";
+import Login from "./Login";
+import RegisterStudent from "./RegisterStudent";
+import RegisterClass from "./RegisterClass"
+import Choice from "./Choice"
+import Home from "./Home"
+import Layout from "./Layout"
+import Success from "./Success"
+
+// Styles
 import '../styles/App.css'
 import '../styles/connexion.css'
 
-function Nav() {
-  return (
-    <nav>
-      <ul>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>|</li>
-        <li>
-           <Link to="/connexion">Connexion</Link>
-        </li>
-        <li>|</li>
-        <li>
-          <Link to="/protected">Page réservée aux connectés</Link>
-        </li>
-      </ul>
-      {/*{authed && <button onClick={handleLogout}>Logout</button>}*/}
-    </nav>
-  );
-}
+
 
 export default function App() {
   return (
-    <div style={{height: "100%", width:"100%", display:"flex", flexDirection:"column"}}>
-      <div className="top-border"/>
+    <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+      <div className="top-border" />
       <Nav />
-
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/connexion" element={<Connexion />} />
-        <Route path="/inscription" element={<Inscription />} />
-        <Route path="/inscriptionClasse" element={<InscriptionClasse/>}/>
-        <Route path="/choix" element={<Choix/>}/>
+        <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register-student" element={<RegisterStudent />} />
+          <Route path="/register-class" element={<RegisterClass />} />
+          <Route path="/choice" element={<Choice />} />
 
-        <Route
-          path="/protected"
-          element={
-              <Protected />
-          }
-        />
-        <Route path="/connexion" element={<Connexion />} />
+          <Route path="/success" element={<Success />}/>
+
+          <Route element={<RequireAuth />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
+
+
+        </Route>
       </Routes>
     </div>
   );

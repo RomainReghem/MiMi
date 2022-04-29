@@ -10,8 +10,11 @@ const GlobalStyle = createGlobalStyle`
 const Sdiv = styled.div`
 display:flex;
 justify-content:center;
-align-items:center;
 flex-direction:column;
+width:600px;
+@media (max-width: 768px) {
+    width:400px;
+}
 height:85%;
 margin:auto;
 `;
@@ -30,10 +33,7 @@ align-items:center;
 justify-content:center;
 background-color:white;
 height:80px;
-width:600px;
-@media (max-width: 768px) {
-    width:400px;
-}
+width:100%;
 padding:12px 20px;
 margin-top:20px;
 border: 1px solid black;
@@ -53,12 +53,12 @@ const Choix = () => {
         <Sdiv>
             <H3>Vous êtes :</H3>
             <Choices>
-                <Link to="/inscription">
+                <Link to="/register-student">
                     <Choice>
                         <p>Un élève 🧑‍🎓</p>
                     </Choice>
                 </Link>
-                <Link to="/inscriptionClasse">
+                <Link to="/register-class">
                 <Choice>
                     <p>
                         L'administration de l'établissement scolaire, un représentant de la classe...

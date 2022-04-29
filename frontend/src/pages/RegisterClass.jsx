@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, createSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { useRef, useState, useEffect } from 'react';
 import axios from '../api/axios'
 
@@ -7,6 +7,8 @@ const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const REGISTER_URL = '/registerClass';
 
 const InscriptionClasse = () => {
+
+    const navigate = useNavigate();
 
     const errRef = useRef();
     const mailRef = useRef();
@@ -64,9 +66,15 @@ const InscriptionClasse = () => {
             console.log(response?.data);
             console.log(response?.accessToken);
             console.log(JSON.stringify(response))
-            setSuccess(true);
             setPwd('');
             setMatchPwd('');
+            navigate({
+                pathname: "success",
+                search: createSearchParams({
+                    from: 2
+                }).toString()
+            });
+
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('No Server Response');
@@ -88,13 +96,13 @@ const InscriptionClasse = () => {
                 <div>
                     <h1>Inscription de la classe réussie !</h1>
                     <p>
-                        <Link to="/connexion" style={{ color: '#ab9471' }}>Connectez-vous.</Link>
+                        <Link to="/login" style={{ color: '#ab9471' }}>Connectez-vous.</Link>
                     </p>
                 </div>
             ) : (
         <div className="formBody">
             <div className="formContainer">
-                <h2>Enregistrer une classe</h2><p className="infoProfs">Elèves, inscrivez-vous <Link to="/inscription" style={{ color: '#ab9471', display:"inline"}}><b>ici</b>.</Link></p>
+                <h2>Enregistrer une classe</h2><p className="infoProfs">Elèves, inscrivez-vous <Link to="/register-student" style={{ color: '#ab9471', display:"inline"}}><b>ici</b>.</Link></p>
                 <p ref={errRef} className={errMsg ? "errmsg" : "hide"} aria-live="assertive">{errMsg}</p>
                 <form onSubmit={handleSubmit}>
                     <input
@@ -163,7 +171,7 @@ const InscriptionClasse = () => {
             </div>
 
 
-            <p>Classe déjà enregistrée ? <Link to="/connexion" style={{ color: '#ab9471' }}>Connectez-vous.</Link></p>
+            <p>Classe déjà enregistrée ? <Link to="/login" style={{ color: '#ab9471' }}>Connectez-vous.</Link></p>
         </div>
             )}</>
     )
