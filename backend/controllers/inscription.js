@@ -1,6 +1,10 @@
 const db = require('../utils/database');
 const bcrypt = require('bcrypt');
 
+const Users = require('../models/users');
+const Eleve = Users.Eleve;
+const Classe = Users.Classe;
+
 const InscriptionEleve = (req, res) => {
     /*données de test valides
     const pseudo = "eleve10";
@@ -53,56 +57,102 @@ const InscriptionEleve = (req, res) => {
         if (err) {
             console.log(err)
         }
+        Eleve.findOne({ where: { pseudo: pseudo } })
+            .then(eleve => {
+                // si on trouve un élève qui a déjà ce pseudo
+                if (eleve) {
+                    console.log("Pseudo pas unique");
+                    res.sendStatus(408)
+                } else {
+                    console.log("pseudo valide")
+                    // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
+                    Eleve.findOne({ where: { courriel: email } })
+                        .then(eleve => {
+                            if (eleve) {
+                                console.log("Mail pas unique");
+                                res.sendStatus(409)
+                            } else {
+                                console.log("mail unique pour eleves");
+                                Classe.findOne({ where: { courriel: email } })
+                                    .then(classe => {
+                                        if (classe) {
+                                            console.log("Mail existant pour la classe");
+                                            res.sendStatus(410)
+                                        } else {
+                                            console.log("inscription ok")
+                                            console.log("mdp" + hash)
+                                            const neweleve = Eleve.create(({
+                                                pseudo: pseudo,
+                                                courriel: email,
+                                                motdepasse: hash,
+                                                nom: nom,
+                                                prenom: prenom
+                                            }))
+                                                .then(() => {
+                                                    console.log("Création de compte élève")
+                                                    res.send(neweleve);
+                                                })
+                                                .catch(err => {
+                                                    console.log("erreur inscription eleve : " + err)
+                                                })
+                                        }
+                                    }
+                                    )
+                            }
+                        })
+
+                }
+            }
+            )
         // On fait des vérifications sur les insertions avant d'insérer dans BD
         // La base de données a déjà des contraintes
         // Verification d'unicité du pseudo 
-        db.query('SELECT * FROM eleve WHERE pseudo = ?', [pseudo], (error, results) => {
-            if (results.length > 0) {
-                console.log("Pseudo pas unique");
-                res.sendStatus(408)
-            } else {
-                console.log("pseudo valide")
-                // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
-                db.query('SELECT * FROM eleve WHERE courriel = ?', [email], (error, results) => {
-                    if (results.length > 0) {
-                        console.log("Mail pas unique");
-                        res.sendStatus(409)
-                    } else {
-                        console.log("Mail unique parmi les élèves")
-                        //  On vérifie que l'email n'est pas possèdé par une classe 
-                        db.query('SELECT * FROM classe WHERE courriel = ?', [email], (error, results) => {
-                            if (results.length > 0) {
-                                console.log("Mail existant pour la classe");
-                                res.sendStatus(410)
-                            } else {
-                                console.log("mdp" + hash)
-                                console.log("Mail valide (unique dans la bd)");
-                                db.query("INSERT INTO eleve(pseudo, prenom, nom, courriel, motdepasse) VALUES (?, ?, ?, ?, ?)", [pseudo, prenom, nom, email, hash],
-                                    function (error, results, fields) {
-                                        if (error) {
-                                            /*if (error.sqlState == '50001') {
-                                                console.log("mail existant dans classe ");
-                                            } else {
-                                                console.log(error)
-                                            }*/
-                                            console.log(error)
-                                        } else {
-                                            console.log("création de compte réussie")
-                                            res.send(results)
-                                        }
-                                    }
-                                );
-                            }
-                        }
-                        );
-                    }
-                }
-                );
-            }
-        }
-        );
+        // db.query('SELECT * FROM eleve WHERE pseudo = ?', [pseudo], (error, results) => {
+        //     if (results.length > 0) {
+        //         console.log("Pseudo pas unique");
+        //         res.sendStatus(408)
+        //     } else {
+        //         console.log("pseudo valide")
+        //         // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
+        //         db.query('SELECT * FROM eleve WHERE courriel = ?', [email], (error, results) => {
+        //             if (results.length > 0) {
+        //                 console.log("Mail pas unique");
+        //                 res.sendStatus(409)
+        //             } else {
+        //                 console.log("Mail unique parmi les élèves")
+        //                 //  On vérifie que l'email n'est pas possèdé par une classe 
+        //                 db.query('SELECT * FROM classe WHERE courriel = ?', [email], (error, results) => {
+        //                     if (results.length > 0) {
+        //                         console.log("Mail existant pour la classe");
+        //                         res.sendStatus(410)
+        //                     } else {
+        //                         console.log("mdp" + hash)
+        //                         console.log("Mail valide (unique dans la bd)");
+        //                         db.query("INSERT INTO eleve(pseudo, prenom, nom, courriel, motdepasse) VALUES (?, ?, ?, ?, ?)", [pseudo, prenom, nom, email, hash],
+        //                             function (error, results, fields) {
+        //                                 if (error) {
+        //                                     /*if (error.sqlState == '50001') {
+        //                                         console.log("mail existant dans classe ");
+        //                                     } else {
+        //                                         console.log(error)
+        //                                     }*/
+        //                                     console.log(error)
+        //                                 } else {
+        //                                     console.log("création de compte réussie")
+        //                                     res.send(results)
+        //                                 }
+        //                             }
+        //                         );
+        //                     }
+        //                 }
+        //                 );
+        //             }
+        //         }
+        //         );
+        //     }
+        // }
+        // );
     }
-
     )
 }
 
@@ -132,52 +182,48 @@ const InscriptionClasse = (req, res) => {
     //console.log("email ok")
 
 
-    // Hashage du mot de passe
-    bcrypt.hash(mdp, 10, (err, hash) => {
-        if (err) {
-            console.log(err)
-        }
-        // On fait des vérifications sur les insertions avant d'insérer dans BD
-        // La base de données a déjà des contraintes
-        // Verification d'unicité du pseudo 
 
-        // On vérifie que dans la table classe aucun classe ne possède déjà cet email
-        db.query('SELECT * FROM classe WHERE courriel = ?', [email], (error, results) => {
-            if (results.length > 0) {
-                console.log("Mail pas unique");
-                res.sendStatus(409)
-            } else {
-                console.log("Mail unique parmi les classes")
-                //  On vérifie que l'email n'est pas possèdé par une classe 
-                db.query('SELECT * FROM eleve WHERE courriel = ?', [email], (error, results) => {
-                    if (results.length > 0) {
+    // On fait des vérifications sur les insertions avant d'insérer dans BD
+    // La base de données a déjà des contraintes
+    // Verification d'unicité du pseudo 
+
+    // On vérifie que dans la table classe aucun classe ne possède déjà cet email
+    Classe.findOne({ where: { courriel: email } })
+    .then(classe => {
+        if (classe) {
+            console.log("Mail existant pour la classe");
+            res.sendStatus(409)
+        } else {
+            Eleve.findOne({ where: { courriel: email } })
+                .then(eleve => {
+                    if (eleve) {
                         console.log("Mail existant pour un eleve");
                         res.sendStatus(411)
                     } else {
-                        console.log("mdp" + hash)
-                        console.log("Mail valide (unique dans la bd)");
-                        db.query("INSERT INTO classe(courriel, motdepasse) VALUES (?, ?)", [email, hash],
-                            function (error, results, fields) {
-                                if (error) {
-                                    /*if (error.sqlState == '50001') {
-                                        console.log("mail existant dans classe ");
-                                    } else {
-                                        console.log(error)
-                                    }*/
-                                    console.log(error)
-                                } else {
-                                    console.log("création de compte réussie")
-                                    res.send(results)
-                                }
+                        // Hashage du mot de passe
+                        bcrypt.hash(mdp, 10, (err, hash) => {
+                            if (err) {
+                                console.log("erreur hashage mdp classe" + err)
+                            } else {
+                                const newclasse = Classe.create(({
+                                    courriel: email,
+                                    motdepasse: hash
+                                }))
+                                    .then(() => {
+                                        console.log("Création de compte classe réussie")
+                                        res.send(newclasse);
+                                    })
+                                    .catch(err => {
+                                        console.log("erreur inscription classe : " + err)
+                                    })
                             }
-                        );
+
+                        });
                     }
-                }
-                );
-            }
+                });
         }
-        );
     });
 }
+
 
 module.exports = { InscriptionClasse, InscriptionEleve };

@@ -1,15 +1,10 @@
 //import { Connexion } from './routes/connexion';
 const router = require('./routes/routes.js')
 
-const mysql = require('mysql');
 const express = require('express');
 const session = require('express-session');
 const cors = require("cors");
-
-/* On crée une connexion à la database : pour l'instant elle est en local (localhost)
- On rentre le nom d'utilisateur et le mot de passe
- Puis le nom de la base de données
-*/
+const cookieParser = require("cookie-parser")
 
 /* Plutot que d'avoir les données confidentielles de la bd : les stocker dans un fichier caché et les récupérer :
 require("dotenv").config()
@@ -28,12 +23,17 @@ const db = mysql.createConnection({
 const app = express();
 
 app.use(session({
-    secret: 'secret123',
+    // pour signer l'id du cookie
+    secret: 'T-4c3d-i*{pWF-Mb9-rK',
+    // ne force pas la sauvegarde de la session
     resave: false,
+    // ne force pas la sauvegarde d'une session nouvelle mais non smodifiée  
     saveUninitialized: false
 }));
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.use(
     cors({
@@ -42,7 +42,6 @@ app.use(
         credentials: true,
     })
 );
-console.log("hey")
 
 app.use(router);
 
