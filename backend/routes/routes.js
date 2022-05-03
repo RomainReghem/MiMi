@@ -19,8 +19,8 @@ router.get('/logout', Connexion.Deconnexion)
 // Pour réactualiser les tokens
 router.get('/refresh', refreshToken.refreshToken);
 // Pour changer le mot de passe 
-router.get('/changePwd', Modification.ChangementMdp)
+router.post('/changePwd', Modification.ChangementMdp)
 // route pour changer le mail
-router.get('/changeMail', Modification.ChangementMail)
+router.post('/changeMail', Modification.ChangementMail)
 
 module.exports = router;
