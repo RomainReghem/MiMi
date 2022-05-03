@@ -7,7 +7,7 @@ const Users = () => {
     const [users, setUsers] = useState();
     const refresh = useRefreshToken();
 
-    useEffect(() => {
+  /*  useEffect(() => {
         let isMounted = true;
         const controller = new AbortController();
         const getUsers = async () => {
@@ -29,7 +29,7 @@ const Users = () => {
             isMounted = false;
             controller.abort();
         }
-    }, [])
+    }, [])*/
     return (
         <article>
             <h2>Users List</h2>

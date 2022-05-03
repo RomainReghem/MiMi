@@ -38,7 +38,8 @@ const Connexion = () => {
                 });
             console.log(JSON.stringify(response?.data));
             //const accessToken = response?.data?.accessToken;
-            const accessToken = "salut";
+            const accessToken = response?.data?.accessToken;
+            console.log(accessToken);
 
             setAuth({ user, pwd, accessToken });
             setPwd('');

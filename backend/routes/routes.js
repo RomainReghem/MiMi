@@ -16,7 +16,6 @@ router.post('/registerClass', Inscription.InscriptionClasse);
 // route pour déconnecter un utilisateur
 router.get('/logout', Connexion.Deconnexion)
 // Pour réactualiser les tokens
-//router.get('/refresh', refreshToken.refreshToken);
-
+router.get('/refresh', refreshToken.refreshToken);
 
 module.exports = router;

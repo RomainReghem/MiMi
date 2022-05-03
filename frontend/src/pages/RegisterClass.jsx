@@ -68,7 +68,7 @@ const InscriptionClasse = () => {
             setPwd('');
             setMatchPwd('');
             navigate({
-                pathname: "success",
+                pathname: "/success",
                 search: createSearchParams({
                     from: 2
                 }).toString()

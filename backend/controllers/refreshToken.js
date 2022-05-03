@@ -1,12 +1,13 @@
 const db = require('../utils/database');
 const connexion = require('./connexion')
-const refreshTokens=connexion.refreshTokens;
+let refreshTokens=connexion.refreshTokens;
 const jwt =require('jsonwebtoken');
 
 require('dotenv').config()
 
 const refreshToken = (req, res)=>{
    const cookies = req.cookies;
+   console.log(cookies);
     if(!cookies?.jwt){
         console.log("acès refusé")
         // 401

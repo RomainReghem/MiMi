@@ -28,7 +28,7 @@ export default function App() {
   return (
     <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
       <div className="top-border" />
-      
+
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route path="/" element={<Home />} />
@@ -38,17 +38,12 @@ export default function App() {
           <Route path="/choice" element={<Choice />} />
           <Route path="/tests" element={<Tests />} />
 
-          <Route path="/success" element={<Success />}/>
-          </Route>
+          <Route path="/success" element={<Success />} />
+        </Route>
 
-          <Route element={<RequireAuth />}>
-            {/* Remettre le dashbord ici*/}
-          </Route>
-
+        <Route element={<RequireAuth />}>
           <Route path="/dashboard/*" element={<Dashboard />} />
-
-
-        
+        </Route>
       </Routes>
     </div>
   );

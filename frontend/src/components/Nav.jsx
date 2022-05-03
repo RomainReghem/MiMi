@@ -14,7 +14,11 @@ const Nav = () => {
                 </li>
                 <li>|</li>
                 <li>
-                    <Link to="/dashboard">Page réservée aux connectés</Link>
+                    <Link to="/Tests">tests</Link>
+                </li>
+                <li>|</li>
+                <li>
+                    <Link to="/Dashboard">Dashboard</Link>
                 </li>
             </ul>
         </nav>
