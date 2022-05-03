@@ -36,4 +36,4 @@ const refreshToken = (req, res)=>{
 
 }
 
-module.exports = refreshToken;
+module.exports = {refreshToken};
