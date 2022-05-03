@@ -25,6 +25,23 @@ const Connexion = (req, res) => {
             if (eleve) {
                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                     if (estValide) {
+                        console.log("*** Création des cookies pour l'élève ***")
+                        // cookie 
+                        const accessToken = jwt.sign(
+                            { "mail": classe.courriel, "role":"eleve" },
+                            process.env.ACCESS_TOKEN_SECRET,
+                            { expiresIn: '10m' }
+                        );
+                        const refreshToken = jwt.sign(
+                            { "mail": classe.courriel, "role": "eleve" },
+                            process.env.REFRESH_TOKEN_SECRET,
+                            { expiresIn: '30m' }
+                        )
+                        refreshTokens.push(refreshToken);
+                        console.log("refresh token connexion "+ refreshToken)
+
+                        res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
+                        res.json({ accessToken: accessToken })
                         console.log("Connexion de l'élève OK")
                         // si le mot de passe entré correspond bien au mot de passe dans la base de données
                         res.send(eleve)
@@ -43,16 +60,18 @@ const Connexion = (req, res) => {
                                     console.log("Création des cookies pour la classe")
                                     // cookie 
                                     const accessToken = jwt.sign(
-                                        { "mail": classe.courriel },
+                                        { "mail": classe.courriel, "role":"classe" },
                                         process.env.ACCESS_TOKEN_SECRET,
-                                        { expiresIn: '5m' }
+                                        { expiresIn: '10m' }
                                     );
                                     const refreshToken = jwt.sign(
-                                        { "mail": classe.courriel },
-                                        process.env.ACCESS_TOKEN_SECRET,
+                                        { "mail": classe.courriel, "role": "classe" },
+                                        process.env.REFRESH_TOKEN_SECRET,
                                         { expiresIn: '30m' }
                                     )
                                     refreshTokens.push(refreshToken);
+                                    console.log("refresh token connexion "+ refreshToken)
+
                                     res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
                                     res.json({ accessToken: accessToken })
                                     console.log("CONNEXION de la classe OK")

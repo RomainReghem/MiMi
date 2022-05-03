@@ -2,6 +2,7 @@ const verifyJWT = require('../middleware/verificationJWT')
 const Connexion = require('../controllers/connexion.js')
 const Inscription = require('../controllers/inscription.js')
 const refreshToken = require('../controllers/refreshToken.js')
+const Modification = require('../controllers/modification')
 
 const express = require('express')
 const router = express.Router();
@@ -17,5 +18,9 @@ router.post('/registerClass', Inscription.InscriptionClasse);
 router.get('/logout', Connexion.Deconnexion)
 // Pour réactualiser les tokens
 router.get('/refresh', refreshToken.refreshToken);
+// Pour changer le mot de passe 
+router.get('/changePwd', Modification.ChangementMdp)
+// route pour changer le mail
+router.get('/changeMail', Modification.ChangementMail)
 
 module.exports = router;

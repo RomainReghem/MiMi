@@ -16,7 +16,7 @@ const verifyJWT = (req, res, next) => {
     // vérification du token
     jwt.verif(
         token, 
-        process.env.ACCESS_TOKEN_SECRET,
+        process.env.REFRESH_TOKEN_SECRET,
         (err, decoded)=>{
             if(err){
                 return res.sendStatus(202)
