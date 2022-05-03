@@ -1,6 +1,7 @@
 const Users = require('../models/users');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
+const bcrypt = require('bcrypt');
 
 const ChangementMdp = (req, res) => {
     const email = req.body.mail;
