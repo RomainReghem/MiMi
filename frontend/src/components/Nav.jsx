@@ -3,7 +3,7 @@ import styledComponents from "styled-components";
 
 const Nav = () => {
     return (
-        <nav>
+        <nav className="navNav">
             <ul>
                 <li>
                     <Link to="/">Home</Link>

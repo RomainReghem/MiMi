@@ -1,17 +1,17 @@
 .App{
     height:100%;
 }
-ul {
+.navNav ul {
     display: flex;
     padding: 0;
 }
 
-li {
+.navNav li {
     list-style-type: none;
     margin-right: 20px;
 }
 
-nav {
+.navNav {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -23,13 +23,13 @@ nav {
     
 }
 
-a {
+.navNav a {
     text-decoration: none;
     color: black;
     
 }
 
-nav>button {
+.navNav>button {
     background: transparent;
     color: var(--white);
     border: none;

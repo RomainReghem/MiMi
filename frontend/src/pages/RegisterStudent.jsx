@@ -1,4 +1,4 @@
-import { Link, createSearchParams, useNavigate, useLocation } from 'react-router-dom'
+import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 import { useRef, useState, useEffect } from 'react';
 import axios from '../api/axios'
 
@@ -40,8 +40,6 @@ const Inscription = () => {
     const [matchFocus, setMatchFocus] = useState(false);
 
     const [errMsg, setErrMsg] = useState('');
-    const [errUser, setErrUser] = useState('');
-    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
         userRef.current.focus();
@@ -126,16 +124,7 @@ const Inscription = () => {
         }
     }
 
-    return (
-        <>
-            {success ? (
-                <div>
-                    <h1>Inscription élève réussie !</h1>
-                    <p>
-                        <Link to="/login" style={{ color: '#ab9471' }}>Connectez-vous.</Link>
-                    </p>
-                </div>
-            ) : (
+    return (        
         <div className="formBody">
             <div className="formContainer">
                 <h2>Inscription élève</h2><p className="infoProfs">Etablissements, enregistrez vos classes <Link to="/register-class" style={{ color: '#ab9471', display:"inline"}}><b>ici</b>.</Link></p>
@@ -265,7 +254,6 @@ const Inscription = () => {
 
             <p>Déjà un compte ? <Link to="/login" style={{ color: '#ab9471' }}>Connectez-vous.</Link></p>
         </div>
-            )}</>
     )
 }
 

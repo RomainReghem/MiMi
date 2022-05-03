@@ -1,21 +1,21 @@
 import { Link } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import "../styles/success.css"
-
+import Users from "../components/Users"
 
 const Success = () => {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const from = searchParams.get("from");
     return (
-        <> {from == 1 ? (
+        <> {from === 1 ? (
             <div className="successMain">
                 <div className="successContainer">
                     <h2>🎉</h2>
                     <h2>Vous êtes bien connecté !</h2>
                     <Link to="/dashboard"><button className="successButton">Accéder au tableau de bord</button></Link>
                 </div></div>) :
-            from == 2 ? (
+            from === 2 ? (
                 <div className="successMain">
                     <div className="successContainer">
                         <h2>🎉</h2>

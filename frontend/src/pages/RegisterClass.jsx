@@ -25,7 +25,6 @@ const InscriptionClasse = () => {
     const [matchFocus, setMatchFocus] = useState(false);
 
     const [errMsg, setErrMsg] = useState('');
-    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
         mailRef.current.focus();
@@ -91,15 +90,6 @@ const InscriptionClasse = () => {
     }
 
     return (
-        <>
-            {success ? (
-                <div>
-                    <h1>Inscription de la classe réussie !</h1>
-                    <p>
-                        <Link to="/login" style={{ color: '#ab9471' }}>Connectez-vous.</Link>
-                    </p>
-                </div>
-            ) : (
         <div className="formBody">
             <div className="formContainer">
                 <h2>Enregistrer une classe</h2><p className="infoProfs">Elèves, inscrivez-vous <Link to="/register-student" style={{ color: '#ab9471', display:"inline"}}><b>ici</b>.</Link></p>
@@ -173,7 +163,6 @@ const InscriptionClasse = () => {
 
             <p>Classe déjà enregistrée ? <Link to="/login" style={{ color: '#ab9471' }}>Connectez-vous.</Link></p>
         </div>
-            )}</>
     )
 }
 
