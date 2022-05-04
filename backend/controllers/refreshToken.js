@@ -11,12 +11,13 @@ const refreshToken = (req, res) => {
     if (!cookies?.jwt) {
         console.log("accès refusé")
         // 401 : authentification raté
-        return res.sendStatus(201)
+        return res.send("401").status("accès refusé")
     }
     const refreshToken = cookies.jwt;
     if (!refreshTokens.includes(refreshToken)) {
         //token invalide 
-        return res.sendStatus(400)
+        //return res.send("403").status("accès interdit")
+        return res.sendStatus(403)
     }
     console.log('REFRESH ' + refreshToken)
     jwt.verify(
@@ -29,13 +30,18 @@ const refreshToken = (req, res) => {
                 console.log(err);
                 // accès interdit
                 res.sendStatus(403);
-            }else{
-                console.log("decoded " + decoded.mail+" : "+ decoded.role)
+            } else {
+                console.log("decoded " + decoded.mail + " : " + decoded.role)
                 const accessToken = jwt.sign(
-                    { 'mail': decoded.mail, 'role':decoded.role },
+                    {
+                        "UserInfo": {
+                            "mail": decoded.mail,
+                            "role": decoded.role
+                        }
+                    },
                     process.env.ACCESS_TOKEN_SECRET,
                     { expiresIn: '10m' });
-                res.json({ accessToken });
+                res.json({role:decoded.role, accessToken:accessToken});
             }
         }
     )

@@ -20,7 +20,7 @@ const Connexion = (req, res) => {
     if (mdp == "" || pseudo == "") {
         res.sendStatus(402)
     }
-    Eleve.findOne({ where: Sequelize.or ({ pseudo: pseudo }, { courriel: pseudo }) })
+    Eleve.findOne({ where: Sequelize.or({ pseudo: pseudo }, { courriel: pseudo }) })
         .then(eleve => {
             if (eleve) {
                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
@@ -28,7 +28,7 @@ const Connexion = (req, res) => {
                         console.log("*** Création des cookies pour l'élève ***")
                         // cookie 
                         const accessToken = jwt.sign(
-                            { "mail": eleve.courriel, "role":"eleve" },
+                            { "UserInfo": { "mail": eleve.courriel, "role": "eleve" } },
                             process.env.ACCESS_TOKEN_SECRET,
                             { expiresIn: '10m' }
                         );
@@ -38,11 +38,11 @@ const Connexion = (req, res) => {
                             { expiresIn: '30m' }
                         )
                         refreshTokens.push(refreshToken);
-                        console.log("refresh token connexion "+ refreshToken)
+                        //console.log("refresh token connexion " + refreshToken)
 
                         res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
-                        res.json({ accessToken: accessToken })
-                        console.log("Connexion de l'élève OK")
+                        res.json({role:"eleve", accessToken: accessToken })
+                        console.log("*** Connexion de l'élève OK ***")
                         // si le mot de passe entré correspond bien au mot de passe dans la base de données
                         //res.send(eleve)
                     } else {
@@ -60,7 +60,12 @@ const Connexion = (req, res) => {
                                     console.log("Création des cookies pour la classe")
                                     // cookie 
                                     const accessToken = jwt.sign(
-                                        { "mail": classe.courriel, "role":"classe" },
+                                        {
+                                            "UserInfo": {
+                                                "mail": classe.courriel,
+                                                "role": "classe"
+                                            }
+                                        },
                                         process.env.ACCESS_TOKEN_SECRET,
                                         { expiresIn: '10m' }
                                     );
@@ -70,10 +75,10 @@ const Connexion = (req, res) => {
                                         { expiresIn: '1d' }
                                     )
                                     refreshTokens.push(refreshToken);
-                                    console.log("refresh token connexion "+ refreshToken)
+                                    //console.log("refresh token connexion " + refreshToken)
 
                                     res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
-                                    res.json({ accessToken: accessToken })
+                                    res.json({role:"classe", accessToken: accessToken })
                                     console.log("CONNEXION de la classe OK")
                                     // si le mot de passe entré correspond bien au mot de passe dans la base de données
                                     //res.send(classe)

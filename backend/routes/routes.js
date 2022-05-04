@@ -1,4 +1,4 @@
-const verifyJWT = require('../middleware/verificationJWT')
+const verifyJWT = require('../middleware/verificationJWT').verifyJWT
 const Connexion = require('../controllers/connexion.js')
 const Inscription = require('../controllers/inscription.js')
 const refreshToken = require('../controllers/refreshToken.js')
