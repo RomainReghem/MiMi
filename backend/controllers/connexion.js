@@ -28,12 +28,12 @@ const Connexion = (req, res) => {
                         console.log("*** Création des cookies pour l'élève ***")
                         // cookie 
                         const accessToken = jwt.sign(
-                            { "mail": classe.courriel, "role":"eleve" },
+                            { "mail": eleve.courriel, "role":"eleve" },
                             process.env.ACCESS_TOKEN_SECRET,
                             { expiresIn: '10m' }
                         );
                         const refreshToken = jwt.sign(
-                            { "mail": classe.courriel, "role": "eleve" },
+                            { "mail": eleve.courriel, "role": "eleve" },
                             process.env.REFRESH_TOKEN_SECRET,
                             { expiresIn: '30m' }
                         )
@@ -44,7 +44,7 @@ const Connexion = (req, res) => {
                         res.json({ accessToken: accessToken })
                         console.log("Connexion de l'élève OK")
                         // si le mot de passe entré correspond bien au mot de passe dans la base de données
-                        res.send(eleve)
+                        //res.send(eleve)
                     } else {
                         console.log("Mauvais mot de passe ELEVE")
                         // sinon, si ce n'est pas le bon mdp mais le bon pseudo
@@ -67,7 +67,7 @@ const Connexion = (req, res) => {
                                     const refreshToken = jwt.sign(
                                         { "mail": classe.courriel, "role": "classe" },
                                         process.env.REFRESH_TOKEN_SECRET,
-                                        { expiresIn: '30m' }
+                                        { expiresIn: '1d' }
                                     )
                                     refreshTokens.push(refreshToken);
                                     console.log("refresh token connexion "+ refreshToken)

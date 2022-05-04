@@ -10,7 +10,7 @@ const refreshToken = (req, res) => {
     console.log("refresh cookies" + cookies);
     if (!cookies?.jwt) {
         console.log("accès refusé")
-        // 401
+        // 401 : authentification raté
         return res.sendStatus(201)
     }
     const refreshToken = cookies.jwt;
@@ -27,14 +27,14 @@ const refreshToken = (req, res) => {
                 console.log("to")
                 //refreshTokens = refreshTokens.filter((c) => c != refreshToken)
                 console.log(err);
-                // interdit
+                // accès interdit
                 res.sendStatus(403);
             }else{
                 console.log("decoded " + decoded.mail+" : "+ decoded.role)
                 const accessToken = jwt.sign(
                     { 'mail': decoded.mail, 'role':decoded.role },
                     process.env.ACCESS_TOKEN_SECRET,
-                    { expiresIn: '5m' });
+                    { expiresIn: '10m' });
                 res.json({ accessToken });
             }
         }
