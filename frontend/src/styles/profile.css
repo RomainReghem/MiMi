@@ -1,32 +1,26 @@
 .profileMain{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     padding: 50px;
     width:100%;
 
 }
 
 .profileGraphics{
-    background-color: green;
-    width:48%;
+    width:600px;
     height:100%;
     display: flex;
     flex-direction: column;
     
 }
 
-.profileSettings{
-    border: 1px solid black;
-    width:48%;
-    height:100%;
-    
-}
-
 .profileInfos{
-    background-color: blue;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
     width:100%;
-    height:20%;
+    height:15%;
 }
 
 .profileAvatar{
@@ -52,9 +46,10 @@
     transition-property: box-shadow;
 }
 
-.profilePwd{
+.profilePwd, .profileMail{
     display: flex;
     flex-direction: column;
+    width:292px;
 }
 
 .profileSettings h3 {
@@ -86,4 +81,45 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+}
+
+.profileSettings{    
+    width:600px;
+    height:100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.profileInfosPic{
+    width:30%;
+    height:100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profileInfosPic img {
+    max-height: 100%;    
+    max-height: 100%;
+    object-fit: cover;
+  border-radius: 50%;
+}
+
+.profileInfosText{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.profileInfosText h2, h3{
+    font-family: Abril Fatface;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.profileGraphics{
+    justify-content: center;
+    align-items: center;
 }
