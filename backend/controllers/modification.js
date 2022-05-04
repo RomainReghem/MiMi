@@ -21,7 +21,7 @@ const ChangementMdp = (req, res) => {
     } else if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
         res.sendStatus(407)
-    }else if(mdp==newMdp){
+    } else if (mdp == newMdp) {
         res.send("406").status("Mot de passe inchangé !")
     } else {
         // on cherche un eleve qui a le mail donné
@@ -40,7 +40,7 @@ const ChangementMdp = (req, res) => {
                                 // on change le mdp
                                 const neweleve = Eleve.update(
                                     {
-                                        motdepasse: newMdp,
+                                        motdepasse: hash,
                                     },
                                     {
                                         where: { ideleve: eleve.ideleve },
@@ -153,7 +153,7 @@ const ChangementMail = (req, res) => {
                                                         if (newEleve) {
                                                             res.sendStatus(201)
                                                         } else {
-                                                            res.send(500).status("non défini")
+                                                            res.status(500).send("non défini")
                                                         }
 
                                                     }).catch(err => {
@@ -161,9 +161,9 @@ const ChangementMail = (req, res) => {
                                                         res.sendStatus(500)
                                                     })
                                                     // Comme on a changé l'adresse mail, on doit aussi changer les tokens
-                                                    /*    const cookies = req.cookies;
+                                                     const cookies = req.cookies;
                                                         console.log("refresh cookies" + cookies);
-                                                        if (!cookies?.jwt) {
+                                                        /*if (!cookies?.jwt) {
                                                             console.log("accès refusé")
                                                             // 401 : authentification raté
                                                             return res.sendStatus(201)
@@ -211,7 +211,7 @@ const ChangementMail = (req, res) => {
                                                             }
                                                         )*/
                                                 } else {
-                                                    console.log("Mauvais mot de passe ELEVE")
+                                                    console.log("Mauvais mot de passe de l'eleve")
                                                     res.sendStatus(400)
                                                 }
                                             });
@@ -235,7 +235,7 @@ const ChangementMail = (req, res) => {
                                     if (classe2) {
                                         console.log("Mail existant pour la classe");
                                         //res.sendStatus(409)
-                                        res.send("409").status('Adresse déjà utilisée par un compte classe')
+                                        res.status(409).send('Adresse déjà utilisée par un compte classe')
                                     } else {
                                         // on vérifie que l'adresse mail n'est aussi pas déjà prise par un élève
                                         Eleve.findOne({ where: { courriel: newEmail } })
@@ -244,7 +244,7 @@ const ChangementMail = (req, res) => {
                                                 if (eleve) {
                                                     console.log("Mail existant pour un eleve");
                                                     // res.sendStatus(411)
-                                                    res.send("409").status('Adresse déjà utilisée par un élève')
+                                                    res.status(409).send('Adresse déjà utilisée par un élève')
                                                 } else {
                                                     // comparaion du mdp avec celui connu
                                                     bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {
@@ -263,9 +263,9 @@ const ChangementMail = (req, res) => {
                                                                 if (newclasse) {
                                                                     console.log("update ok : " + newclasse + newclasse.courriel)
                                                                     // on envoie la nouvelle classe 
-                                                                    res.send("201").status("update ok")
+                                                                    res.status(201).send("update ok")
                                                                 } else {
-                                                                    res.send(500).status("non défini")
+                                                                    res.status(500).send("non défini")
                                                                 }
                                                             })
                                                                 .catch(err => {
@@ -289,4 +289,132 @@ const ChangementMail = (req, res) => {
     }
 }
 
-module.exports = { ChangementMdp, ChangementMail }
+const ChangementPseudo = (req, res) => {
+    const email = req.body.mail;
+    const pseudo = req.body.newPseudo;
+    const mdp = req.body.pwd;
+    console.log("email " + email + " new " + pseudo + " mdp " + mdp)
+
+    console.log("\n*** Vérification pseudo ***")
+    if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
+        console.log("taille mdp pas ok")
+        res.sendStatus(406)
+    } else if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+        console.log("forme mail incorrect")
+        res.sendStatus(407)
+    } else if (!(pseudo.match("^[A-z0-9-_]{3,24}$"))) {
+        console.log("forme pseudo incorrect")
+        res.sendStatus(405)
+    } else {
+        Eleve.findOne({ where: { courriel: email } })
+            .then(eleveToChange => {
+                if (!eleveToChange) {
+                    res.status(401).send("Eleve pas trouvé")
+                } else {
+                    // sinon on ne change rien
+                    if (eleveToChange.pseudo != pseudo) {
+                        // on vérifie que le pseudo ne soit pas déjà pris
+                        Eleve.findOne({ where: { pseudo: pseudo } })
+                            .then(elevePseudo => {
+                                if (elevePseudo) {
+                                    res.status(408).send("Pseudo déjà pris")
+                                } else {
+                                    bcrypt.compare(mdp, eleveToChange.motdepasse, function (err, estValide) {
+                                        if (err) {
+                                            res.status(500).send("erreur lors du hashage")
+                                        } else if (estValide) {
+                                            Eleve.update(
+                                                {
+                                                    pseudo: pseudo,
+                                                },
+                                                {
+                                                    where: { ideleve: eleveToChange.ideleve },
+                                                }
+                                            ).then(newEleve => {
+                                                if (newEleve) {
+                                                    //res.sendStatus(201)
+                                                    res.status(201).send("Modification de pseudo réussie.")
+                                                } else {
+                                                    res.status(500).send("non défini")
+                                                }
+
+                                            }).catch(err => {
+                                                console.log(err)
+                                                res.status(500).send("Erreur lors de la modification de pseudo.")
+                                            })
+                                        }
+                                    });
+                                }
+                            })
+                    } else {
+                        //res.send(eleveToChange);
+                        res.status(201).send("Pas de modification de pseudo.")
+                    }
+                }
+            })
+
+    }
+}
+
+const ChangementPreference = (req, res) => {
+    const email = req.body.mail;
+    const pseudo = req.body.newPseudo;
+    const preference = req.body.pref;
+
+    console.log("\n*** Vérification pseudo ***")
+    if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
+        console.log("taille mdp pas ok")
+        res.sendStatus(406)
+    } else if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+        console.log("forme mail incorrect")
+        res.sendStatus(407)
+    } else if (preference != "photo" || preference != "camera" || preference != "avatar") {
+        console.log("Pref pas dans les valeurs possibles (photo, camera ou avatar)")
+        res.status(413).send("Préférence incorrecte.")
+    } else {
+        console.log("Tout est bon pour la modification de préférences")
+        Eleve.findOne({ where: { courriel: email } })
+            .then(eleveToChange => {
+                if (!eleveToChange) {
+                    res.status(401).send("Eleve pas trouvé")
+                } else {
+                    // si la preference n'a pas changé, on ne change rien
+                    if (eleveToChange.preference != preference) {
+
+                        bcrypt.compare(mdp, eleveToChange.motdepasse, function (err, estValide) {
+                            if (err) {
+                                res.status(500).send("erreur lors du hashage")
+                            } else if (estValide) {
+                                Eleve.update(
+                                    {
+                                        preference: preference,
+                                    },
+                                    {
+                                        where: { ideleve: eleveToChange.ideleve },
+                                    }
+                                ).then(newEleve => {
+                                    if (newEleve) {
+                                        //res.sendStatus(201)
+                                        res.status(201).send("Modification de préférence réussie.")
+                                    } else {
+                                        res.status(500).send("Aucun élève modifié.")
+                                    }
+
+                                }).catch(err => {
+                                    console.log(err)
+                                    res.status(500).send("Erreur lors de la modification de préférence.")
+                                })
+                            }
+                        });
+                    } else {
+                        //res.send(eleveToChange);
+                        res.status(201).send("Pas de modification de préférence.")
+                    }
+                }
+            })
+
+        res.send(600)
+    }
+}
+
+module.exports = { ChangementMdp, ChangementMail, ChangementPseudo, ChangementPreference}

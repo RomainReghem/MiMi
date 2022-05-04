@@ -22,5 +22,9 @@ router.get('/refresh', refreshToken.refreshToken);
 router.post('/changePwd', Modification.ChangementMdp)
 // route pour changer le mail
 router.post('/changeMail', Modification.ChangementMail)
+// route pour changer le pseudo, seulement pour l'élève
+// router.post('/change', Modification.ChangementPseudo)
+// route pour changer les préférences (comment l'élève sera représenté)
+// router.post('/change', Modification.ChangementPreference)
 
 module.exports = router;
