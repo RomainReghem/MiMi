@@ -163,7 +163,7 @@ const ChangementMail = (req, res) => {
                                                     })
                                                     // Comme on a changé l'adresse mail, on doit aussi changer les tokens
                                                      const cookies = req.cookies;
-                                                        console.log("refresh cookies" + cookies);
+                                                        console.log("refresh cookies" + cookies.jwt);
                                                         /*if (!cookies?.jwt) {
                                                             console.log("accès refusé")
                                                             // 401 : authentification raté
