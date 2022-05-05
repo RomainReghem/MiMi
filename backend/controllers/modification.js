@@ -151,6 +151,7 @@ const ChangementMail = (req, res) => {
                                                         }
                                                     ).then(newEleve => {
                                                         if (newEleve) {
+                                                            console.log("modification du mail de l'eleve effectuée")
                                                             res.sendStatus(201)
                                                         } else {
                                                             res.status(500).send("non défini")
@@ -335,12 +336,12 @@ const ChangementPseudo = (req, res) => {
                                                     //res.sendStatus(201)
                                                     res.status(201).send("Modification de pseudo réussie.")
                                                 } else {
-                                                    res.status(500).send("non défini")
+                                                    res.status(520).send("non défini")
                                                 }
 
                                             }).catch(err => {
                                                 console.log(err)
-                                                res.status(500).send("Erreur lors de la modification de pseudo.")
+                                                res.status(520).send("Erreur lors de la modification de pseudo.")
                                             })
                                         }
                                     });
@@ -397,12 +398,12 @@ const ChangementPreference = (req, res) => {
                                         //res.sendStatus(201)
                                         res.status(201).send("Modification de préférence réussie.")
                                     } else {
-                                        res.status(500).send("Aucun élève modifié.")
+                                        res.status(520).send("Aucun élève modifié.")
                                     }
 
                                 }).catch(err => {
                                     console.log(err)
-                                    res.status(500).send("Erreur lors de la modification de préférence.")
+                                    res.status(520).send("Erreur lors de la modification de préférence.")
                                 })
                             }
                         });
@@ -412,8 +413,6 @@ const ChangementPreference = (req, res) => {
                     }
                 }
             })
-
-        res.send(600)
     }
 }
 
