@@ -5,6 +5,8 @@ import axios from '../api/axios';
 const CHANGEMAIL_URL = '/changeMail';
 const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
+const LOGIN_URL = '/login';
+
 
 const ChangenewMail = () => {
 

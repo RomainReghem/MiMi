@@ -39,9 +39,10 @@ const Connexion = () => {
             console.log(JSON.stringify(response?.data));
             //const accessToken = response?.data?.accessToken;
             const accessToken = response?.data?.accessToken;
-            console.log(accessToken);
+            const role = response?.data?.role;
+            console.log(role);
 
-            setAuth({ user, pwd, accessToken });
+            setAuth({ user, pwd, accessToken, role });
             setPwd('');
             setUser('');
             navigate({
