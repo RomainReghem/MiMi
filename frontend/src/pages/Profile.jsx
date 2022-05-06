@@ -12,8 +12,7 @@ const Profile = () => {
 
     const { auth } = useAuth();
     // Remettre ça 
-    //const role = auth?.role;
-    const role = "eleve";
+    const role = auth?.role;
     const mail = auth?.user;
     const pseudo = "";
 
@@ -42,7 +41,7 @@ const Profile = () => {
                     </section>
                     <AvatarComponent/>
                 </div>) : (
-                <div className="profileContainer">
+                <div className="pcMain">
                     <h2>Tableau de bord classe #4234</h2>
                     <p>(rajouter la liste des élèves de la classe ?)</p>
                     <div className="pcChild">
