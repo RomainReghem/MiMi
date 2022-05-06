@@ -11,7 +11,9 @@ const PSEUDO_URL = '/pseudo';
 const Profile = () => {
 
     const { auth } = useAuth();
-    const role = auth?.role;
+    // Remettre ça 
+    //const role = auth?.role;
+    const role = "eleve";
     const mail = auth?.user;
     const pseudo = "";
 
@@ -34,16 +36,11 @@ const Profile = () => {
         <>
             {role == "eleve" ? (
                 <div className="profileMain">
-                    <AvatarComponent/>
                     <section className="profileSettings">
-                        <div className="profileName">
-
-                            <h3>Changer de pseudo</h3>
-                            <input placeholder="Nouveau pseudo"></input>
-                        </div><br />
                         <ChangePwd /><br />
                         <ChangeMail />
                     </section>
+                    <AvatarComponent/>
                 </div>) : (
                 <div className="profileContainer">
                     <h2>Tableau de bord classe #4234</h2>

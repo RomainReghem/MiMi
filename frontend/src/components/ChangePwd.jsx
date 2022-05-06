@@ -116,7 +116,6 @@ const ChangePwd = () => {
                         transitionProperty: "box-shadow"
                     }}
                 />
-                <p id="pwdnote" className={newPwdFocus && newPwd && !validNewPwd ? "instructions" : "hide"}>Entre 8 et 24 caractères, majuscule et caractère spécial (!@#$%) obligatoires</p>
 
                 <input
                     type="password"
@@ -135,14 +134,15 @@ const ChangePwd = () => {
                         transitionProperty: "box-shadow"
                     }}
                 />
-                <p id="confirmnote" className={!matchFocus && matchPwd && !validMatch ? "instructions" : "hide"}>Les mots de passe ne correspondent pas !</p>
-                <button disabled={!validMatch || !validNewPwd ? true : false} style={validMatch && validNewPwd ? {
+                <div className="btn-ins"><button disabled={!validMatch || !validNewPwd ? true : false} style={validMatch && validNewPwd ? {
                     boxShadow: "5px 5px #4cf579", transitionDuration: "300ms",
                     transitionProperty: "box-shadow"
                 } : {
                     boxShadow: "5px 5px #ffc3ae", transitionDuration: "300ms",
                     transitionProperty: "box-shadow"
                 }}>→</button>
+                <p id="pwdnote" className={newPwdFocus && newPwd && !validNewPwd ? "instructions" : "hide"}>Entre 8 et 24 caractères, majuscule et caractère spécial (!@#$%) obligatoires</p>
+                <p id="confirmnote" className={!matchFocus && !newPwdFocus && matchPwd && !validMatch ? "instructions" : "hide"}>Les mots de passe ne correspondent pas !</p></div>
             </form>
         </div>
 

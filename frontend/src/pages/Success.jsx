@@ -12,7 +12,7 @@ const Success = () => {
                 <div className="successContainer">
                     <h2>🎉</h2>
                     <h2>Vous êtes bien connecté !</h2>
-                    <Link to="/dashboard"><button className="successButton">Accéder au tableau de bord</button></Link>
+                    <Link to="/profile"><button className="successButton">Accéder à votre profil</button></Link>
                 </div></div>) :
             from == 2 ? (
                 <div className="successMain">

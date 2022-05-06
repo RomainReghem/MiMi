@@ -20,10 +20,11 @@ code {
 }
 
 .top-border {
+  display: none;
   padding: 0;
   margin: 0;
   background:#ffc3ae;
-  height: 7px;
+  height: 0.5rem;
   width: 100%;
 
 }
