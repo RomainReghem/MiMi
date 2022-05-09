@@ -73,14 +73,12 @@ const ChangePwd = () => {
             } else {
                 setErrMsg('Registration Failed')
             }
-            errRef.current.focus();
         }
     }
 
     return (
         <div className="profilePwd">
             <h3>Changer de mot de passe</h3>
-            <p ref={errRef} className={errMsg ? "errmsg" : "hide"} aria-live="assertive">{errMsg}</p>
             <form onSubmit={handleSubmit}>
                 <input
                     type="password"

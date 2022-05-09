@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import useAuth from "../hooks/useAuth";
 import axios from '../api/axios';
+import { Store } from 'react-notifications-component';
 
 const CHANGEMAIL_URL = '/changeMail';
 const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -8,12 +9,14 @@ const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const LOGIN_URL = '/login';
 
 
-const ChangenewMail = () => {
+const ChangeMail = () => {
 
     const { auth } = useAuth();
-    const { setAuth } = useAuth();    
+    const { setAuth } = useAuth();   
+    console.log(auth) 
+    
 
-    const [mail, setMail] = useState('');
+    const [mail, setMail] = useState(auth?.user);
 
     const newMailRef = useRef();
     const [newMail, setnewMail] = useState('');
@@ -29,10 +32,13 @@ const ChangenewMail = () => {
         setValidnewMail(MAIL_REGEX.test(newMail));
     }, [newMail])
 
+    useEffect(() => {
+        setErrMsg('');
+    }, [newMail, pwd])
+
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault();        
         setMail(auth?.user);
-        console.log("mail set to : " +  auth?.user);
         
         if (!MAIL_REGEX.test(newMail)) {
             setErrMsg("Invalid Entry");
@@ -40,6 +46,7 @@ const ChangenewMail = () => {
         }
         
         try {
+            console.log(JSON.stringify({ mail, newMail, pwd }))
             const response = await axios.post(CHANGEMAIL_URL,
                 JSON.stringify({ mail, newMail, pwd }),
                 {
@@ -47,14 +54,9 @@ const ChangenewMail = () => {
                     withCredentials: true
                 }
             );
+            
             console.log(response?.data);
-            setPwd('');
-            setnewMail('');
-            setAuth({
-                ...auth,
-                user:newMail            
-            });
-            console.log("Email changé !");           
+            setMail(newMail);
 
         } catch (err) {
             if (!err?.response) {
@@ -68,6 +70,7 @@ const ChangenewMail = () => {
                 setErrMsg('Registration Failed')
             }
             errRef.current.focus();
+            return;
         }
     }
 
@@ -117,4 +120,4 @@ const ChangenewMail = () => {
 
 }
 
-export default ChangenewMail;
+export default ChangeMail;

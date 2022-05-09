@@ -19,8 +19,6 @@ const AvatarComponent = () => {
 
     const { auth } = useAuth();
     const { setAuth } = useAuth();
-    const mail = auth?.user;
-    const pseudo = "";
 
     const shirts = ["hoody", "short", "polo"]
     const glasses = ["none", "round", "square"]
