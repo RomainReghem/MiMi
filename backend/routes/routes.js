@@ -26,7 +26,7 @@ router.get('/refresh', refreshToken.refreshToken);
 // Pour changer le mot de passe 
 router.post('/changePwd', Modification.ChangementMdp)
 // route pour changer le mail
-router.post('/changeMail',verifyJWT, Modification.ChangementMail)
+router.post('/changeMail', Modification.ChangementMail)
 //router.post('/changeMail', verifyJWT, Modification.ChangementMail)
 
 // route qui permet de retourner un pseudo à partir du mail
