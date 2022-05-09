@@ -1,9 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
 
 .formBody {
-    height: 90%;
     width: 100%;
     display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
     align-items: center;
     justify-content: center;
     flex-direction: column;       

@@ -8,7 +8,8 @@ import Nav from "../components/Nav"
 import RequireAuth from "../components/RequireAuth"
 
 // Pages
-import Dashboard from "./Dashboard";
+import Profile from "./Profile"
+import Documents from "./Documents"
 import Login from "./Login";
 import RegisterStudent from "./RegisterStudent";
 import RegisterClass from "./RegisterClass"
@@ -37,13 +38,16 @@ export default function App() {
           <Route path="/register-class" element={<RegisterClass />} />
           <Route path="/choice" element={<Choice />} />
           <Route path="/tests" element={<Tests />} />
-
           <Route path="/success" element={<Success />} />
+
+          <Route element={<RequireAuth />}>
+          </Route>
+
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/documents" element={<Documents />} />
         </Route>
 
-        <Route element={<RequireAuth />}>
-          <Route path="/dashboard/*" element={<Dashboard />} />
-        </Route>
+
       </Routes>
     </div>
   );
