@@ -1,5 +1,7 @@
 //const db = require('../utils/database');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const path = require("path")
 
 const Users = require('../models/users');
 const Eleve = Users.Eleve;
@@ -104,54 +106,6 @@ const InscriptionEleve = (req, res) => {
                 }
             }
             )
-        // On fait des vérifications sur les insertions avant d'insérer dans BD
-        // La base de données a déjà des contraintes
-        // Verification d'unicité du pseudo 
-        // db.query('SELECT * FROM eleve WHERE pseudo = ?', [pseudo], (error, results) => {
-        //     if (results.length > 0) {
-        //         console.log("Pseudo pas unique");
-        //         res.sendStatus(408)
-        //     } else {
-        //         console.log("pseudo valide")
-        //         // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
-        //         db.query('SELECT * FROM eleve WHERE courriel = ?', [email], (error, results) => {
-        //             if (results.length > 0) {
-        //                 console.log("Mail pas unique");
-        //                 res.sendStatus(409)
-        //             } else {
-        //                 console.log("Mail unique parmi les élèves")
-        //                 //  On vérifie que l'email n'est pas possèdé par une classe 
-        //                 db.query('SELECT * FROM classe WHERE courriel = ?', [email], (error, results) => {
-        //                     if (results.length > 0) {
-        //                         console.log("Mail existant pour la classe");
-        //                         res.sendStatus(410)
-        //                     } else {
-        //                         console.log("mdp" + hash)
-        //                         console.log("Mail valide (unique dans la bd)");
-        //                         db.query("INSERT INTO eleve(pseudo, prenom, nom, courriel, motdepasse) VALUES (?, ?, ?, ?, ?)", [pseudo, prenom, nom, email, hash],
-        //                             function (error, results, fields) {
-        //                                 if (error) {
-        //                                     /*if (error.sqlState == '50001') {
-        //                                         console.log("mail existant dans classe ");
-        //                                     } else {
-        //                                         console.log(error)
-        //                                     }*/
-        //                                     console.log(error)
-        //                                 } else {
-        //                                     console.log("création de compte réussie")
-        //                                     res.send(results)
-        //                                 }
-        //                             }
-        //                         );
-        //                     }
-        //                 }
-        //                 );
-        //             }
-        //         }
-        //         );
-        //     }
-        // }
-        // );
     }
     )
 }
@@ -189,40 +143,76 @@ const InscriptionClasse = (req, res) => {
 
     // On vérifie que dans la table classe aucun classe ne possède déjà cet email
     Classe.findOne({ where: { courriel: email } })
-    .then(classe => {
-        if (classe) {
-            console.log("Mail existant pour la classe");
-            res.sendStatus(409)
-        } else {
-            Eleve.findOne({ where: { courriel: email } })
-                .then(eleve => {
-                    if (eleve) {
-                        console.log("Mail existant pour un eleve");
-                        res.sendStatus(411)
-                    } else {
-                        // Hashage du mot de passe
-                        bcrypt.hash(mdp, 10, (err, hash) => {
-                            if (err) {
-                                console.log("erreur hashage mdp classe" + err)
-                            } else {
-                                const newclasse = Classe.create(({
-                                    courriel: email,
-                                    motdepasse: hash
-                                }))
-                                    .then(() => {
-                                        console.log("Création de compte classe réussie")
-                                        res.send(newclasse);
-                                    })
-                                    .catch(err => {
-                                        console.log("erreur inscription classe : " + err)
-                                    })
-                            }
+        .then(classe => {
+            if (classe) {
+                console.log("Mail existant pour la classe");
+                return res.sendStatus(409)
+            } else {
+                Eleve.findOne({ where: { courriel: email } })
+                    .then(eleve => {
+                        if (eleve) {
+                            console.log("Mail existant pour un eleve");
+                            return res.sendStatus(411)
+                        } else {
+                            // Hashage du mot de passe
+                            bcrypt.hash(mdp, 10, (err, hash) => {
+                                if (err) {
+                                    console.log("erreur hashage mdp classe" + err)
+                                    return res.sendStatus(600)
+                                } else {
+                                    const newclasse = Classe.create(({
+                                        courriel: email,
+                                        motdepasse: hash
+                                    }))
+                                        .then((classe) => {
+                                            const num = classe.idclasse;
 
-                        });
-                    }
-                });
-        }
-    });
+                                            console.log("Création de compte classe réussie, idclasse : " + num)
+                                            console.log("*** Création d'un dossier ***")
+                                            //const path ="./test/classe" + num + "/avatar"
+                                            //const path = __dirname+"\\test\\classe" + num + "\\avatar"
+                                            //console.log(path)
+                                            /* fs.access(path.join(__dirname, "test/classe" + num + "/avatar"), (err) => {
+                                                 if (err) {*/
+                                        /*    if (!fs.existsSync(__dirname, "../testclasse")) {
+                                                // ça veut dire qu'aucun dossier n'existe
+                                                // on crée donc le dossier
+                                                fs.mkdirSync(path.join(__dirname, "../testclasse","classe" + num, "avatar" ), (err) => {
+                                                    if (err) {
+                                                        console.log("Erreur lors de la création de dossier test " + err)
+                                                        return res.status(600).send("Erreur lors de la création de dossier")
+                                                    }
+
+                                                },{recursive:true})
+
+                                            }else
+                                            if (!fs.existsSync(__dirname + "../testclasse", "classe" + num)) {
+                                                console.log("YO")
+                                                fs.mkdirSync(path.join(__dirname, "../testclasse/classe" + num, "avatar"), (err) => {
+                                                    console.log("Erreur lors de la création de dossier test " + err)
+                                                    return res.status(600).send("Erreur lors de la création de dossier")
+                                                }, {recursive:true})
+                                            }else if(!fs.existsSync(__dirname + "../testclasse/classe"+num, "avatar")){
+                                                fs.mkdirSync(path.join(__dirname, "../testclasse/classe" + num, "avatar"), (err) => {
+                                                    console.log("Erreur lors de la création de dossier test " + err)
+                                                    return res.status(600).send("Erreur lors de la création de dossier")
+                                                }, {recursive:true})
+                                            }*/
+                                            console.log("dossier crée")
+                                            return res.send(newclasse);
+                                            /*  }
+                                          })*/
+                                        })
+                                        .catch(err => {
+                                            console.log("erreur inscription classe : " + err)
+                                        })
+                                }
+
+                            });
+                        }
+                    });
+            }
+        });
 }
 
 

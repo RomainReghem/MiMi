@@ -26,7 +26,7 @@ const ChangementMdp = (req, res) => {
     }
 
     console.log("mail " + email + " mdp " + mdp + " newMdp " + newMdp)
-    console.log("*** Vérification mot de passe ***")
+    console.log("\n*** Vérification mot de passe ***")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
         res.sendStatus(406)
@@ -130,7 +130,7 @@ const ChangementMail = (req, res) => {
         )
     }
 
-    console.log("*** Vérification mail ***")
+    console.log("\n*** Vérification mail ***")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
         res.sendStatus(406)
@@ -220,7 +220,7 @@ const ChangementMail = (req, res) => {
                                                                             )
                                                                             // on insère dans la liste le nouveau refreshtoken
                                                                             refreshTokens.push(refreshToken);
-                                                                            res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                                            res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                                                                             res.json({ accessToken: accessToken })
                                                                         } else {
                                                                             res.sendStatus(403)

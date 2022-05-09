@@ -19,11 +19,12 @@ const Connexion = (req, res) => {
     if (mdp == "" || pseudo == "") {
         res.sendStatus(402)
     }
-    Eleve.findOne({ where: //Sequelize.or(
-        //{ pseudo: pseudo },
-         { courriel: pseudo }
-         //) 
-        })
+    Eleve.findOne({
+        where: //Sequelize.or(
+            //{ pseudo: pseudo },
+            { courriel: pseudo }
+        //) 
+    })
         .then(eleve => {
             if (eleve) {
                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
@@ -44,8 +45,8 @@ const Connexion = (req, res) => {
                         //console.log("refresh token connexion " + refreshToken)
                         console.log("*** Connexion de l'élève effectuée ***")
 
-                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite:'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                        res.status(200).json({role:"eleve", accessToken: accessToken })
+                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                        res.status(200).json({ role: "eleve", accessToken: accessToken })
                         // si le mot de passe entré correspond bien au mot de passe dans la base de données
                         //res.send(eleve)
                     } else {
@@ -80,8 +81,8 @@ const Connexion = (req, res) => {
                                     refreshTokens.push(refreshToken);
                                     //console.log("refresh token connexion " + refreshToken)
 
-                                    res.cookie('jwt', refreshToken, { httpOnly: true, sameSite:'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                    res.status(201).json({role:"classe", accessToken: accessToken })
+                                    res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                    res.status(201).json({ role: "classe", accessToken: accessToken })
                                     console.log("CONNEXION de la classe OK")
                                     // si le mot de passe entré correspond bien au mot de passe dans la base de données
                                     //res.send(classe)

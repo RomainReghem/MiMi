@@ -1,3 +1,5 @@
+const { Classe } = require('../models/users')
+
 const Class = require('../models/users').Classe
 const Eleve = require('../models/users').Eleve
 
@@ -5,6 +7,7 @@ const getAllStudents = (req, res) =>{
     const mail = req.query.mail
     console.log("yo")
     Class.findAll({
+        attributes:classe.courriel,
         where :{
             courriel:mail
         },
@@ -15,10 +18,10 @@ const getAllStudents = (req, res) =>{
         }]
     }).then(eleves =>{
         for(e in eleves){
-            console.log('élève '+e.courriel)
+            console.log('élève '+e)
         }
        // res.json({students:eleves})
-       res.json({mail:eleves.courriel})
+       res.json({mail:eleves})
     })
 }
 
