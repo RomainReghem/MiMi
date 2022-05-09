@@ -3,12 +3,12 @@ const jwt = require("jsonwebtoken")
 require("dotenv").config();
 
 const verifyJWT = (req, res, next) => {
-    console.log("verification cookie")
+    console.log("\n*** Vérification du token (accessToken) ***")
     for(e in req.headers){
-        console.log("test" +e)
+        console.log("test " +e)
     }
-    console.log(req.accessToken+" cookie "+req.cookie+" autre tesr"+req.header.auth)
-    console.log("requetes"+req.headers['cookie'])
+   /* console.log(req.accessToken+" cookie "+req.cookie+" autre tesr"+req.header.auth)*/
+    console.log("requetes "+req.headers['Authorization'])
     const authHeader = req.headers.authorization || req.headers.Authorization;
     // si l'utilisateur n'est pas autorisé
     if (!authHeader) {

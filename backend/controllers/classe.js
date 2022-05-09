@@ -5,7 +5,6 @@ const getAllStudents = (req, res) =>{
     const mail = req.body.mail
     console.log("yo")
     Class.findAll({
-        attributes:courriel,
         where :{
             courriel:mail
         },
@@ -16,10 +15,10 @@ const getAllStudents = (req, res) =>{
         }]
     }).then(eleves =>{
         for(e in eleves){
-            console.log('élève '+e)
+            console.log('élève '+e.courriel)
         }
        // res.json({students:eleves})
-       res.json(eleves)
+       res.json({mail:eleves.courriel})
     })
 }
 
