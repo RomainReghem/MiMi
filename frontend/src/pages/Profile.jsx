@@ -30,7 +30,7 @@ const Profile = () => {
         } catch (err) { console.log("erreur pseudo"); }
     }
 
-    findPseudo();
+   // findPseudo();
 
     return (
         <>

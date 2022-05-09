@@ -6,6 +6,7 @@ import useAuth from "../hooks/useAuth";
 // Composants
 import Nav from "../components/Nav"
 import RequireAuth from "../components/RequireAuth"
+import { ReactNotifications } from 'react-notifications-component'
 
 // Pages
 import Profile from "./Profile"
@@ -22,11 +23,13 @@ import Tests from "./Tests"
 // Styles
 import '../styles/App.css'
 import '../styles/connexion.css'
-
+import 'react-notifications-component/dist/theme.css'
 
 
 export default function App() {
   return (
+    <>
+    <ReactNotifications />
     <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
       <div className="top-border" />
 
@@ -50,5 +53,7 @@ export default function App() {
 
       </Routes>
     </div>
+
+    </>
   );
 }

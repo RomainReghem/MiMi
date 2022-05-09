@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import axios from "../api/axios";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Users = () => {
@@ -18,8 +19,8 @@ const Users = () => {
                     params:{mail:"test@classe.fr"},
                     signal: controller.signal
                 });
-                console.log(response.data);
-                isMounted && setUsers(response.data);
+                console.log(response.data.eleves);
+                isMounted && setUsers(response.data.eleves);
             } catch (err) {
                 console.error(err);
                 {/*navigate('/login', { state: { from: location }, replace: true });*/}
@@ -40,7 +41,7 @@ const Users = () => {
             {users?.length
                 ? (
                     <ul>
-                        {users.map((user, i) => <li key={i}>{user?.username}</li>)}
+                        {users.map((user, i) => <li key={i}>{user?.courriel}</li>)}
                     </ul>
                 ) : <p>No users to display</p>
             }

@@ -1,12 +1,31 @@
 import { Link } from "react-router-dom";
-import styledComponents from "styled-components";
+import { useState } from "react";
+import axios from "../api/axios";
 import useAuth from "../hooks/useAuth";
 import Avatar, { AvatarFullConfig, genConfig } from 'react-nice-avatar'
 
 
 const Nav = () => {
     const { auth } = useAuth();
-    console.log(auth.avatarconfig);
+    const [pseudo, setPseudo] = useState("Profil");
+
+    const getPseudo = async (e) => {
+            try {
+                const response = await axios.get("/pseudo",
+                    {
+                        params:{mail:auth?.user},
+                        headers: { 'Content-Type': 'application/json' },
+                        withCredentials: true
+                    });
+                setPseudo(response?.data.pseudo)
+                
+    
+            } catch (err) { console.log("erreur pseudo"); }
+    }
+
+    if(auth?.user){
+        getPseudo()
+    }
 
     return (
         <>
@@ -30,7 +49,7 @@ const Nav = () => {
                 <nav className="navNav">
                     <ul>
                         <li>
-                            <Link to="/Profile" className="navNavProfile"><Avatar style={{ width: '3rem', height: '3rem', marginRight:"1rem" }} {...auth?.avatarconfig} /><p>Profil</p></Link>
+                            <Link to="/Profile" className="navNavProfile"><Avatar style={{ width: '3rem', height: '3rem', marginRight:"1rem" }} {...auth?.avatarconfig} /><p>{pseudo}</p></Link>
                         </li>
                         <li>|</li>
                         <li>
