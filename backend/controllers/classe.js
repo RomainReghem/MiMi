@@ -2,7 +2,7 @@ const Class = require('../models/users').Classe
 const Eleve = require('../models/users').Eleve
 
 const getAllStudents = (req, res) =>{
-    const mail = req.body.mail
+    const mail = req.query.mail
     console.log("yo")
     Class.findAll({
         where :{

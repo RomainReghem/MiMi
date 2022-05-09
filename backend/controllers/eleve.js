@@ -1,7 +1,7 @@
 const Eleve = require('../models/users').Eleve
 
 const getUsernameStudent = (req, res) => {
-    const mail = req.body.mail
+    const mail = req.query.mail
  
     if (mail==undefined){
         console.log("pas de mail")

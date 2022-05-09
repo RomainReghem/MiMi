@@ -8,9 +8,23 @@ const jwt = require('jsonwebtoken');
 let refreshTokens = require('./connexion').refreshTokens;
 
 const ChangementMdp = (req, res) => {
-    const email = req.body.mail;
+    let email = req.body.mail;
     const mdp = req.body.pwd;
     const newMdp = req.body.newPwd;
+
+    if (email == "") {
+        console.log("MAIL VIDE")
+        const refreshTokenOld = req.cookies.jwt;
+
+        jwt.verify(
+            refreshTokenOld,
+            process.env.REFRESH_TOKEN_SECRET,
+            (err, decoded) => {
+                email = decoded.mail
+            }
+        )
+    }
+
     console.log("mail " + email + " mdp " + mdp + " newMdp " + newMdp)
     console.log("*** Vérification mot de passe ***")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
@@ -98,11 +112,23 @@ const ChangementMdp = (req, res) => {
 }
 
 const ChangementMail = (req, res) => {
-    const email = req.body.mail;
+    let email = req.body.mail;
     const newEmail = req.body.newMail;
     const mdp = req.body.pwd;
     console.log("email " + email + " new " + newEmail + " mdp " + mdp)
-    // console.log("cookie " + cookie.jwt)
+
+    if (email == "") {
+        console.log("MAIL VIDE")
+        const refreshTokenOld = req.cookies.jwt;
+
+        jwt.verify(
+            refreshTokenOld,
+            process.env.REFRESH_TOKEN_SECRET,
+            (err, decoded) => {
+                email = decoded.mail
+            }
+        )
+    }
 
     console.log("*** Vérification mail ***")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
@@ -141,7 +167,7 @@ const ChangementMail = (req, res) => {
                                             // on vérifie maintenant dans la bd si le mdp donné est bien celui associé au mail
                                             bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                                                 if (estValide) {
-                                                   // console.log("Bon mot de passe de l'élève")
+                                                    console.log("Bon mot de passe de l'élève")
                                                     // on change le mdp
                                                     Eleve.update(
                                                         {
