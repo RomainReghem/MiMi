@@ -11,6 +11,7 @@ const LOGIN_URL = '/login';
 const ChangenewMail = () => {
 
     const { auth } = useAuth();
+    const { setAuth } = useAuth();    
 
     const [mail, setMail] = useState('');
 
@@ -49,6 +50,10 @@ const ChangenewMail = () => {
             console.log(response?.data);
             setPwd('');
             setnewMail('');
+            setAuth({
+                ...auth,
+                user:newMail            
+            });
             console.log("Email changé !");           
 
         } catch (err) {

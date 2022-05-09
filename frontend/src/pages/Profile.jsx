@@ -10,21 +10,22 @@ const PSEUDO_URL = '/pseudo';
 
 const Profile = () => {
 
-    const { auth } = useAuth();
-    // Remettre ça 
+    const { auth, setAuth } = useAuth();
     const role = auth?.role;
     const mail = auth?.user;
-    const pseudo = "";
+    let pseudo = "";
 
 
     const findPseudo = async (e) => {
         try {
-            const response = await axios.get(PSEUDO_URL, JSON.stringify({ mail }),
+            const response = await axios.get(PSEUDO_URL,
                 {
+                    params:{mail:mail},
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            pseudo = response?.data?.pseudo;
+            pseudo = response?.data.pseudo;
+            
 
         } catch (err) { console.log("erreur pseudo"); }
     }

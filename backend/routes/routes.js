@@ -30,7 +30,7 @@ router.post('/changeMail', Modification.ChangementMail)
 //router.post('/changeMail', verifyJWT, Modification.ChangementMail)
 
 // route qui permet de retourner un pseudo à partir du mail
-router.post('/pseudo', Eleve.getUsernameStudent)
+router.get('/pseudo', Eleve.getUsernameStudent)
 // route qui permet de retourner la liste d'emails des eleves d'une classe
 router.get('/eleves', Classe.getAllStudents)
 
