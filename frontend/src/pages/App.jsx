@@ -41,10 +41,10 @@ export default function App() {
           <Route path="/success" element={<Success />} />
 
           <Route element={<RequireAuth />}>
-          </Route>
 
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/documents" element={<Documents />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/documents" element={<Documents />} />
+          </Route>
         </Route>
 
 
