@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import Notifs from '../components/Notifs';
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import useAuth from "../hooks/useAuth";
@@ -23,6 +24,8 @@ const Nav = () => {
     const signOut = async () => {
         await logout();
         navigate('/')
+        Notifs('Déconnexion', '', 'info')
+        
     }
 
     const getPseudo = async (e) => {
@@ -95,21 +98,21 @@ const Nav = () => {
                         </li>
                         <li>|</li>
                         <li>
-                            <Link to="/Documents" >
+                            <Link to="/documents" >
                                 <p className="navText">Documents</p>
                                 <HiOutlineDocumentText size={iconSize} className="navIcon" />
                             </Link>
                         </li>
                         <li>|</li>
                         <li>
-                            <Link to="/Visio" >
+                            <Link to="/visio" >
                                 <p className="navText">Visio</p>
                                 <AiOutlineVideoCamera size={iconSize} className="navIcon" />
                             </Link>
                         </li>
                         <li>|</li>
                         <li>
-                            <Link to="/Jeux" >
+                            <Link to="/jeux" >
                                 <p className="navText">Jeux</p>
                                 <GrGamepad size={iconSize} className="navIcon" />
                             </Link>

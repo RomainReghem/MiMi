@@ -94,3 +94,12 @@
 .navText{
     margin: 0;
 }
+
+
+.construction{
+    display: flex;
+    width: 100%;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}

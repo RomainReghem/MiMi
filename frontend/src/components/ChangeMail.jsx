@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import useAuth from "../hooks/useAuth";
 import axios from '../api/axios';
 import { Store } from 'react-notifications-component';
+import Notifs from '../components/Notifs';
 
 const CHANGEMAIL_URL = '/changeMail';
 const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -52,20 +53,20 @@ const ChangeMail = () => {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 }
-            );
-            
+            );            
             setMail(newMail);
+            Notifs('Mail modifié', 'Votre nouvelle adresse mail est : ' + newMail, 'Danger');
 
         } catch (err) {
             if (!err?.response) {
-                setErrMsg('No Server Response');
+                Notifs('Erreur', 'Pas de réponse du serveur', 'Danger')
             } else if (err.response?.status === 406 || err.response?.status === 407 ) {
-                setErrMsg('Mauvais format de mail, réessayez.');
+                Notifs('Erreur', 'Mauvais format de mail', 'Danger')
             } 
             else if (err.response?.status === 400) {
-                setErrMsg("Mauvais mot de passe");
+                Notifs('Erreur', 'Mauvais mot de passe', 'Danger')
             } else {
-                setErrMsg('Registration Failed')
+                Notifs('Erreur', 'Veuillez réessayer', 'Danger')
             }
             errRef.current.focus();
             return;

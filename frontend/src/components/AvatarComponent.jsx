@@ -1,4 +1,5 @@
 import Avatar, { AvatarFullConfig, genConfig } from 'react-nice-avatar'
+import Notifs from '../components/Notifs';
 import { useState, useEffect } from 'react'
 import axios from '../api/axios';
 import randomColor from "randomcolor";
@@ -105,6 +106,7 @@ const AvatarComponent = () => {
                     withCredentials: true
                 });
             console.log(response?.data)
+            Notifs("Avatar sauvegardé !", "Recharger la page s'il ne s'affiche pas correctement", "Success")
             
 
         } catch (err) { console.log("couldnt save avatar"); }
