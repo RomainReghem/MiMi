@@ -7,6 +7,7 @@ import useAuth from "../hooks/useAuth";
 import Nav from "../components/Nav"
 import RequireAuth from "../components/RequireAuth"
 import { ReactNotifications } from 'react-notifications-component'
+import PersistLogin from "../components/PersistLogin";
 
 // Pages
 import Profile from "./Profile"
@@ -29,30 +30,37 @@ import 'react-notifications-component/dist/theme.css'
 export default function App() {
   return (
     <>
-    <ReactNotifications />
-    <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
-      <div className="top-border" />
+      <ReactNotifications />
+      <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+        <div className="top-border" />
 
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register-student" element={<RegisterStudent />} />
-          <Route path="/register-class" element={<RegisterClass />} />
-          <Route path="/choice" element={<Choice />} />
-          <Route path="/tests" element={<Tests />} />
-          <Route path="/success" element={<Success />} />
+        <Routes>
+          <Route path="/" element={<Layout />}>
 
-          <Route element={<RequireAuth />}>
+            {/* Routes publiques, pas besoin d'être connecté*/}
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register-student" element={<RegisterStudent />} />
+            <Route path="/register-class" element={<RegisterClass />} />
+            <Route path="/choice" element={<Choice />} />
+            <Route path="/tests" element={<Tests />} />
+            <Route path="/success" element={<Success />} />
 
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/documents" element={<Documents />} />
+
+
+            {/* Routes qui nécessitent d'être connecté*/}
+            <Route element={<PersistLogin />}>
+              <Route element={<RequireAuth />}>
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/documents" element={<Documents />} />
+              </Route>
+            </Route>
+
+
+
           </Route>
-        </Route>
-
-
-      </Routes>
-    </div>
+        </Routes>
+      </div>
 
     </>
   );

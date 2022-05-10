@@ -1,5 +1,6 @@
 import Avatar, { AvatarFullConfig, genConfig } from 'react-nice-avatar'
 import { useState, useEffect } from 'react'
+import axios from '../api/axios';
 import randomColor from "randomcolor";
 import useAuth from "../hooks/useAuth";
 import { GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
@@ -19,6 +20,7 @@ const AvatarComponent = () => {
 
     const { auth } = useAuth();
     const { setAuth } = useAuth();
+    let mail = auth?.user;
 
     const shirts = ["hoody", "short", "polo"]
     const glasses = ["none", "round", "square"]
@@ -93,6 +95,18 @@ const AvatarComponent = () => {
         });
     }
 
+    const SaveDB = async (e) => {
+        try {
+            const response = await axios.post("/avatar", JSON.stringify({ mail, config }),
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                });
+            
+
+        } catch (err) { console.log("couldnt save avatar"); }
+    }
+
     const iconSize = 28;
 
 
@@ -122,7 +136,7 @@ const AvatarComponent = () => {
                         </div>
                         <div className="controls-thirdRow">
                             <button className="controls-btn" onClick={RandomC}><GiPerspectiveDiceSixFacesRandom size={iconSize} /> Aléatoire</button>
-                            <button className="controls-btn" onClick={Save}><RiSave3Fill size={iconSize} /> Sauvegarder</button>
+                            <button className="controls-btn" onClick={() => { Save(); SaveDB();}}><RiSave3Fill size={iconSize} /> Sauvegarder</button>
                         </div>
                     </div>
                 </div>

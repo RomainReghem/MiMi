@@ -12,8 +12,7 @@ const LOGIN_URL = '/login';
 const ChangeMail = () => {
 
     const { auth } = useAuth();
-    const { setAuth } = useAuth();   
-    console.log(auth) 
+    const { setAuth } = useAuth();
     
 
     const [mail, setMail] = useState(auth?.user);
@@ -55,7 +54,6 @@ const ChangeMail = () => {
                 }
             );
             
-            console.log(response?.data);
             setMail(newMail);
 
         } catch (err) {
