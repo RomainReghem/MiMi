@@ -29,7 +29,6 @@ const ChangePwd = () => {
 
     useEffect(() => {
         setValidNewPwd(PWD_REGEX.test(newPwd));
-        console.log(validMatch);
         setValidMatch(newPwd === matchPwd);
     }, [newPwd, matchPwd]);
 
@@ -39,7 +38,7 @@ const ChangePwd = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMail(auth?.user);
+        setMail(auth?.accessToken);
         
         
         if (!PWD_REGEX.test(newPwd)) {
@@ -48,7 +47,7 @@ const ChangePwd = () => {
         }
         
         try {
-            console.log("Voici le mail :" + auth?.user)
+            console.log("Voici le mail :" + auth?.accessToken)
             const response = await axios.post(CHANGEPWD_URL,
                 JSON.stringify({ mail, pwd, newPwd }),
                 {
@@ -56,11 +55,10 @@ const ChangePwd = () => {
                     withCredentials: true
                 }
             );
-            console.log(response?.data);
             setPwd('');
             setNewPwd('');
-            setMatchPwd('');
-            console.log("mot de passe changé !");           
+            setMatchPwd('');    
+            console.log("mot de passe changé")  
 
         } catch (err) {
             if (!err?.response) {
