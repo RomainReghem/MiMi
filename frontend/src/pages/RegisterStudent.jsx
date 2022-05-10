@@ -1,5 +1,6 @@
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 import { useRef, useState, useEffect } from 'react';
+import Notifs from '../components/Notifs';
 import axios from '../api/axios'
 
 const USER_REGEX = /^[A-z0-9-_]{3,24}$/;
@@ -81,7 +82,7 @@ const Inscription = () => {
         const v4 = NAME_REGEX.test(name)
         const v5 = NAME_REGEX.test(firstName)
         if (!v1 || !v2 || !v3 || !v4 || !v5) {
-            setErrMsg("Invalid Entry");
+            Notifs('Erreur, réessayez', '', 'Danger');
             return;
         }
 
@@ -105,20 +106,21 @@ const Inscription = () => {
                     from: 2
                 }).toString()
             });
+            Notifs('Inscription réussie', '', 'Success');
 
         } catch (err) {
             if (!err?.response) {
-                setErrMsg('No Server Response');
+                Notifs('Erreur', 'Pas de réponse du serveur', 'Danger');
             } else if (err.response?.status === 409) {
-                setErrMsg('Un compte est déjà associé à cette adresse mail');
+                Notifs('Erreur', 'Un compte est déjà associé à cette adresse mail', 'Danger');
             }
             else if (err.response?.status === 408) {
-                setErrMsg('Le pseudo est déjà pris');
+                Notifs('Erreur', 'Ce pseudo est déjà pris !', 'Danger');
             }
             else if (err.response?.status === 410) {
-                setErrMsg('Ce mail est utilisé par un compte de classe');
+                Notifs('Erreur', 'Un compte de classe est déjà associé à cette adresse mail', 'Danger');
             } else {
-                setErrMsg('Registration Failed')
+                Notifs('Erreur', 'Veuillez réessayer', 'Danger')
             }
             errRef.current.focus();
         }

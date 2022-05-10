@@ -1,4 +1,5 @@
 import { Link, createSearchParams, useNavigate, useLocation } from 'react-router-dom'
+import Notifs from '../components/Notifs';
 import { useRef, useState, useEffect } from 'react';
 import axios from '../api/axios'
 
@@ -24,8 +25,6 @@ const InscriptionClasse = () => {
     const [validMatch, setValidMatch] = useState(false);
     const [matchFocus, setMatchFocus] = useState(false);
 
-    const [errMsg, setErrMsg] = useState('');
-
     useEffect(() => {
         mailRef.current.focus();
     }, [])
@@ -39,10 +38,6 @@ const InscriptionClasse = () => {
         setValidMatch(pwd === matchPwd);
     }, [pwd, matchPwd])
 
-    useEffect(() => {
-        setErrMsg('');
-    }, [pwd, matchPwd])
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -50,7 +45,7 @@ const InscriptionClasse = () => {
         const v2 = MAIL_REGEX.test(mail);
         const v1 = PWD_REGEX.test(pwd);
         if (!v1 || !v2) {
-            setErrMsg("Invalid Entry");
+            Notifs("Erreur, Réessayez.", '', 'Danger');
             return;
         }
         
@@ -73,17 +68,18 @@ const InscriptionClasse = () => {
                     from: 2
                 }).toString()
             });
+            Notifs('Inscription réussie', '', 'Success');
 
         } catch (err) {
             if (!err?.response) {
-                setErrMsg('No Server Response');
+                Notifs('Erreur', 'Pas de réponse du serveur', 'Danger');
             } else if (err.response?.status === 409) {
-                setErrMsg('Un compte est déjà associé à cette adresse mail');
+                Notifs('Erreur', 'Un compte est déjà associé à cette adresse mail', 'Danger');
             } 
             else if (err.response?.status === 411) {
-                setErrMsg("Ce mail est utilisé par un compte d'élève");
+                Notifs('Erreur', "Un compte d'élève est déjà associé à cette adresse mail", 'Danger');
             } else {
-                setErrMsg('Registration Failed')
+                Notifs('Erreur', 'Veuillez réessayer', 'Danger')
             }
             errRef.current.focus();
         }
@@ -93,7 +89,6 @@ const InscriptionClasse = () => {
         <div className="formBody">
             <div className="formContainer">
                 <h2>Enregistrer une classe</h2><p className="infoProfs">Elèves, inscrivez-vous <Link to="/register-student" style={{ color: '#ab9471', display:"inline"}}><b>ici</b>.</Link></p>
-                <p ref={errRef} className={errMsg ? "errmsg" : "hide"} aria-live="assertive">{errMsg}</p>
                 <form onSubmit={handleSubmit}>
                     <input
                             type="text"

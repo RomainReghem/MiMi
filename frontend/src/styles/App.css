@@ -42,17 +42,17 @@
 
 .deconnexion button {
     font-family: Abril Fatface;
-    background-color: #99AABF;
+    background-color: #C05946;
     font-size: 0.9rem;
     padding: 0.7rem 1rem;
     border:none;
-    color:#264040;
+    color:#F2F2F2;
     cursor: pointer;    
-    box-shadow: 1px 1px #264040;
+    box-shadow: 1px 1px #8D1D16;
 }
 
 .deconnexion button:hover{    
-    box-shadow: 2px 2px #264040;
+    box-shadow: 2px 2px #8D1D16;
     transition-duration: 300ms;
     transition-property: box-shadow;
 }
@@ -93,4 +93,13 @@
 
 .navText{
     margin: 0;
+}
+
+
+.construction{
+    display: flex;
+    width: 100%;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
 }

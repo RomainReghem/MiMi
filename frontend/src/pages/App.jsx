@@ -20,6 +20,7 @@ import Home from "./Home"
 import Layout from "./Layout"
 import Success from "./Success"
 import Tests from "./Tests"
+import Construction from "./Construction"
 
 // Styles
 import '../styles/App.css'
@@ -52,7 +53,9 @@ export default function App() {
             <Route element={<PersistLogin />}>
               <Route element={<RequireAuth />}>
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/documents" element={<Documents />} />
+                <Route path="/documents" element={<Construction />} />
+                <Route path="/visio" element={<Construction />} />
+                <Route path="/jeux" element={<Construction />} />
               </Route>
             </Route>
 

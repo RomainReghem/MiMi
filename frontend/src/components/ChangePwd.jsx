@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import useAuth from "../hooks/useAuth";
 import axios from '../api/axios';
+import Notifs from '../components/Notifs';
 
 const CHANGEPWD_URL = '/changePwd';
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
@@ -62,18 +63,18 @@ const ChangePwd = () => {
             setPwd('');
             setNewPwd('');
             setMatchPwd('');    
-            console.log("mot de passe changé")  
+            Notifs('Mot de passe modifié', '', 'Success');
 
         } catch (err) {
             if (!err?.response) {
-                setErrMsg('No Server Response');
+                Notifs('Erreur', 'Pas de réponse du serveur', 'Danger')
             } else if (err.response?.status === 400) {
-                setErrMsg('Mot de passe actuel erroné');
+                Notifs('Erreur', 'Mot de passe actuel erroné', 'Danger')
             } 
             else if (err.response?.status === 404) {
-                setErrMsg("Erreur d'authentification, reconnectez vous");
+                Notifs('Erreur', "Problème d'authentification, reconnectez-vous", 'Danger')
             } else {
-                setErrMsg('Registration Failed')
+                Notifs('Erreur', 'Veuillez réessayer', 'Danger')
             }
         }
     }
