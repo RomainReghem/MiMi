@@ -7,6 +7,12 @@ const jwt = require('jsonwebtoken');
 
 let refreshTokens = require('./connexion').refreshTokens;
 
+/**
+ * Change dans la base de données le mot de passe de l'utilsateur donné.
+ * 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
+ */
 const ChangementMdp = (req, res) => {
     console.log("\n*** Changement de mot de passe ***")
     let test = req.query.mail
@@ -111,9 +117,14 @@ const ChangementMdp = (req, res) => {
                 }
             });
     }
-
 }
 
+/**
+ * Change dans la base de données l'email de l'utilisateur, dont l'ancien email et le mot de passe sont donné.
+ * 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
+ */
 const ChangementMail = (req, res) => {
     console.log("\n*** Changement d'adresse mail ***")
     let email = req.body.mail;
@@ -321,7 +332,7 @@ const ChangementMail = (req, res) => {
                                                                                     // on retire l'ancien refreshtoken de la liste
                                                                                     refreshTokens = refreshTokens.filter((c) => c != refreshTokenOld)
                                                                                     // on crée de nouveaux token 
-                                                                                    console.log("*** Recréation des cookies pour la classe ***")
+                                                                                    console.log("** Recréation des cookies pour la classe **")
                                                                                     // cookie 
                                                                                     const accessToken = jwt.sign(
                                                                                         { "UserInfo": { "mail": newEmail, "role": "classe" } },
@@ -370,6 +381,14 @@ const ChangementMail = (req, res) => {
     }
 }
 
+/**
+ * Change le pseudo de l'élève dans la base de données.
+ * Utilise l'email, l'ancien pseudo et le mot de passe donnés par le client.
+ * Vérifie la validité des informations et le fait que le pseudo soit unique.
+ * 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
+ */
 const ChangementPseudo = (req, res) => {
     const email = req.body.mail;
     const pseudo = req.body.newPseudo;
@@ -437,6 +456,14 @@ const ChangementPseudo = (req, res) => {
     }
 }
 
+/**
+ * Change la préférence de l'élève pour se représenter.
+ * Utilise l'email, la nouvelle préférence et le mot de passe donnés par le client.
+ * Vérifie la validité des informations.
+ * 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
+ */
 const ChangementPreference = (req, res) => {
     console.log("\n*** Changement des préférences d'un élève. ***")
     const email = req.body.mail;
@@ -498,6 +525,42 @@ const ChangementPreference = (req, res) => {
                 }
             })
     }
+}
+
+/**
+ * Change la classe de l'élève.
+ * Utilise l'email fourni par le client pour retrouver la classe correspondante et l'ajouter à l'élève.
+ * Vérifie la validité des informations.
+ * 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
+ */
+const ChangementClasse = (req, res)=>{
+    console.log("\n*** Changement de classe ***")
+    const emailEleve = req.body.mail;
+    const emailClasse = req.body.mailClasse;
+    if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
+        console.log("forme mail élève incorrect")
+        // erreur 400
+        return res.status(407).send("Le mail de l'élève n'est pas de la bonne forme.")
+    }
+    if (!(emailClasse.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailClasse.length) {
+        console.log("forme mail classe incorrect")
+        // erreur 400
+        return res.status(407).send("Le mail fourni de la classe n'est pas de la bonne forme.")
+    }
+
+    Classe.findOne({
+        where:{courriel:emailClasse}
+    }).then(classe=>{
+        if(!classe){
+            console.log("Pas de classe trouvée !")
+            return res.status(404).send("Aucune classe trouvée correspondant à ce mail.")
+        }
+
+    })
+
+
 }
 
 module.exports = { ChangementMdp, ChangementMail, ChangementPseudo, ChangementPreference }

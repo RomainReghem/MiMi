@@ -1,6 +1,7 @@
 const verifyJWT = require('../middleware/verificationJWT.js').verifyJWT
 const Connexion = require('../controllers/connexion.js')
 const Inscription = require('../controllers/inscription.js')
+const Deconnexion = require('../controllers/deconnexion.js')
 const refreshToken = require('../controllers/refreshToken.js')
 const Modification = require('../controllers/modification.js')
 const Document = require('../controllers/document.js')
@@ -10,17 +11,17 @@ const Eleve = require('../controllers/eleve.js')
 const Classe = require('../controllers/classe.js')
 
 const express = require('express')
+const { cp } = require('fs')
 const router = express.Router();
 
 // route de la connexion d'un utilisateur
-//router.post('/login', verifyJWT, Connexion.Connexion);
 router.post('/login', Connexion.Connexion);
 // route de l'inscription d'un eleve
 router.post('/registerStudent', Inscription.InscriptionEleve);
 // route de l'inscription d'une classe
 router.post('/registerClass', Inscription.InscriptionClasse);
 // route pour déconnecter un utilisateur
-router.get('/logout', Connexion.Deconnexion)
+router.get('/logout', Deconnexion)
 // Pour réactualiser les tokens
 router.get('/refresh', refreshToken.refreshToken);
 // Pour changer le mot de passe 
@@ -35,13 +36,16 @@ router.get('/pseudo', Eleve.getUsernameStudent)
 router.get('/eleves', Classe.getAllStudents)
 
 // route pour sauvegarder l'avatar d'un élève
-//router.post('/avatar', Document.saveAvatar)
+ router.post('/avatar', Document.saveAvatar)
 // router pour récupèrer l'avatar
-//router.get('/avatar', Document.getAvatar)
+router.get('/avatar', Document.getAvatar)
 
-// route pour changer le pseudo, seulement pour l'élève
-// router.post('/change', Modification.ChangementPseudo)
+// route pour changer le pseudo : seulement pour l'élève
+// router.post('/changeUsername', Modification.ChangementPseudo)
 // route pour changer les préférences (comment l'élève sera représenté)
-// router.post('/change', Modification.ChangementPreference)
+// router.post('/changePref', Modification.ChangementPreference)
+
+// route pour supprimer l'élève
+// router.delete("/eleve", Eleve.deleteStudent)
 
 module.exports = router;

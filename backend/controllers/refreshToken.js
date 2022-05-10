@@ -1,23 +1,26 @@
-const db = require('../utils/database');
 const connexion = require('./connexion')
 let refreshTokens = connexion.refreshTokens;
 const jwt = require('jsonwebtoken');
 
 require('dotenv').config()
 
+/**
+ * Si l'authentification et l'authorisation sont correctes, remets à jour le token d'accès.
+ * 
+ * @param {*} req la requête du client, contient le mail de l'élève
+ * @param {*} res la réponse du serveur
+ */
 const refreshToken = (req, res) => {
     const cookies = req.cookies;
-    console.log("refresh cookies" + cookies);
     if (!cookies?.jwt) {
         console.log("accès refusé")
         // 401 : authentification raté
-        return res.send("401").status("accès refusé")
+        return res.status(401).send("accès refusé")
     }
     const refreshToken = cookies.jwt;
     if (!refreshTokens.includes(refreshToken)) {
         //token invalide 
-        //return res.send("403").status("accès interdit")
-        return res.sendStatus(403)
+        return res.status(403).send("accès interdit")
     }
     console.log('REFRESH ' + refreshToken)
     jwt.verify(
@@ -25,8 +28,6 @@ const refreshToken = (req, res) => {
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
             if (err || decoded == undefined) {
-                console.log("to")
-                //refreshTokens = refreshTokens.filter((c) => c != refreshToken)
                 console.log(err);
                 // accès interdit
                 res.sendStatus(403);
@@ -45,8 +46,6 @@ const refreshToken = (req, res) => {
             }
         }
     )
-
-
 }
 
 module.exports = { refreshToken };
