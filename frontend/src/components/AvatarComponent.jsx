@@ -82,8 +82,7 @@ const AvatarComponent = () => {
         });
     }
 
-    const Save = (e) => {
-        e.preventDefault();
+    const Save = () => {
         setSavedConfig({
             ...config,
             shape: "circle"
@@ -93,15 +92,19 @@ const AvatarComponent = () => {
             ...auth,
             avatarconfig:config            
         });
+
+        
     }
 
     const SaveDB = async (e) => {
+        console.log(JSON.stringify({ mail, config }))
         try {
-            const response = await axios.post("/avatar", JSON.stringify({ mail, config }),
+            const response = await axios.post("/avatar", JSON.stringify({ mail, avatar:config }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
+            console.log(response?.data)
             
 
         } catch (err) { console.log("couldnt save avatar"); }

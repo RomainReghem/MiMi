@@ -51,8 +51,7 @@ const saveAvatar = (req, res) => {
                 console.error(err);
                 return res.status(600).send("Erreur lors de la création de dossier avatar")
             }
-            // mise en forme du JSON pour son enregistrement
-            avatar = JSON.parse(avatar)
+            // mise en forme du JSON pour son enregistrement            
             avatar = JSON.stringify(avatar)
 
             // on enregistre le fichier JSON correspondant à l'avatar de l'élève
