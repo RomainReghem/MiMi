@@ -1,13 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "../api/axios";
 import useAuth from "../hooks/useAuth";
 import Avatar, { AvatarFullConfig, genConfig } from 'react-nice-avatar'
+import useLogout from "../hooks/useLogout";
 
 
 const Nav = () => {
     const { auth } = useAuth();
     const [pseudo, setPseudo] = useState("Profil");
+
+    const navigate = useNavigate();
+    const logout = useLogout();
+    const signOut = async () => {
+        await logout();
+        navigate('/')
+    }
 
     const getPseudo = async (e) => {
             try {
@@ -62,6 +70,10 @@ const Nav = () => {
                         <li>|</li>
                         <li>
                             Jeux
+                        </li>
+                        <li>|</li>
+                        <li>
+                            <button onClick={signOut}>Déconnexion</button>
                         </li>
                     </ul>
                 </nav>)}

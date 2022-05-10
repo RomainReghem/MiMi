@@ -38,6 +38,7 @@ const ChangePwd = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setMail(auth?.user);
         
         
         if (!PWD_REGEX.test(newPwd)) {
