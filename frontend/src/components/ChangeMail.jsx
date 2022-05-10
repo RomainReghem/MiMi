@@ -55,7 +55,7 @@ const ChangeMail = () => {
                 }
             );            
             setMail(newMail);
-            Notifs('Mail modifié', 'Votre nouvelle adresse mail est : ' + newMail, 'Danger');
+            Notifs('Mail modifié', 'Votre nouvelle adresse mail est : ' + newMail, 'Success');
 
         } catch (err) {
             if (!err?.response) {

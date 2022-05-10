@@ -19,15 +19,10 @@ const Connexion = () => {
 
     const [user, setUser] = useState('');
     const [pwd, setPwd] = useState('');
-    const [errMsg, setErrMsg] = useState('');
 
     useEffect(() => {
         userRef.current.focus();
     }, [])
-
-    useEffect(() => {
-        setErrMsg('');
-    }, [user, pwd])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -59,17 +54,13 @@ const Connexion = () => {
             if (!err?.response) {
                 Notifs("Erreur", "Pas de réponse du serveur", "danger");
             } else if (err.response?.status === 400) {
-                setErrMsg('Mauvais mot de passe');
                 Notifs("Erreur", "Mauvais mot de passe", "danger");
             } else if (err.response?.status === 401) {
-                setErrMsg("Nom d'utilisateur inconnu");
-                Notifs("Erreur", "Nom d'utilisateur inconnu", "danger");
+                Notifs("Erreur", "Adresse mail inconnue", "danger");
             }
             else if (err.response?.status === 402) {
-                setErrMsg("Nom d'utilisateur ou mot de passe manquant");
                 Notifs("Erreur", "Nom d'utilisateur ou mot de passe manquant", "danger");
             } else {
-                setErrMsg('Erreur');
                 Notifs("Erreur", "Erreur", "danger");
             }
 
