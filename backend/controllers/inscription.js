@@ -90,8 +90,93 @@ const InscriptionEleve = (req, res) => {
                                                 nom: nom,
                                                 prenom: prenom
                                             }))
-                                                .then(() => {
-                                                    console.log("Création de compte élève")
+                                                .then((eleve) => {
+                                                    console.log("Création de compte élève réussie")
+                                                    const num = eleve.ideleve
+                                                    const path = "./testeleve/eleve" + num + "/avatar"
+
+
+                                                    console.log("*** Création d'un dossier ***")
+
+                                                    try {
+                                                        if (!fs.existsSync('./testeleve')) {
+                                                            fs.mkdirSync('./testeleve');
+                                                        }
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        return res.status(600).send("Erreur lors de la création de dossier test")
+                                                    }
+
+                                                    try {
+                                                        if (!fs.existsSync('./testeleve/eleve' + num)) {
+                                                            fs.mkdirSync('./testeleve/eleve' + num);
+                                                        }
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        return res.status(600).send("Erreur lors de la création de dossier classe")
+                                                    }
+
+                                                    try {
+                                                        if (!fs.existsSync(path)) {
+                                                            fs.mkdirSync(path);
+                                                        }
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        return res.status(600).send("Erreur lors de la création de dossier avatar")
+                                                    }
+
+                                                    /* let avatar = JSON.stringify({
+                                                             bgColor: "#E0DDFF",
+                                                             earSize: "small",
+                                                             eyeBrowStyle: "up",
+                                                             eyeStyle: "oval",
+                                                             faceColor: "#AC6651",
+                                                             glassesStyle: "none",
+                                                             hairColor: "#000",
+                                                             hairStyle: "thick",
+                                                             hatColor: "#000",
+                                                             hatStyle: "none",
+                                                             mouthStyle: "laugh",
+                                                             noseStyle: "round",
+                                                             shape: "square",
+                                                             shirtColor: "#6BD9E9",
+                                                             shirtStyle: "polo"
+                                                         }
+                                                         )*/
+                                                    // let avatar = '{bgColor: "#E0DDFF", earSize: "small", eyeBrowStyle: "up", eyeStyle: "oval", faceColor: "#AC6651", glassesStyle: "none", hairColor: "#000", hairStyle: "thick", hatColor: "#000", hatStyle: "none", mouthStyle: "laugh", noseStyle: "round", shape: "square", shirtColor: "#6BD9E9", shirtStyle: "polo"}'
+                                                    // enregistrement de l'avatar par défaut
+                                                    let avatar = {
+                                                        bgColor: "#E0DDFF",
+                                                        earSize: "small",
+                                                        eyeBrowStyle: "up",
+                                                        eyeStyle: "oval",
+                                                        faceColor: "#AC6651",
+                                                        glassesStyle: "none",
+                                                        hairColor: "#000",
+                                                        hairStyle: "thick",
+                                                        hatColor: "#000",
+                                                        hatStyle: "none",
+                                                        mouthStyle: "laugh",
+                                                        noseStyle: "round",
+                                                        shape: "square",
+                                                        shirtColor: "#6BD9E9",
+                                                        shirtStyle: "polo"
+                                                    }
+                                                    // avatar=JSON.parse(avatar)
+                                                    //  console.log("\n2."+avatar)
+                                                    avatar = JSON.stringify(avatar)
+
+                                                    console.log("dossiers créés")
+
+                                                    console.log("enregistrement d'un avatar")
+                                                    fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
+                                                        if (err) {
+                                                            console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+                                                            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                                                        }
+                                                        console.log("Le fichier JSON a bien été sauvegardé");
+                                                        //res.status(201).send("Enregistrement effectué");
+                                                    });
                                                     res.send(neweleve);
                                                 })
                                                 .catch(err => {
@@ -174,31 +259,55 @@ const InscriptionClasse = (req, res) => {
                                             //console.log(path)
                                             /* fs.access(path.join(__dirname, "test/classe" + num + "/avatar"), (err) => {
                                                  if (err) {*/
-                                        /*    if (!fs.existsSync(__dirname, "../testclasse")) {
-                                                // ça veut dire qu'aucun dossier n'existe
-                                                // on crée donc le dossier
-                                                fs.mkdirSync(path.join(__dirname, "../testclasse","classe" + num, "avatar" ), (err) => {
-                                                    if (err) {
-                                                        console.log("Erreur lors de la création de dossier test " + err)
-                                                        return res.status(600).send("Erreur lors de la création de dossier")
-                                                    }
+                                            /*  if (!fs.existsSync(__dirname, "../testclasse")) {
+                                                  // ça veut dire qu'aucun dossier n'existe
+                                                  // on crée donc le dossier
+                                                  fs.mkdirSync(path.join(__dirname, "../testclasse", "classe" + num, "avatar"), (err) => {
+                                                      if (err) {
+                                                          console.log("Erreur lors de la création de dossier test " + err)
+                                                          return res.status(600).send("Erreur lors de la création de dossier")
+                                                      }
+  
+                                                  }, { recursive: true })
+  
+                                              } else if (!fs.existsSync(__dirname + "../testclasse", "classe" + num)) {
+                                                  console.log("YO")
+                                                  fs.mkdirSync(path.join("./../testclasse", "classe" + num, "avatar"), (err) => {
+                                                      console.log("Erreur lors de la création de dossier classe " + err)
+                                                      return res.status(600).send("Erreur lors de la création de dossier")
+                                                  }, { recursive: true })
+  
+                                              } else if (!fs.existsSync(__dirname + "../testclasse/classe" + num, "avatar")) {
+                                                  fs.mkdirSync(path.join("./../testclasse/classe" + num, "avatar"), (err) => {
+                                                      console.log("Erreur lors de la création de dossier avatar " + err)
+                                                      return res.status(600).send("Erreur lors de la création de dossier")
+                                                  }, { recursive: true })
+                                              }*/
 
-                                                },{recursive:true})
+                                            /*fs.mkdir('./../testclasse/classe' + num + '/avatar', { recursive: true }, (err) => {
+                                                console.log("error occurred in creating new directory", err);
+                                                return res.status(600).send("Erreur lors de la création de dossier")
+                                            })*/
 
-                                            }else
-                                            if (!fs.existsSync(__dirname + "../testclasse", "classe" + num)) {
-                                                console.log("YO")
-                                                fs.mkdirSync(path.join(__dirname, "../testclasse/classe" + num, "avatar"), (err) => {
-                                                    console.log("Erreur lors de la création de dossier test " + err)
-                                                    return res.status(600).send("Erreur lors de la création de dossier")
-                                                }, {recursive:true})
-                                            }else if(!fs.existsSync(__dirname + "../testclasse/classe"+num, "avatar")){
-                                                fs.mkdirSync(path.join(__dirname, "../testclasse/classe" + num, "avatar"), (err) => {
-                                                    console.log("Erreur lors de la création de dossier test " + err)
-                                                    return res.status(600).send("Erreur lors de la création de dossier")
-                                                }, {recursive:true})
-                                            }*/
-                                            console.log("dossier crée")
+                                            console.log("\n*** Création des dossiers ***")
+
+                                            try {
+                                                if (!fs.existsSync('./testclasse')) {
+                                                    fs.mkdirSync('./testclasse');
+                                                }
+                                            } catch (err) {
+                                                console.error(err);
+                                                return res.status(600).send("Erreur lors de la création de dossier test")
+                                            }
+                                            try {
+                                                if (!fs.existsSync('./testclasse/classe' + num)) {
+                                                    fs.mkdirSync('./testclasse/classe' + num);
+                                                }
+                                            } catch (err) {
+                                                console.error(err);
+                                                return res.status(600).send("Erreur lors de la création de dossier classe")
+                                            }
+
                                             return res.send(newclasse);
                                             /*  }
                                           })*/

@@ -3,7 +3,7 @@ const Eleve = require('../models/users').Eleve
 const fs = require('fs');
 
 const saveAvatar = (req, res) => {
-    const avatar = req.body.avatar;
+    let avatar = req.body.avatar;
     const email = req.body.mail;
     Eleve.findOne({
         where:
@@ -15,9 +15,9 @@ const saveAvatar = (req, res) => {
                 return res.status(404).send("Élève pas trouvé")
             }
             const num = eleve.ideleve;
-            const path = "./eleve" + num + "/avatar"
+           // const path = "./testeleve/eleve" + num + "/avatar"
             // d'abord on essaie d'accèder au dossier où est sauvegardé l'avatar de l'élève
-            fs.access(path, (err) => {
+           /* fs.access(path, (err) => {
                 if (err) {
                     // ça veut dire qu'aucun dossier n'existe
                     // on crée donc le dossier
@@ -30,7 +30,38 @@ const saveAvatar = (req, res) => {
 
                     })
                 }
-            })
+            })*/
+            // Création des dossiers si nécessaire
+            try {
+                if (!fs.existsSync('./testeleve')) {
+                    fs.mkdirSync('./testeleve');
+                }
+            } catch (err) {
+                console.error(err);
+                return res.status(600).send("Erreur lors de la création de dossier test")
+            }
+
+            try {
+                if (!fs.existsSync('./testeleve/eleve' + num)) {
+                    fs.mkdirSync('./testeleve/eleve' + num);
+                }
+            } catch (err) {
+                console.error(err);
+                return res.status(600).send("Erreur lors de la création de dossier classe")
+            }
+
+            try {
+                if (!fs.existsSync('./testeleve/eleve' + num + "/avatar")) {
+                    fs.mkdirSync('./testeleve/eleve' + num + "/avatar");
+                }
+            } catch (err) {
+                console.error(err);
+                return res.status(600).send("Erreur lors de la création de dossier avatar")
+            }
+            // mise en forme du JSON pour son enregistrement
+            avatar = JSON.parse(avatar)
+            avatar = JSON.stringify(avatar)
+
              // on enregistre le fichier JSON correspondant à l'avatar de l'élève
              fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
                 if (err) {
@@ -56,7 +87,7 @@ const getAvatar = (req, res) => {
                 return res.status(404).send("Élève pas trouvé")
             }
             const num = eleve.ideleve;
-            const path = "./eleve" + num + "/avatar/avatar"+num+".json"
+            const path = "./testeleve/eleve" + num + "/avatar/avatar"+num+".json"
             fs.readFile(path, 'utf-80', function(err, avatar){
                 if(err){
                     console.log('erreur lors de la récupération de l\'avatar')

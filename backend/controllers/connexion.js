@@ -34,12 +34,12 @@ const Connexion = (req, res) => {
                         const accessToken = jwt.sign(
                             { "UserInfo": { "mail": eleve.courriel, "role": "eleve" } },
                             process.env.ACCESS_TOKEN_SECRET,
-                            { expiresIn: '10m' }
+                            { expiresIn: '30s' }
                         );
                         const refreshToken = jwt.sign(
                             { "mail": eleve.courriel, "role": "eleve" },
                             process.env.REFRESH_TOKEN_SECRET,
-                            { expiresIn: '30m' }
+                            { expiresIn: '1d' }
                         )
                         refreshTokens.push(refreshToken);
                         //console.log("refresh token connexion " + refreshToken)

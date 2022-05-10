@@ -8,11 +8,13 @@ const jwt = require('jsonwebtoken');
 let refreshTokens = require('./connexion').refreshTokens;
 
 const ChangementMdp = (req, res) => {
+    console.log("\n*** Changement de mot de passe ***")
+    let test = req.query.mail
     let email = req.body.mail;
     const mdp = req.body.pwd;
     const newMdp = req.body.newPwd;
 
-    if (email == "") {
+    /*if (email == "") {
         console.log("MAIL VIDE")
         const refreshTokenOld = req.cookies.jwt;
 
@@ -23,10 +25,10 @@ const ChangementMdp = (req, res) => {
                 email = decoded.mail
             }
         )
-    }
+    }*/
 
-    console.log("mail " + email + " mdp " + mdp + " newMdp " + newMdp)
-    console.log("\n*** Vérification mot de passe ***")
+    console.log("mail " + email + " mdp " + mdp + " newMdp " + newMdp + " param " + test)
+    console.log("** Vérification mot de passe **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
         res.sendStatus(406)
@@ -37,6 +39,7 @@ const ChangementMdp = (req, res) => {
         console.log("forme mail incorrect")
         res.sendStatus(407)
     } else if (mdp == newMdp) {
+        console.log("Mot de passe inchangé !")
         res.send("406").status("Mot de passe inchangé !")
     } else {
         // on cherche un eleve qui a le mail donné
@@ -112,25 +115,26 @@ const ChangementMdp = (req, res) => {
 }
 
 const ChangementMail = (req, res) => {
+    console.log("\n*** Changement d'adresse mail ***")
     let email = req.body.mail;
     const newEmail = req.body.newMail;
     const mdp = req.body.pwd;
     console.log("email " + email + " new " + newEmail + " mdp " + mdp)
 
-    if (email == "") {
-        console.log("MAIL VIDE")
-        const refreshTokenOld = req.cookies.jwt;
+    /* if (email == "") {
+         console.log("MAIL VIDE")
+         const refreshTokenOld = req.cookies.jwt;
+ 
+         jwt.verify(
+             refreshTokenOld,
+             process.env.REFRESH_TOKEN_SECRET,
+             (err, decoded) => {
+                 email = decoded.mail
+             }
+         )
+     }*/
 
-        jwt.verify(
-            refreshTokenOld,
-            process.env.REFRESH_TOKEN_SECRET,
-            (err, decoded) => {
-                email = decoded.mail
-            }
-        )
-    }
-
-    console.log("\n*** Vérification mail ***")
+    console.log("** Vérification mail **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
         res.sendStatus(406)
@@ -157,7 +161,7 @@ const ChangementMail = (req, res) => {
                                 console.log("Mail pas unique");
                                 res.sendStatus(409)
                             } else {
-                               // console.log("mail unique pour eleves");
+                                // console.log("mail unique pour eleves");
                                 Classe.findOne({ where: { courriel: newEmail } })
                                     .then(classe => {
                                         if (classe) {
@@ -178,7 +182,7 @@ const ChangementMail = (req, res) => {
                                                         }
                                                     ).then(newEleve => {
                                                         if (newEleve) {
-                                                            console.log("Pas besoin de modification du mail de l'eleve")
+                                                            console.log("Changement de mail ok")
                                                             // Comme on a changé l'adresse mail, on doit aussi changer les tokens
                                                             const cookies = req.cookies;
                                                             //console.log("refresh cookies" + cookies.jwt);
@@ -209,7 +213,7 @@ const ChangementMail = (req, res) => {
                                                                             console.log("*** Recréation des cookies pour l'élève ***")
                                                                             // cookie 
                                                                             const accessToken = jwt.sign(
-                                                                                { "mail": newEmail, "role": "eleve" },
+                                                                                { "UserInfo": { "mail": newEmail, "role": "eleve" } },
                                                                                 process.env.ACCESS_TOKEN_SECRET,
                                                                                 { expiresIn: '10m' }
                                                                             );
@@ -278,7 +282,7 @@ const ChangementMail = (req, res) => {
                                                     bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {
                                                         if (estValide) {
                                                             console.log("Bon mot de passe de la classe")
-                                                            // on change le mdp
+                                                            // on change le mail
                                                             // si le mot de passe entré correspond bien au mot de passe dans la base de données
                                                             Classe.update(
                                                                 {
@@ -289,17 +293,66 @@ const ChangementMail = (req, res) => {
                                                                 }
                                                             ).then(async newclasse => {
                                                                 if (newclasse) {
-                                                                    console.log("update ok : " + newclasse + newclasse.courriel)
+                                                                    console.log("update ok : " + newclasse.idclasse + newclasse.courriel)
+                                                                    // console.log("\n*** Recréation des tokens ***")
+                                                                    const cookies = req.cookies;
+                                                                    //console.log("refresh cookies" + cookies.jwt);
+                                                                    if (!cookies?.jwt) {
+                                                                        console.log("accès refusé")
+                                                                        // 401 : authentification raté
+                                                                        return res.status(401).send("Accès refusé : authentification requise")
+                                                                    }
+                                                                    const refreshTokenOld = cookies.jwt;
+                                                                    if (!refreshTokens.includes(refreshTokenOld)) {
+                                                                        //token invalide 
+                                                                        return res.status(403).send("Accès interdit : autorisation nécessaire")
+                                                                    }
+                                                                    jwt.verify(
+                                                                        refreshTokenOld,
+                                                                        process.env.REFRESH_TOKEN_SECRET,
+                                                                        (err, decoded) => {
+                                                                            if (err) {
+                                                                                //refreshTokens = refreshTokens.filter((c) => c != refreshToken)
+                                                                                console.log(err);
+                                                                                // accès interdit
+                                                                                res.sendStatus(403);
+                                                                            } else {
+                                                                                if (decoded.mail == email) {
+                                                                                    // on retire l'ancien refreshtoken de la liste
+                                                                                    refreshTokens = refreshTokens.filter((c) => c != refreshTokenOld)
+                                                                                    // on crée de nouveaux token 
+                                                                                    console.log("*** Recréation des cookies pour la classe ***")
+                                                                                    // cookie 
+                                                                                    const accessToken = jwt.sign(
+                                                                                        { "UserInfo": { "mail": newEmail, "role": "classe" } },
+                                                                                        process.env.ACCESS_TOKEN_SECRET,
+                                                                                        { expiresIn: '10m' }
+                                                                                    );
+                                                                                    const refreshToken = jwt.sign(
+                                                                                        { "mail": newEmail, "role": "classe" },
+                                                                                        process.env.REFRESH_TOKEN_SECRET,
+                                                                                        { expiresIn: '1d' }
+                                                                                    )
+                                                                                    // on insère dans la liste le nouveau refreshtoken
+                                                                                    refreshTokens.push(refreshToken);
+                                                                                    res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                                                    res.json({ accessToken: accessToken })
+                                                                                } else {
+                                                                                    res.sendStatus(403)
+                                                                                }
+
+                                                                            }
+                                                                        }
+                                                                    )
+
                                                                     // on envoie la nouvelle classe 
-                                                                    res.status(201).send("update ok")
+                                                                    // res.status(201).send("update ok")
                                                                 } else {
                                                                     res.status(500).send("non défini")
                                                                 }
                                                             })
                                                                 .catch(err => {
-                                                                    res.status(500).send({
-                                                                        message: "Error updating Tutorial with id=" + id
-                                                                    });
+                                                                    res.status(500).send("Erreur " + err);
                                                                 });
 
                                                         } else {
@@ -368,7 +421,7 @@ const ChangementPseudo = (req, res) => {
 
                                             }).catch(err => {
                                                 console.log(err)
-                                                res.status(520).send("Erreur lors de la modification de pseudo.")
+                                                res.status(500).send("Erreur lors de la modification de pseudo.")
                                             })
                                         }
                                     });
@@ -385,30 +438,34 @@ const ChangementPseudo = (req, res) => {
 }
 
 const ChangementPreference = (req, res) => {
+    console.log("\n*** Changement des préférences d'un élève. ***")
     const email = req.body.mail;
     const pseudo = req.body.newPseudo;
     const preference = req.body.pref;
 
-    console.log("\n*** Vérification pseudo ***")
+    console.log("** Vérification pseudo **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
+        // erreur 400
         res.sendStatus(406)
     } else if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
+        // erreur 400
         res.sendStatus(407)
     } else if (preference != "photo" || preference != "camera" || preference != "avatar") {
         console.log("Pref pas dans les valeurs possibles (photo, camera ou avatar)")
+        // erreur 400
         res.status(413).send("Préférence incorrecte.")
     } else {
         console.log("Tout est bon pour la modification de préférences")
         Eleve.findOne({ where: { courriel: email } })
             .then(eleveToChange => {
                 if (!eleveToChange) {
+                    // erreur 404
                     res.status(401).send("Eleve pas trouvé")
                 } else {
                     // si la preference n'a pas changé, on ne change rien
                     if (eleveToChange.preference != preference) {
-
                         bcrypt.compare(mdp, eleveToChange.motdepasse, function (err, estValide) {
                             if (err) {
                                 res.status(500).send("erreur lors du hashage")
@@ -430,7 +487,7 @@ const ChangementPreference = (req, res) => {
 
                                 }).catch(err => {
                                     console.log(err)
-                                    res.status(520).send("Erreur lors de la modification de préférence.")
+                                    res.status(500).send("Erreur lors de la modification de préférence.")
                                 })
                             }
                         });
@@ -441,11 +498,6 @@ const ChangementPreference = (req, res) => {
                 }
             })
     }
-}
-
-const ChangementAvatar = (req, res) => {
-    const email = req.body.mail;
-    const avatar = req.body.avatar;
 }
 
 module.exports = { ChangementMdp, ChangementMail, ChangementPseudo, ChangementPreference }

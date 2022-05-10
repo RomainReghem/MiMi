@@ -26,4 +26,6 @@ yarn-error.log*
 # fichier souvenir
 ancienindex.js
 
+# stockage des documents
 /testclasse
+/testeleve
