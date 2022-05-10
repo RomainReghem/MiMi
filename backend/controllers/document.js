@@ -2,6 +2,18 @@ const Eleve = require('../models/users').Eleve
 
 const fs = require('fs');
 
+const {Storage} = require('@google-cloud/storage');
+
+const google_cloud_project_id = "oceanic-cacao-348707";
+const google_cloud_keyfile = "./oceanic-cacao-348707-bcb3c919f769.json";
+
+const storage = new Storage({
+    projectId: google_cloud_project_id,
+    keyFilename: google_cloud_keyfile,
+});
+
+const bucket = storage.bucket("bucket_projet_mimi");
+
 /**
  * Sauvegarde l'avatar de l'élève dont le mail est donné.
  * Crée les dossiers nécessaires s'ils n'existent pas.
@@ -26,43 +38,57 @@ const saveAvatar = (req, res) => {
 
             // Création des dossiers quand n'existent pas
             try {
-                if (!fs.existsSync('./testeleve')) {
-                    fs.mkdirSync('./testeleve');
-                }
-            } catch (err) {
-                console.error(err);
-                return res.status(600).send("Erreur lors de la création de dossier test")
-            }
-
-            try {
-                if (!fs.existsSync('./testeleve/eleve' + num)) {
-                    fs.mkdirSync('./testeleve/eleve' + num);
-                }
-            } catch (err) {
-                console.error(err);
-                return res.status(600).send("Erreur lors de la création de dossier classe")
-            }
-
-            try {
-                if (!fs.existsSync('./testeleve/eleve' + num + "/avatar")) {
-                    fs.mkdirSync('./testeleve/eleve' + num + "/avatar");
-                }
-            } catch (err) {
-                console.error(err);
-                return res.status(600).send("Erreur lors de la création de dossier avatar")
-            }
+                 if (!fs.existsSync('./testeleve')) {
+                     fs.mkdirSync('./testeleve');
+                 }
+             } catch (err) {
+                 console.error(err);
+                 return res.status(600).send("Erreur lors de la création de dossier test")
+             }
+ 
+             try {
+                 if (!fs.existsSync('./testeleve/eleve' + num)) {
+                     fs.mkdirSync('./testeleve/eleve' + num);
+                 }
+             } catch (err) {
+                 console.error(err);
+                 return res.status(600).send("Erreur lors de la création de dossier classe")
+             }
+ 
+             try {
+                 if (!fs.existsSync('./testeleve/eleve' + num + "/avatar")) {
+                     fs.mkdirSync('./testeleve/eleve' + num + "/avatar");
+                 }
+             } catch (err) {
+                 console.error(err);
+                 return res.status(600).send("Erreur lors de la création de dossier avatar")
+             }
             // mise en forme du JSON pour son enregistrement            
             avatar = JSON.stringify(avatar)
 
-            // on enregistre le fichier JSON correspondant à l'avatar de l'élève
-            fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
+    // on enregistre le fichier JSON correspondant à l'avatar de l'élève
+    fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
+        if (err) {
+            console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+        }
+        //console.log("Le fichier JSON a bien été sauvegardé");
+        //res.status(201).send("Enregistrement effectué");
+    });
+
+            bucket.upload(path + "/avatar" + num + ".json", { destination: "testeleve/eleve" + num + "/avatar"+num+".json"}, function (err, file) {
                 if (err) {
-                    console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
-                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                    console.log("erreur sauvegarde " + err)
+                    return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
+                }else{
+                    //storage.bucket(bucket_projet_mimi).file("avatar" + num + ".json").makePublic();
+            console.log("Le fichier JSON a bien été sauvegardé");
+            res.status(201).send("Enregistrement effectué");
                 }
-                console.log("Le fichier JSON a bien été sauvegardé");
-                res.status(201).send("Enregistrement effectué");
-            });
+              
+            })
+            
+        
 
         });
 }
@@ -109,7 +135,8 @@ const saveCoursEleve = (req, res) => {
     //pour l'eleve
     const matiere = req.body.cours;
     const mail = req.body.mail;
-    const doc = req.body.doc;
+    const doc = req.files.file;
+    const nom = doc.name;
 
     Eleve.findOne({
         where: { courriel: email }
@@ -155,10 +182,10 @@ const saveCoursEleve = (req, res) => {
                 }
             } catch (err) {
                 console.error(err);
-                return res.status(600).send("Erreur lors de la création de dossier pour la matiere "+matiere)
+                return res.status(600).send("Erreur lors de la création de dossier pour la matiere " + matiere)
             }
 
-            fs.writeFile(path, doc, 'utf8', function (err) {
+            fs.writeFile(path + "/" + nom, doc, 'utf8', function (err) {
                 if (err) {
                     console.log("Erreur lors de l'enregistrement du document : " + err);
                     return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")

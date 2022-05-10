@@ -557,6 +557,31 @@ const ChangementClasse = (req, res)=>{
             console.log("Pas de classe trouvée !")
             return res.status(404).send("Aucune classe trouvée correspondant à ce mail.")
         }
+        Eleve.findOne({
+            where:{courriel:emailEleve}
+        }).then(eleve=>{
+            console.log("Début modification ")
+            if(eleve.idclasse==classe.idclasse){
+                console.log("classe déjà enregistrée")
+                return res.status(204).send("Cet élève est déjà enregistré avec cet classe.")
+            }
+            Eleve.update(
+                {
+                    idclasse: classe.idclasse,
+                },
+                {
+                    where: { ideleve: eleve.ideleve },
+                }
+            ).then(newEleve => {
+                if (newEleve) {
+                    //res.sendStatus(201)
+                    console.log("Modification de la classe réussie")
+                    res.status(201).send("Modification de classe réussie.")
+                } else {
+                    res.status(520).send("Aucun élève modifié.")
+                }
+            })
+        })
 
     })
 
