@@ -38,7 +38,7 @@ const ChangePwd = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMail(auth?.accessToken);
+        setMail(auth?.user);
         
         
         if (!PWD_REGEX.test(newPwd)) {
@@ -47,12 +47,16 @@ const ChangePwd = () => {
         }
         
         try {
-            console.log("Voici le mail :" + auth?.accessToken)
+            console.log("Voici le mail :" + auth?.user)
             const response = await axios.post(CHANGEPWD_URL,
                 JSON.stringify({ mail, pwd, newPwd }),
                 {
+                    params:{
+                        mail:mail
+                    },
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
+
                 }
             );
             setPwd('');
