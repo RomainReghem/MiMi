@@ -87,7 +87,7 @@ const getAvatar = (req, res) => {
             }
             const num = eleve.ideleve;
             const path = "./testeleve/eleve" + num + "/avatar/avatar" + num + ".json"
-            fs.readFile(path, 'utf-80', function (err, avatar) {
+            fs.readFile(path, 'utf-8', function (err, avatar) {
                 if (err) {
                     console.log('erreur lors de la récupération de l\'avatar')
                     return res.status(600).send("Problème de lecture de l'avatar.")
