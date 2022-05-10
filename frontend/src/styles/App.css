@@ -6,6 +6,7 @@
 
 .navNav ul {
     display: flex;
+    justify-content: flex-start;
     width: 100%;
 }
 
@@ -21,13 +22,11 @@
     flex-shrink: 1;
     flex-basis: auto;
     align-items: center;
-    margin-right: 1.5rem;
 }
 
 .navNav {
     width: 100%;
     display: flex;
-    flex-direction: row;
     align-items: center;
     height: 5rem;
     font-family: Abril Fatface;
@@ -35,6 +34,27 @@
     border-bottom: 5px solid #ffc3ae;
     font-size: 1em;
 
+}
+
+.deconnexion{
+    margin-left: auto;
+}
+
+.deconnexion button {
+    font-family: Abril Fatface;
+    background-color: #99AABF;
+    font-size: 0.9rem;
+    padding: 0.7rem 1rem;
+    border:none;
+    color:#264040;
+    cursor: pointer;    
+    box-shadow: 1px 1px #264040;
+}
+
+.deconnexion button:hover{    
+    box-shadow: 2px 2px #264040;
+    transition-duration: 300ms;
+    transition-property: box-shadow;
 }
 
 .navNav a {
@@ -47,4 +67,30 @@
     background: transparent;
     color: var(--white);
     border: none;
+}
+
+@media screen and (max-width: 650px) {
+    .navText{
+        display: none;
+    }
+    .navNav li {
+        margin-right: 0.9rem;
+    }
+  }
+
+@media screen and (min-width:650px){
+    .navIcon{
+        display: none;
+    }
+    .navNav li {
+        margin-right: 1.2rem;
+    }
+}
+
+.pseudo{
+    align-self: center;
+}
+
+.navText{
+    margin: 0;
 }
