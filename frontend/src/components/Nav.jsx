@@ -93,7 +93,7 @@ const Nav = () => {
             ) : (
                 <nav className="navNav">
                     <ul>
-                        <li style={{background:avatar.bgColor, marginRight:"0rem", paddingRight:"1.2rem" }}>
+                        <li style={{background:avatar?.bgColor, marginRight:"0rem", paddingRight:"1.2rem" }}>
                             <Link to="/Profile" className="navNavProfile"><Avatar style={{ width: '3rem', height: '3rem', marginRight: "1rem" }} {...avatar} />
                                 <p className="navText pseudo">{pseudo}</p></Link>
                         </li>

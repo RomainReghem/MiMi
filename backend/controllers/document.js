@@ -76,7 +76,7 @@ const saveAvatar = (req, res) => {
         //res.status(201).send("Enregistrement effectué");
     });
 
-            bucket.upload(path + "/avatar" + num + ".json", { destination: "testeleve/eleve" + num + "/avatar"+num+".json"}, function (err, file) {
+            bucket.upload(path + "/avatar" + num + ".json", { destination: "testeleve/eleve" + num + "/avatar"+num+".json"}, function (err, avatar) {
                 if (err) {
                     console.log("erreur sauvegarde " + err)
                     return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
