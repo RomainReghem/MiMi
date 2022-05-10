@@ -10,7 +10,7 @@ const ChangePwd = () => {
 
     const { auth } = useAuth();
 
-    const [mail, setMail] = useState('');
+    const [mail, setMail] = useState(auth?.user);
 
     const [pwd, setPwd] = useState('');
     const [validPwd, setValidPwd] = useState(false);
@@ -38,7 +38,6 @@ const ChangePwd = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMail(auth?.user);
         
         
         if (!PWD_REGEX.test(newPwd)) {
