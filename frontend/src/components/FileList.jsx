@@ -7,7 +7,7 @@ const FileList = () => {
 
     const { auth } = useAuth();
 
-    useEffect(() => {
+    /*useEffect(() => {
         loadFiles()
     }, [])
 
@@ -20,10 +20,27 @@ const FileList = () => {
         } catch (error) {
             console.log(error)
         }
-    }
+    }*/
 
         return (
             <div className="fileList">
+                <div className="file">Maths</div>
+                <div className="file">Fr</div>
+                <div className="file">Géo</div>
+                <div className="file">Maths</div>
+                <div className="file">Fr</div>
+                <div className="file">Géo</div>
+                <div className="file">Maths</div>
+                <div className="file">Fr</div>
+                <div className="file">Géo</div>
+                <div className="file">Maths</div>
+                <div className="file">Fr</div>
+                <div className="file">Géo</div>
+                <div className="file">Fr</div>
+                <div className="file">Géo</div>
+                <div className="file">Maths</div>
+                <div className="file">Fr</div>
+                <div className="file">Géo</div>
                 <div className="file">Maths</div>
                 <div className="file">Fr</div>
                 <div className="file">Géo</div>

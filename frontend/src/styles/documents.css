@@ -4,7 +4,7 @@
     flex-shrink: 1;
     flex-basis: auto;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
     width: 100%;
 }
@@ -13,38 +13,49 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width:18.3rem;
+    justify-content: flex-end;
+    width: 18.3rem;
 }
 
-.fileUploadFormContainer{
+.fileViewer{
+    display: flex;
+    height: 34rem;
+    overflow-y: scroll;
+    overflow-x:hidden;
+}
+
+.fileUploadFormContainer {
     margin-top: 0.3rem;
     display: flex;
     width: 100%;
     align-items: flex-start;
 }
 
-.fileForm{
+.fileForm {
     display: flex;
-    width:100%;
+    width: 100%;
 }
 
-.fileInput{
+.fileInput {
     display: none;
 }
 
-.fileLabel:hover, .fileSendButton:hover{
+.fileLabel:hover,
+.fileSendButton:hover {
     background-color: #024959;
-    
+
     transition-duration: 500ms;
     transition-property: background-color;
 }
 
-.fileLabel p, .fileSendButton p{
+.fileLabel p,
+.fileSendButton p {
     display: inline;
     margin-left: 0.5rem;
 }
 
-.fileSendButton, .fileLabel{
+.fileSendButton,
+.fileLabel {
     color: #F2E3D5;
     display: block;
     background-color: #012E40;
@@ -52,37 +63,67 @@
     font-size: 0.9rem;
     padding: 0.8rem 0rem;
     cursor: pointer;
-    border:none;
+    border: none;
 }
 
-.fileLabel{
-    width:11rem;
+.fileLabel {
+    width: 11rem;
     margin-right: 0.3rem;
     text-align: center;
 }
 
-.fileSendButton{
-    width:7rem;
+.fileSendButton {
+    width: 7rem;
 }
 
-.file{
+.file {
     background-color: #3CA6A6;
-    border:1px solid #3CA6A6;
+    border: 1px solid #3CA6A6;
     text-decoration: none;
-    width:16.2rem;
+    width: 15.7rem;
     padding: 0.8rem 1rem;
     margin-bottom: 0.3rem;
     cursor: pointer;
 }
 
-.file:hover{
-    border:1px solid black;
+.file:hover {
+    border: 1px solid black;
 
 }
 
-.fileList{
+.fileList {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    width:100%;
+    overflow-y:scroll;
+    overflow-x: hidden;
+    width: 18.3rem;
+    max-height: 30rem;
+}
+
+/* width */
+.fileList::-webkit-scrollbar, .fileViewer::-webkit-scrollbar {
+    width: 0.3rem;
+}
+
+/* Track */
+.fileList::-webkit-scrollbar-track {
+}
+
+/* Handle */
+.fileList::-webkit-scrollbar-thumb, .fileViewer::-webkit-scrollbar-thumb {
+    background: #012E40;
+}
+
+/* Handle on hover */
+.fileList::-webkit-scrollbar-thumb:hover, .fileViewer::-webkit-scrollbar-thumb:hover {
+    background: #024959;
+}
+
+.linkAnnotation{
+    display: none;
+}
+
+.react-pdf__message{
+    display: none;
 }
