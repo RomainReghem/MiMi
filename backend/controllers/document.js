@@ -2,7 +2,7 @@ const Eleve = require('../models/users').Eleve
 
 const fs = require('fs');
 
-const {Storage} = require('@google-cloud/storage');
+const { Storage } = require('@google-cloud/storage');
 
 const google_cloud_project_id = "oceanic-cacao-348707";
 const google_cloud_keyfile = "./oceanic-cacao-348707-bcb3c919f769.json";
@@ -38,57 +38,57 @@ const saveAvatar = (req, res) => {
 
             // Création des dossiers quand n'existent pas
             try {
-                 if (!fs.existsSync('./testeleve')) {
-                     fs.mkdirSync('./testeleve');
-                 }
-             } catch (err) {
-                 console.error(err);
-                 return res.status(600).send("Erreur lors de la création de dossier test")
-             }
- 
-             try {
-                 if (!fs.existsSync('./testeleve/eleve' + num)) {
-                     fs.mkdirSync('./testeleve/eleve' + num);
-                 }
-             } catch (err) {
-                 console.error(err);
-                 return res.status(600).send("Erreur lors de la création de dossier classe")
-             }
- 
-             try {
-                 if (!fs.existsSync('./testeleve/eleve' + num + "/avatar")) {
-                     fs.mkdirSync('./testeleve/eleve' + num + "/avatar");
-                 }
-             } catch (err) {
-                 console.error(err);
-                 return res.status(600).send("Erreur lors de la création de dossier avatar")
-             }
+                if (!fs.existsSync('./testeleve')) {
+                    fs.mkdirSync('./testeleve');
+                }
+            } catch (err) {
+                console.error(err);
+                return res.status(600).send("Erreur lors de la création de dossier test")
+            }
+
+            try {
+                if (!fs.existsSync('./testeleve/eleve' + num)) {
+                    fs.mkdirSync('./testeleve/eleve' + num);
+                }
+            } catch (err) {
+                console.error(err);
+                return res.status(600).send("Erreur lors de la création de dossier classe")
+            }
+
+            try {
+                if (!fs.existsSync('./testeleve/eleve' + num + "/avatar")) {
+                    fs.mkdirSync('./testeleve/eleve' + num + "/avatar");
+                }
+            } catch (err) {
+                console.error(err);
+                return res.status(600).send("Erreur lors de la création de dossier avatar")
+            }
             // mise en forme du JSON pour son enregistrement            
             avatar = JSON.stringify(avatar)
 
-    // on enregistre le fichier JSON correspondant à l'avatar de l'élève
-    fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
-        if (err) {
-            console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
-            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-        }
-        //console.log("Le fichier JSON a bien été sauvegardé");
-        //res.status(201).send("Enregistrement effectué");
-    });
+            // on enregistre le fichier JSON correspondant à l'avatar de l'élève
+            fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
+                if (err) {
+                    console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                }
+                //console.log("Le fichier JSON a bien été sauvegardé");
+                //res.status(201).send("Enregistrement effectué");
+            });
 
-            bucket.upload(path + "/avatar" + num + ".json", { destination: "testeleve/eleve" + num + "/avatar"+num+".json"}, function (err, avatar) {
+            bucket.upload(path + "/avatar" + num + ".json", { destination: "testeleve/eleve" + num + "/avatar" + num + ".json" }, function (err, avatar) {
                 if (err) {
                     console.log("erreur sauvegarde " + err)
                     return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
-                }else{
+                } else {
                     //storage.bucket(bucket_projet_mimi).file("avatar" + num + ".json").makePublic();
-            console.log("Le fichier JSON a bien été sauvegardé");
-            res.status(201).send("Enregistrement effectué");
+                    console.log("Le fichier JSON a bien été sauvegardé");
+                    res.status(201).send("Enregistrement effectué");
                 }
-              
+
             })
-            
-        
+
+
 
         });
 }
@@ -112,8 +112,8 @@ const getAvatar = (req, res) => {
                 return res.status(404).send("Élève pas trouvé")
             }
             const num = eleve.ideleve;
-            const path = "./testeleve/eleve" + num + "/avatar/avatar" + num + ".json"
-            fs.readFile(path, 'utf-8', function (err, avatar) {
+            const path = "./testeleve/eleve" + num + "/avatar" + num + ".json"
+            /*fs.readFile(path, 'utf-8', function (err, avatar) {
                 if (err) {
                     console.log('erreur lors de la récupération de l\'avatar')
                     return res.status(600).send("Problème de lecture de l'avatar.")
@@ -121,7 +121,19 @@ const getAvatar = (req, res) => {
                 console.log("avatar récupéré")
                 // on envoie le fichier json au front
                 res.json({ avatar: avatar })
-            })
+            })*/
+            let avatar = "";
+            bucket.file("testeleve/eleve" + num + "/avatar" + num + ".json").createReadStream()
+                .on('error', function (err) { console.log(err) })
+                .on('data', function (response) {
+                    avatar += response
+                })
+                .on('end', function () {
+                    //console.log("AVATAR : " + avatar)
+                    console.log("avatar récupéré");
+                    // on envoie le fichier json au front
+                    return res.json({ avatar: avatar })
+                })
         })
 }
 

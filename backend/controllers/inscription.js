@@ -7,6 +7,18 @@ const Users = require('../models/users');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
+const {Storage} = require('@google-cloud/storage');
+
+const google_cloud_project_id = "oceanic-cacao-348707";
+const google_cloud_keyfile = "./oceanic-cacao-348707-bcb3c919f769.json";
+
+const storage = new Storage({
+    projectId: google_cloud_project_id,
+    keyFilename: google_cloud_keyfile,
+});
+
+const bucket = storage.bucket("bucket_projet_mimi");
+
 /**
  * Crée un compte élève, avec les données transmises par le serveur.
  * Crée aussi des dossiers pour stocker les futurs documents de l'élève.
@@ -105,7 +117,7 @@ const InscriptionEleve = (req, res) => {
 
                                                     console.log("*** Création d'un dossier ***")
 
-                                                    try {
+                                                 /*   try {
                                                         if (!fs.existsSync('./testeleve')) {
                                                             fs.mkdirSync('./testeleve');
                                                         }
@@ -130,27 +142,8 @@ const InscriptionEleve = (req, res) => {
                                                     } catch (err) {
                                                         console.error(err);
                                                         return res.status(600).send("Erreur lors de la création de dossier avatar")
-                                                    }
+                                                    }*/
 
-                                                    /* let avatar = JSON.stringify({
-                                                             bgColor: "#E0DDFF",
-                                                             earSize: "small",
-                                                             eyeBrowStyle: "up",
-                                                             eyeStyle: "oval",
-                                                             faceColor: "#AC6651",
-                                                             glassesStyle: "none",
-                                                             hairColor: "#000",
-                                                             hairStyle: "thick",
-                                                             hatColor: "#000",
-                                                             hatStyle: "none",
-                                                             mouthStyle: "laugh",
-                                                             noseStyle: "round",
-                                                             shape: "square",
-                                                             shirtColor: "#6BD9E9",
-                                                             shirtStyle: "polo"
-                                                         }
-                                                         )*/
-                                                    // let avatar = '{bgColor: "#E0DDFF", earSize: "small", eyeBrowStyle: "up", eyeStyle: "oval", faceColor: "#AC6651", glassesStyle: "none", hairColor: "#000", hairStyle: "thick", hatColor: "#000", hatStyle: "none", mouthStyle: "laugh", noseStyle: "round", shape: "square", shirtColor: "#6BD9E9", shirtStyle: "polo"}'
                                                     // enregistrement de l'avatar par défaut
                                                     let avatar = {
                                                         bgColor: "#E0DDFF",
@@ -184,6 +177,18 @@ const InscriptionEleve = (req, res) => {
                                                         console.log("Le fichier JSON a bien été sauvegardé");
                                                         //res.status(201).send("Enregistrement effectué");
                                                     });
+
+                                                    bucket.upload(path + "/avatar" + num + ".json", { destination: "testeleve/eleve" + num + "/avatar"+num+".json"}, function (err, avatar) {
+                                                        if (err) {
+                                                            console.log("erreur sauvegarde " + err)
+                                                            return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
+                                                        }else{
+                                                            //storage.bucket(bucket_projet_mimi).file("avatar" + num + ".json").makePublic();
+                                                    console.log("Le fichier JSON a bien été sauvegardé");
+                                                    //res.status(201).send("Enregistrement effectué");
+                                                        }
+                                                      
+                                                    })
                                                     res.send(neweleve);
                                                 })
                                                 .catch(err => {
