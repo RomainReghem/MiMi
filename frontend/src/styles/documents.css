@@ -1,0 +1,88 @@
+.fileMain {
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.fileManager {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width:18.3rem;
+}
+
+.fileUploadFormContainer{
+    margin-top: 0.3rem;
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+}
+
+.fileForm{
+    display: flex;
+    width:100%;
+}
+
+.fileInput{
+    display: none;
+}
+
+.fileLabel:hover, .fileSendButton:hover{
+    background-color: #024959;
+    
+    transition-duration: 500ms;
+    transition-property: background-color;
+}
+
+.fileLabel p, .fileSendButton p{
+    display: inline;
+    margin-left: 0.5rem;
+}
+
+.fileSendButton, .fileLabel{
+    color: #F2E3D5;
+    display: block;
+    background-color: #012E40;
+    font-family: Abril Fatface;
+    font-size: 0.9rem;
+    padding: 0.8rem 0rem;
+    cursor: pointer;
+    border:none;
+}
+
+.fileLabel{
+    width:11rem;
+    margin-right: 0.3rem;
+    text-align: center;
+}
+
+.fileSendButton{
+    width:7rem;
+}
+
+.file{
+    background-color: #3CA6A6;
+    border:1px solid #3CA6A6;
+    text-decoration: none;
+    width:16.2rem;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.3rem;
+    cursor: pointer;
+}
+
+.file:hover{
+    border:1px solid black;
+
+}
+
+.fileList{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width:100%;
+}

@@ -21,16 +21,21 @@ const AvatarComponent = () => {
 
     const { auth } = useAuth();
     const { setAuth } = useAuth();
+
     let mail = auth?.user;
 
-    const shirts = ["hoody", "short", "polo"]
-    const glasses = ["none", "round", "square"]
-    const noses = ["short", "long", "round"]
-    const mouths = ["laugh", "smile", "peace"]
-    const eyes = ["circle", "oval", "smile"]
-    const hatsnhairs = [["none", "normal"], ["none", "thick"], ["none", "mohawk"], ["none", "womanLong"], ["none", "womanShort"], ["beanie", "normal"], ["turban", "normal"]]
-    const faces = ["#c58c85", "#f9c9b6", "#ac6651", "#592f2a"]
+    useEffect(() => {
+        getAvatar()
+        
+    },[])
 
+    const getAvatar = async (e) => {
+        try {
+            const response = await axios.get("/avatar",{params: { mail: auth?.user }});
+            setConfig(JSON.parse(response.data.avatar));
+        } catch (err) { console.log("Erreur du chargement de l'avatar"); }
+    }
+    
     const [config, setConfig] = useState({
         bgColor: "#E0DDFF",
         earSize: "small",
@@ -49,8 +54,13 @@ const AvatarComponent = () => {
         shape: "square"
     });
 
-    const [savedConfig, setSavedConfig] = useState({ ...config, shape: "circle" })
-
+    const shirts = ["hoody", "short", "polo"]
+    const glasses = ["none", "round", "square"]
+    const noses = ["short", "long", "round"]
+    const mouths = ["laugh", "smile", "peace"]
+    const eyes = ["circle", "oval", "smile"]
+    const hatsnhairs = [["none", "normal"], ["none", "thick"], ["none", "mohawk"], ["none", "womanLong"], ["none", "womanShort"], ["beanie", "normal"], ["turban", "normal"]]
+    const faces = ["#c58c85", "#f9c9b6", "#ac6651", "#592f2a"]
 
     const changeBg = (e) => {
         e.preventDefault();
@@ -84,11 +94,6 @@ const AvatarComponent = () => {
     }
 
     const Save = () => {
-        setSavedConfig({
-            ...config,
-            shape: "circle"
-        })
-
         setAuth({
             ...auth,
             avatarconfig:config            

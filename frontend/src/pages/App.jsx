@@ -25,6 +25,7 @@ import Construction from "./Construction"
 // Styles
 import '../styles/App.css'
 import '../styles/connexion.css'
+import '../styles/documents.css'
 import 'react-notifications-component/dist/theme.css'
 
 
@@ -53,7 +54,7 @@ export default function App() {
             <Route element={<PersistLogin />}>
               <Route element={<RequireAuth />}>
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/documents" element={<Construction />} />
+                <Route path="/documents" element={<Documents />} />
                 <Route path="/visio" element={<Construction />} />
                 <Route path="/jeux" element={<Construction />} />
               </Route>
