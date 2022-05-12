@@ -68,10 +68,15 @@
 }
 
 .formContainer button:hover {
-    box-shadow: 7px 7px #ffc3ae;
+    box-shadow: 4px 4px #ffc3ae;
     transition-duration: 300ms;
     transition-property: box-shadow;
 }
+
+.formContainer button:focus{    
+    box-shadow: 2px 2px #ffc3ae;
+}
+
 
 .formContainer form{
     display: flex;

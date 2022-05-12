@@ -14,15 +14,21 @@ const Form = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
         const formData = new FormData();
+        // PDF only
         if (selectedFile.type != "application/pdf") {
-            Notifs("Erreur fichier", "Les seuls fichier acceptés sont les PDF", "warning")
+            Notifs("Erreur type de fichier", "Les seuls fichier acceptés sont les PDF", "warning")
+            return;
+        }
+        // Fichiers < 10 Mo
+        if(selectedFile.size > 10_000_000){
+            Notifs("Erreur taille de fichier", "Le fichier séléctionné doit faire moins de 10Mo", "warning")
             return;
         }
         formData.append("selectedFile", selectedFile);
+        console.log(formData);
         try {
-            const response = await axios.post("/saveFile", JSON.stringify({ mail: auth?.user, cours: "maths" }),
+            const response = await axios.post("/saveFile", JSON.stringify({ mail: auth?.user, cours: "maths" }), formData,
                 {
-                    data: formData,
                     headers: { "Content-Type": "multipart/form-data" },
                 });
             Notifs("Fichier ajouté !", "", "success")

@@ -84,9 +84,13 @@
 }
 
 .profileSettings button:hover, .pcChild button:hover {
-    box-shadow: 7px 7px #ffc3ae !important;
+    box-shadow: 4px 4px #4cf579 !important;
     transition-duration: 300ms;
     transition-property: box-shadow;
+}
+
+.profileSettings button:focus {
+    box-shadow: 2px 2px #4cf579 !important;
 }
 
 .profilePwd form,
