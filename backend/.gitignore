@@ -23,8 +23,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# fichier souvenir
+# fichiers souvenir
 ancienindex.js
+document_local.js
+OLDdocument.js
 
 # stockage des documents
 /testclasse

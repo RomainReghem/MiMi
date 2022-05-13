@@ -1,4 +1,5 @@
 const verifyJWT = require('../middleware/verificationJWT.js').verifyJWT
+const verifyDoc = require('../middleware/verificationSauvegardeDoc')
 const Connexion = require('../controllers/connexion.js')
 const Inscription = require('../controllers/inscription.js')
 const Deconnexion = require('../controllers/deconnexion.js')
@@ -11,7 +12,6 @@ const Eleve = require('../controllers/eleve.js')
 const Classe = require('../controllers/classe.js')
 
 const express = require('express')
-const { cp } = require('fs')
 const router = express.Router();
 
 // route de la connexion d'un utilisateur
@@ -37,8 +37,16 @@ router.get('/eleves', Classe.getAllStudents)
 
 // route pour sauvegarder l'avatar d'un élève
  router.post('/avatar', Document.saveAvatar)
-// router pour récupèrer l'avatar
+// route pour récupèrer l'avatar
 router.get('/avatar', Document.getAvatar)
+// route pour sauvegarder un document d'un élève
+router.post('/saveFile', Document.saveCoursEleve)
+// route pour récupèrer un document d'un élève
+router.get('/getFile', Document.getCoursEleve)
+// route pour récupèrer le nom de tous les fichiers qu'un élève possède
+router.get('/getFiles', Document.getAllCoursEleve)
+// route pour récupèrer le nom de toutes les matières qu'un élève possède
+router.get('/getFiles', Document.getAllMatieresEleve)
 
 // route pour changer le pseudo : seulement pour l'élève
 // router.post('/changeUsername', Modification.ChangementPseudo)

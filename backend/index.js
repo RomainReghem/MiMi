@@ -2,10 +2,11 @@ const credential = require('./config/credential')
 const router = require('./routes/routes.js')
 
 const express = require('express');
+const fileupload = require("express-fileupload");
 const session = require('express-session');
 const cors = require("cors");
 const cookieParser = require("cookie-parser")
-//const bodyParser = require("body-parser")
+const bodyParser = require("body-parser")
 
 //const db = require("./utils/database").db;
 
@@ -34,11 +35,16 @@ app.use(
         //credentials: true,
     })
 );
+
+// pour l'enregistrement des documents
+app.use(fileupload());
+app.use(express.static("files"));
+app.use(bodyParser.json());
+
 //app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
-
-app.use(express.urlencoded({ extended: false }));
 
 /*app.use(session({
     // pour signer l'id du cookie

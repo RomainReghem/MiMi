@@ -7,7 +7,7 @@ const Users = require('../models/users');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
-const {Storage} = require('@google-cloud/storage');
+const { Storage } = require('@google-cloud/storage');
 
 const google_cloud_project_id = "oceanic-cacao-348707";
 const google_cloud_keyfile = "./oceanic-cacao-348707-bcb3c919f769.json";
@@ -77,13 +77,14 @@ const InscriptionEleve = (req, res) => {
     bcrypt.hash(mdp, 10, (err, hash) => {
         if (err) {
             console.log(err)
+            return res.status(600)
         }
         Eleve.findOne({ where: { pseudo: pseudo } })
             .then(eleve => {
                 // si on trouve un élève qui a déjà ce pseudo
                 if (eleve) {
                     console.log("Pseudo pas unique");
-                    res.sendStatus(408)
+                    return res.sendStatus(408)
                 } else {
                     console.log("pseudo valide")
                     // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
@@ -91,14 +92,14 @@ const InscriptionEleve = (req, res) => {
                         .then(eleve => {
                             if (eleve) {
                                 console.log("Mail pas unique");
-                                res.sendStatus(409)
+                                return res.sendStatus(409)
                             } else {
                                 console.log("mail unique pour eleves");
                                 Classe.findOne({ where: { courriel: email } })
                                     .then(classe => {
                                         if (classe) {
                                             console.log("Mail existant pour la classe");
-                                            res.sendStatus(410)
+                                            return res.sendStatus(410)
                                         } else {
                                             console.log("inscription ok")
                                             console.log("mdp" + hash)
@@ -112,37 +113,35 @@ const InscriptionEleve = (req, res) => {
                                                 .then((eleve) => {
                                                     console.log("Création de compte élève réussie")
                                                     const num = eleve.ideleve
-                                                    const path = "./testeleve/eleve" + num + "/avatar"
+                                                    //const path = "./testeleve/eleve" + num + "/avatar"
+                                                    // console.log("*** Création d'un dossier ***")
 
-
-                                                    console.log("*** Création d'un dossier ***")
-
-                                                 /*   try {
-                                                        if (!fs.existsSync('./testeleve')) {
-                                                            fs.mkdirSync('./testeleve');
-                                                        }
-                                                    } catch (err) {
-                                                        console.error(err);
-                                                        return res.status(600).send("Erreur lors de la création de dossier test")
-                                                    }
-
-                                                    try {
-                                                        if (!fs.existsSync('./testeleve/eleve' + num)) {
-                                                            fs.mkdirSync('./testeleve/eleve' + num);
-                                                        }
-                                                    } catch (err) {
-                                                        console.error(err);
-                                                        return res.status(600).send("Erreur lors de la création de dossier classe")
-                                                    }
-
-                                                    try {
-                                                        if (!fs.existsSync(path)) {
-                                                            fs.mkdirSync(path);
-                                                        }
-                                                    } catch (err) {
-                                                        console.error(err);
-                                                        return res.status(600).send("Erreur lors de la création de dossier avatar")
-                                                    }*/
+                                                    /*   try {
+                                                           if (!fs.existsSync('./testeleve')) {
+                                                               fs.mkdirSync('./testeleve');
+                                                           }
+                                                       } catch (err) {
+                                                           console.error(err);
+                                                           return res.status(600).send("Erreur lors de la création de dossier test")
+                                                       }
+   
+                                                       try {
+                                                           if (!fs.existsSync('./testeleve/eleve' + num)) {
+                                                               fs.mkdirSync('./testeleve/eleve' + num);
+                                                           }
+                                                       } catch (err) {
+                                                           console.error(err);
+                                                           return res.status(600).send("Erreur lors de la création de dossier classe")
+                                                       }
+   
+                                                       try {
+                                                           if (!fs.existsSync(path)) {
+                                                               fs.mkdirSync(path);
+                                                           }
+                                                       } catch (err) {
+                                                           console.error(err);
+                                                           return res.status(600).send("Erreur lors de la création de dossier avatar")
+                                                       }*/
 
                                                     // enregistrement de l'avatar par défaut
                                                     let avatar = {
@@ -165,42 +164,39 @@ const InscriptionEleve = (req, res) => {
                                                     // avatar=JSON.parse(avatar)
                                                     //  console.log("\n2."+avatar)
                                                     avatar = JSON.stringify(avatar)
-
-                                                    console.log("dossiers créés")
-
-                                                    console.log("enregistrement d'un avatar")
-                                                    fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
+                                                    /*
+                                                                                                     console.log("dossiers créés")
+                                                    
+                                                                                                        console.log("enregistrement d'un avatar")
+                                                                                                        fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
+                                                                                                            if (err) {
+                                                                                                                console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+                                                                                                                return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                                                                                                            }
+                                                                                                            console.log("Le fichier JSON a bien été sauvegardé");
+                                                                                                            //res.status(201).send("Enregistrement effectué");
+                                                                                                        });
+                                                    */
+                                                     bucket.file(path + "/avatar" + num + ".json").save(avatar, function (err) {
                                                         if (err) {
-                                                            console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
-                                                            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                                                            return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
                                                         }
                                                         console.log("Le fichier JSON a bien été sauvegardé");
-                                                        //res.status(201).send("Enregistrement effectué");
-                                                    });
-
-                                                    bucket.upload(path + "/avatar" + num + ".json", { destination: "testeleve/eleve" + num + "/avatar"+num+".json"}, function (err, avatar) {
-                                                        if (err) {
-                                                            console.log("erreur sauvegarde " + err)
-                                                            return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
-                                                        }else{
-                                                            //storage.bucket(bucket_projet_mimi).file("avatar" + num + ".json").makePublic();
-                                                    console.log("Le fichier JSON a bien été sauvegardé");
-                                                    //res.status(201).send("Enregistrement effectué");
-                                                        }
-                                                      
+                                                        return res.status(201).send("Enregistrement effectué");
                                                     })
-                                                    res.send(neweleve);
-                                                })
-                                                .catch(err => {
-                                                    console.log("erreur inscription eleve : " + err)
-                                                })
-                                        }
-                                    }
-                                    )
-                            }
-                        })
 
+                                            //return res.send(neweleve);
+                                        })
+                                    .catch(err => {
+                                        console.log("erreur inscription eleve : " + err)
+                                    })
+                            }
+                        }
+                        )
                 }
+            })
+
+    }
             }
             )
     }
@@ -229,13 +225,13 @@ const InscriptionClasse = (req, res) => {
 
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
-        res.sendStatus(406)
+        return res.sendStatus(406)
     }
     //console.log("mdp ok")
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
-        res.sendStatus(407)
+        return res.sendStatus(407)
     }
     //console.log("email ok")
 

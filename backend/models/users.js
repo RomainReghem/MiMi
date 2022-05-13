@@ -32,6 +32,11 @@ const Eleve = db.define('eleve', {
         type: Sequelize.STRING,
         allowNull: false,
     },
+    nomphoto:{
+        type: Sequelize.STRING,
+        defaultValue:"",
+        allowNull: false
+    },
     idclasse: {
         type: Sequelize.INTEGER,
         references: 'classe', 
@@ -71,7 +76,6 @@ const Score = db.define('score',
 Classe.hasMany(Eleve,{foreignKey: 'idclasse'})
 Eleve.belongsTo(Classe,{foreignKey:'idclasse'})
 // Eleve.hasOne(Score,{as:'score'})
-// ou
 //Score.belongsTo(Eleve, {as:"eleves"})
 
 module.exports= {Eleve, Classe};

@@ -555,11 +555,15 @@ const ChangementClasse = (req, res)=>{
     }).then(classe=>{
         if(!classe){
             console.log("Pas de classe trouvée !")
-            return res.status(404).send("Aucune classe trouvée correspondant à ce mail.")
+            return res.status(404).send("Aucune classe trouvée correspondant à ce mail : "+emailClasse)
         }
         Eleve.findOne({
             where:{courriel:emailEleve}
         }).then(eleve=>{
+            if(!eleve){
+                console.log("Pas d'élève trouvé !")
+                return res.status(404).send("Aucun élève trouvé correspondant à ce mail : "+emailEleve)
+            }
             console.log("Début modification ")
             if(eleve.idclasse==classe.idclasse){
                 console.log("classe déjà enregistrée")

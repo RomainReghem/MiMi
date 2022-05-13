@@ -22,8 +22,14 @@ const bucket = storage.bucket("bucket_projet_mimi");
  * @param {*} res la réponse du serveur
  */
 const saveAvatar = (req, res) => {
+    console.log("\n*** Sauvegarde d'avatar ***")
     let avatar = req.body.avatar;
     const email = req.body.mail;
+    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+        console.log("forme mail incorrect")
+        // erreur 400
+        return res.sendStatus(407)
+    }
     Eleve.findOne({
         where:
             { courriel: email }
@@ -34,63 +40,24 @@ const saveAvatar = (req, res) => {
                 return res.status(404).send("Élève pas trouvé")
             }
             const num = eleve.ideleve;
-            const path = "./testeleve/eleve" + num + "/avatar"
+            const path = "testeleve/eleve" + num + "/avatar"
 
-            // Création des dossiers quand n'existent pas
-            try {
-                if (!fs.existsSync('./testeleve')) {
-                    fs.mkdirSync('./testeleve');
-                }
-            } catch (err) {
-                console.error(err);
-                return res.status(600).send("Erreur lors de la création de dossier test")
-            }
-
-            try {
-                if (!fs.existsSync('./testeleve/eleve' + num)) {
-                    fs.mkdirSync('./testeleve/eleve' + num);
-                }
-            } catch (err) {
-                console.error(err);
-                return res.status(600).send("Erreur lors de la création de dossier classe")
-            }
-
-            try {
-                if (!fs.existsSync('./testeleve/eleve' + num + "/avatar")) {
-                    fs.mkdirSync('./testeleve/eleve' + num + "/avatar");
-                }
-            } catch (err) {
-                console.error(err);
-                return res.status(600).send("Erreur lors de la création de dossier avatar")
-            }
             // mise en forme du JSON pour son enregistrement            
             avatar = JSON.stringify(avatar)
 
-            // on enregistre le fichier JSON correspondant à l'avatar de l'élève
-            fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
-                if (err) {
-                    console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
-                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-                }
-                //console.log("Le fichier JSON a bien été sauvegardé");
-                //res.status(201).send("Enregistrement effectué");
-            });
-
-            bucket.upload(path + "/avatar" + num + ".json", { destination: "testeleve/eleve" + num + "/avatar" + num + ".json" }, function (err, avatar) {
-                if (err) {
-                    console.log("erreur sauvegarde " + err)
-                    return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
-                } else {
-                    //storage.bucket(bucket_projet_mimi).file("avatar" + num + ".json").makePublic();
-                    console.log("Le fichier JSON a bien été sauvegardé");
-                    res.status(201).send("Enregistrement effectué");
-                }
-
-            })
-
-
+            saveJSON(path, avatar, num, res);
 
         });
+}
+
+async function saveJSON(path, json, num, res) {
+    await bucket.file(path + "/avatar" + num + ".json").save(json, function (err) {
+        if (err) {
+            return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
+        }
+        console.log("Le fichier JSON a bien été sauvegardé");
+        return res.status(201).send("Enregistrement effectué");
+    })
 }
 
 /**
@@ -101,7 +68,13 @@ const saveAvatar = (req, res) => {
  */
 const getAvatar = (req, res) => {
     console.log("\n*** Récupération d'avatar ***")
+
     const email = req.query.mail;
+    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+        console.log("forme mail incorrect")
+        // erreur 400
+        return res.sendStatus(407)
+    }
     Eleve.findOne({
         where:
             { courriel: email }
@@ -112,7 +85,7 @@ const getAvatar = (req, res) => {
                 return res.status(404).send("Élève pas trouvé")
             }
             const num = eleve.ideleve;
-            const path = "./testeleve/eleve" + num + "/avatar" + num + ".json"
+            const path = "testeleve/eleve" + num + "/avatar"
             /*fs.readFile(path, 'utf-8', function (err, avatar) {
                 if (err) {
                     console.log('erreur lors de la récupération de l\'avatar')
@@ -122,20 +95,28 @@ const getAvatar = (req, res) => {
                 // on envoie le fichier json au front
                 res.json({ avatar: avatar })
             })*/
-            let avatar = "";
-            bucket.file("testeleve/eleve" + num + "/avatar" + num + ".json").createReadStream()
-                .on('error', function (err) { console.log(err) })
-                .on('data', function (response) {
-                    avatar += response
-                })
-                .on('end', function () {
-                    //console.log("AVATAR : " + avatar)
-                    console.log("avatar récupéré");
-                    // on envoie le fichier json au front
-                    return res.json({ avatar: avatar })
-                })
+            getJSON(path, num, res)
         })
 }
+
+async function getJSON(path, num, res) {
+    let avatar = "";
+    await bucket.file(path + "/avatar" + num + ".json").createReadStream()
+        .on('error', function (err) {
+            console.log(err);
+            return res.status(520)
+        })
+        .on('data', function (response) {
+            avatar += response;
+        })
+        .on('end', function () {
+            //console.log("AVATAR : " + avatar)
+            console.log("avatar récupéré");
+            // on envoie le fichier json au front
+            return res.json({ avatar: avatar });
+        })
+}
+
 
 /**
  * Sauvegarde sur le serveur le document dont la matière est donné dans le dossier approprié.
@@ -144,12 +125,24 @@ const getAvatar = (req, res) => {
  * @param {*} res la réponse du serveur
  */
 const saveCoursEleve = (req, res) => {
+    console.log("\n*** Sauvegarde de cours d'un eleve ***")
     //pour l'eleve
     const matiere = req.body.cours;
-    const mail = req.body.mail;
-    const doc = req.files.file;
-    const nom = doc.name;
+    const email = req.body.mail;
+    const doc = req.body.data;
 
+   console.log("document "+doc+" autre"+req.files+"fg "+req.file)
+    //console.log("test "+req.selectedFile)
+   /*for(r in req){
+        console.log(" ok "+r)
+    }*/
+    console.log(req)
+    const nom ="test.pdf" //doc.name;
+    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+        console.log("forme mail incorrect")
+        // erreur 400
+        return res.sendStatus(407)
+    }
     Eleve.findOne({
         where: { courriel: email }
     })
@@ -159,11 +152,11 @@ const saveCoursEleve = (req, res) => {
                 return res.status(404).send("Élève pas trouvé")
             }
             const num = eleve.ideleve;
-            const path = "./testeleve/eleve" + num + "/depot/" + matiere;
+            const path = "./Eleves/eleve" + num + "/depot/" + matiere;
             // Création des dossiers quand n'existent pas
             try {
-                if (!fs.existsSync('./testeleve')) {
-                    fs.mkdirSync('./testeleve');
+                if (!fs.existsSync('./Eleves')) {
+                    fs.mkdirSync('./Eleves');
                 }
             } catch (err) {
                 console.error(err);
@@ -171,8 +164,8 @@ const saveCoursEleve = (req, res) => {
             }
 
             try {
-                if (!fs.existsSync('./testeleve/eleve' + num)) {
-                    fs.mkdirSync('./testeleve/eleve' + num);
+                if (!fs.existsSync('./Eleves/eleve' + num)) {
+                    fs.mkdirSync('./Eleves/eleve' + num);
                 }
             } catch (err) {
                 console.error(err);
@@ -180,8 +173,8 @@ const saveCoursEleve = (req, res) => {
             }
 
             try {
-                if (!fs.existsSync('./testeleve/eleve' + num + "/depot")) {
-                    fs.mkdirSync('./testeleve/eleve' + num + "/depot");
+                if (!fs.existsSync('./Eleves/eleve' + num + "/depot")) {
+                    fs.mkdirSync('./Eleves/eleve' + num + "/depot");
                 }
             } catch (err) {
                 console.error(err);
@@ -203,31 +196,87 @@ const saveCoursEleve = (req, res) => {
                     return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
                 }
                 console.log("Le fichier a bien été sauvegardé");
-                res.status(201).send("Enregistrement effectué");
+                return res.status(201).send("Enregistrement effectué");
             });
-
-            console.log("Le fichier a bien été sauvegardé");
-            res.status(201).send("Enregistrement effectué");
         })
 }
 
-/*
+const getAllMatieresEleve = (req, res) => {
+    const email = req.body.mail;
 
-const saveCoursProf =(req, res)=>{
+    Eleve.findOne({
+        where: { courriel: email }
+    })
+        .then(eleve => {
+            if (!eleve) {
+                console.log("Utilisateur pas trouvé");
+                return res.status(404).send("Élève pas trouvé")
+            }
+            const num = eleve.ideleve;
+            const path = "./Eleves/eleve" + num + "/depot";
+            const folders = getAllFiles(path);
+            return res.json({ matieres: folders })
+        })
+}
+
+const getAllCoursEleve = (req, res) => {
+    const email = req.body.mail;
+    const matiere = req.body.cours;
+
+    Eleve.findOne({
+        where: { courriel: email }
+    })
+        .then(eleve => {
+            if (!eleve) {
+                console.log("Utilisateur pas trouvé");
+                return res.status(404).send("Élève inexistant");
+            }
+            const num = eleve.ideleve;
+            const path = "./Eleves/eleve" + num + "/depot/" + matiere;
+            const files = getAllFiles(path);
+            return res.json({ cours: files })
+        })
+}
+
+const getCoursEleve=(req, res)=>{
+    const email = req.body.mail;
+    const matiere = req.body.cours;
+    const name =req.body.name;
+    console.log(name)
+    Eleve.findOne({
+        where: { courriel: email }
+    })
+        .then(eleve => {
+            if (!eleve) {
+                console.log("Utilisateur pas trouvé");
+                return res.status(404).send("Élève inexistant");
+            }
+            const num = eleve.ideleve;
+            const path = "./Eleves/eleve" + num + "/depot/" + matiere;
+           // const files = getAllFiles(path);
+        })
+}
+
+
+/**
+ * Retourne tous les fichiers ou les répertoires en fonction du chemin donné
+ * @param {*} path le chemin du répertoire à lister
+ */
+async function getAllFiles(path) {
+    fs.readdirSync(dir, function (err, files) {
+        if (err) {
+            console.log("erreur durant la récupération " + err)
+            return [];
+        } else {
+            for (const file of files) {
+                console.log(file)
+            }
+            return files;
+        }
+    })
 
 }
 
-const getCoursEleve = (req, res)=>{
 
-}*/
 
-/**
- * 
- * @param {*} req 
- * @param {*} res 
- */
-/*const getCoursProf =(req, res)=>{
-
-}*/
-
-module.exports = { saveAvatar, getAvatar }
+module.exports = { saveAvatar, getAvatar, saveCoursEleve , getAllCoursEleve, getAllMatieresEleve, getCoursEleve}

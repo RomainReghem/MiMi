@@ -20,6 +20,8 @@ let refreshTokens = [];
  * @param {*} res la réponse du serveur
  */
 const Connexion = (req, res) => {
+    console.log("\n*** Connexion ***")
+
     const pseudo = req.body.user;
     const mdp = req.body.pwd;
     console.log("connexion " + mdp + " " + pseudo)
@@ -36,7 +38,7 @@ const Connexion = (req, res) => {
             if (eleve) {
                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                     if (estValide) {
-                        console.log("\n*** Création des cookies pour l'élève ***")
+                        console.log("** Création des cookies pour l'élève **")
                         // cookie 
                         const accessToken = jwt.sign(
                             { "UserInfo": { "mail": eleve.courriel, "role": "eleve" } },
@@ -50,7 +52,7 @@ const Connexion = (req, res) => {
                         )
                         refreshTokens.push(refreshToken);
                         //console.log("refresh token connexion " + refreshToken)
-                        console.log("*** Connexion de l'élève effectuée ***")
+                        console.log("** Connexion de l'élève effectuée **")
 
                         res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                         res.status(200).json({ role: "eleve", accessToken: accessToken })
