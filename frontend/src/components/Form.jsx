@@ -1,6 +1,5 @@
 import { useState } from "react";
 import axios from "../api/axios";
-import { BiUpload, BiRocket } from "react-icons/bi"
 import useAuth from "../hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faPaperPlane } from "@fortawesome/free-solid-svg-icons";

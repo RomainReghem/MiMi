@@ -2,6 +2,7 @@ import "../styles/profile.css"
 import useAuth from "../hooks/useAuth";
 import ChangePwd from "../components/ChangePwd"
 import ChangeMail from "../components/ChangeMail"
+import Identity from "../components/Identity";
 import AvatarComponent from "../components/AvatarComponent"
 import Users from "../components/Users"
 
@@ -16,8 +17,7 @@ const Profile = () => {
             {role == "eleve" ? (
                 <div className="profileMain">
                     <section className="profileSettings">
-                        <ChangePwd /><br />
-                        <ChangeMail />
+                        <Identity/>
                     </section>
                     <AvatarComponent/>
                 </div>) : (

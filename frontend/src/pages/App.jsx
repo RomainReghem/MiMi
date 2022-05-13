@@ -21,12 +21,16 @@ import Layout from "./Layout"
 import Success from "./Success"
 import Tests from "./Tests"
 import Construction from "./Construction"
+import Settings from "./Settings";
 
 // Styles
 import '../styles/App.css'
 import '../styles/connexion.css'
 import '../styles/documents.css'
 import 'react-notifications-component/dist/theme.css'
+import '../styles/identity.css'
+import '../styles/settings.css'
+
 
 
 export default function App() {
@@ -57,6 +61,7 @@ export default function App() {
                 <Route path="/documents" element={<Documents />} />
                 <Route path="/visio" element={<Construction />} />
                 <Route path="/jeux" element={<Construction />} />
+                <Route path="/settings" element={<Settings/>}/>
               </Route>
             </Route>
 

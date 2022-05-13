@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import useAuth from "../hooks/useAuth";
 import axios from '../api/axios';
-import { Store } from 'react-notifications-component';
 import Notifs from '../components/Notifs';
 
 const CHANGEMAIL_URL = '/changeMail';

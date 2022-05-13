@@ -9,6 +9,8 @@ import { GrGamepad } from 'react-icons/gr';
 import { BiPowerOff } from 'react-icons/bi';
 import { AiOutlineVideoCamera } from 'react-icons/ai';
 import { HiOutlineDocumentText } from 'react-icons/hi';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGear } from "@fortawesome/free-solid-svg-icons";
 
 
 const Nav = () => {
@@ -152,12 +154,19 @@ const Nav = () => {
                                 <GrGamepad size={iconSize} className="navIcon" />
                             </Link>
                         </li>
-                        <li className="deconnexion">
-                            <button onClick={signOut}>
-                                <p className="navText">Déconnexion</p>
-                                <BiPowerOff size={iconSize} className="navIcon" />
-                            </button>
-                        </li>
+                        <span className="navRightSide">
+                            <li className="settings">
+                            <Link to="/settings" >
+                                <button><FontAwesomeIcon icon={faGear} className="gearIcon" /></button>
+                            </Link>
+                            </li>
+                            <li className="deconnexion">
+                                <button onClick={signOut}>
+                                    <p className="navText">Déconnexion</p>
+                                    <BiPowerOff size={iconSize} className="navIcon" />
+                                </button>
+                            </li>
+                        </span>
                     </ul>
                 </nav>)
             }
