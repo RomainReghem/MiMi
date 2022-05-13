@@ -131,13 +131,19 @@ const saveCoursEleve = (req, res) => {
     const email = req.body.mail;
     const doc = req.body.data;
 
-   console.log("document "+doc+" autre"+req.files+"fg "+req.file)
+    console.log("document " + doc + " autre" + req.files + "fg " + req.file)
     //console.log("test "+req.selectedFile)
-   /*for(r in req){
-        console.log(" ok "+r)
-    }*/
-    console.log(req)
-    const nom ="test.pdf" //doc.name;
+    /*for(r in doc){
+         console.log(" ok "+r)
+     }*/
+    //   console.log(req)
+
+    const nom = "test.pdf" //doc.name;
+
+    if (req.files == null) {
+        console.log("null")
+        return res.status(600).send("Erreur serveur")
+    }
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
         // erreur 400
@@ -238,10 +244,10 @@ const getAllCoursEleve = (req, res) => {
         })
 }
 
-const getCoursEleve=(req, res)=>{
+const getCoursEleve = (req, res) => {
     const email = req.body.mail;
     const matiere = req.body.cours;
-    const name =req.body.name;
+    const name = req.body.name;
     console.log(name)
     Eleve.findOne({
         where: { courriel: email }
@@ -253,7 +259,16 @@ const getCoursEleve=(req, res)=>{
             }
             const num = eleve.ideleve;
             const path = "./Eleves/eleve" + num + "/depot/" + matiere;
-           // const files = getAllFiles(path);
+            // const files = getAllFiles(path);
+            fs.readFile(path, 'utf-80', function (err, avatar) {
+                if (err) {
+                    console.log('erreur lors de la récupération de l\'avatar')
+                    return res.status(600).send("Problème de lecture de l'avatar.")
+                }
+                console.log("avatar récupéré")
+                // on envoie le fichier json au front
+                res.json({ avatar: avatar })
+            })
         })
 }
 
@@ -279,4 +294,4 @@ async function getAllFiles(path) {
 
 
 
-module.exports = { saveAvatar, getAvatar, saveCoursEleve , getAllCoursEleve, getAllMatieresEleve, getCoursEleve}
+module.exports = { saveAvatar, getAvatar, saveCoursEleve, getAllCoursEleve, getAllMatieresEleve, getCoursEleve }

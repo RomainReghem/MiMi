@@ -3,10 +3,10 @@ const router = require('./routes/routes.js')
 
 const express = require('express');
 const fileupload = require("express-fileupload");
-const session = require('express-session');
+//const session = require('express-session');
 const cors = require("cors");
 const cookieParser = require("cookie-parser")
-const bodyParser = require("body-parser")
+//onst bodyParser = require("body-parser")
 
 //const db = require("./utils/database").db;
 
@@ -38,10 +38,9 @@ app.use(
 
 // pour l'enregistrement des documents
 app.use(fileupload());
-app.use(express.static("files"));
-app.use(bodyParser.json());
-
+app.use(express.static("maths"));
 //app.use(bodyParser.json());
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
