@@ -392,14 +392,10 @@ const ChangementMail = (req, res) => {
 const ChangementPseudo = (req, res) => {
     const email = req.body.mail;
     const pseudo = req.body.newPseudo;
-    const mdp = req.body.pwd;
-    console.log("email " + email + " new " + pseudo + " mdp " + mdp)
+    console.log("email " + email + " new " + pseudo)
 
     console.log("\n*** Vérification pseudo ***")
-    if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
-        console.log("taille mdp pas ok")
-        res.sendStatus(406)
-    } else if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
         res.sendStatus(407)
     } else if (!(pseudo.match("^[A-z0-9-_]{3,24}$"))) {
@@ -419,38 +415,32 @@ const ChangementPseudo = (req, res) => {
                                 if (elevePseudo) {
                                     res.status(408).send("Pseudo déjà pris")
                                 } else {
-                                    bcrypt.compare(mdp, eleveToChange.motdepasse, function (err, estValide) {
-                                        if (err) {
-                                            res.status(500).send("erreur lors du hashage")
-                                        } else if (estValide) {
-                                            Eleve.update(
-                                                {
-                                                    pseudo: pseudo,
-                                                },
-                                                {
-                                                    where: { ideleve: eleveToChange.ideleve },
-                                                }
-                                            ).then(newEleve => {
-                                                if (newEleve) {
-                                                    //res.sendStatus(201)
-                                                    res.status(201).send("Modification de pseudo réussie.")
-                                                } else {
-                                                    res.status(520).send("non défini")
-                                                }
-
-                                            }).catch(err => {
-                                                console.log(err)
-                                                res.status(500).send("Erreur lors de la modification de pseudo.")
-                                            })
+                                    Eleve.update(
+                                        {
+                                            pseudo: pseudo,
+                                        },
+                                        {
+                                            where: { ideleve: eleveToChange.ideleve },
                                         }
-                                    });
+                                    ).then(newEleve => {
+                                        if (newEleve) {
+                                            //res.sendStatus(201)
+                                            return res.status(201).send("Modification de pseudo réussie.")
+                                        } else {
+                                            return res.status(520).send("non défini")
+                                        }
+
+                                    }).catch(err => {
+                                        console.log(err)
+                                        res.status(500).send("Erreur lors de la modification de pseudo.")
+                                    })
                                 }
                             })
-                    } else {
-                        //res.send(eleveToChange);
-                        res.status(201).send("Pas de modification de pseudo.")
-                    }
-                }
+    } else {
+        //res.send(eleveToChange);
+        res.status(201).send("Pas de modification de pseudo.")
+    }
+}
             })
 
     }
@@ -535,7 +525,7 @@ const ChangementPreference = (req, res) => {
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
  */
-const ChangementClasse = (req, res)=>{
+const ChangementClasse = (req, res) => {
     console.log("\n*** Changement de classe ***")
     const emailEleve = req.body.mail;
     const emailClasse = req.body.mailClasse;
@@ -551,21 +541,21 @@ const ChangementClasse = (req, res)=>{
     }
 
     Classe.findOne({
-        where:{courriel:emailClasse}
-    }).then(classe=>{
-        if(!classe){
+        where: { courriel: emailClasse }
+    }).then(classe => {
+        if (!classe) {
             console.log("Pas de classe trouvée !")
-            return res.status(404).send("Aucune classe trouvée correspondant à ce mail : "+emailClasse)
+            return res.status(404).send("Aucune classe trouvée correspondant à ce mail : " + emailClasse)
         }
         Eleve.findOne({
-            where:{courriel:emailEleve}
-        }).then(eleve=>{
-            if(!eleve){
+            where: { courriel: emailEleve }
+        }).then(eleve => {
+            if (!eleve) {
                 console.log("Pas d'élève trouvé !")
-                return res.status(404).send("Aucun élève trouvé correspondant à ce mail : "+emailEleve)
+                return res.status(404).send("Aucun élève trouvé correspondant à ce mail : " + emailEleve)
             }
             console.log("Début modification ")
-            if(eleve.idclasse==classe.idclasse){
+            if (eleve.idclasse == classe.idclasse) {
                 console.log("classe déjà enregistrée")
                 return res.status(204).send("Cet élève est déjà enregistré avec cet classe.")
             }
