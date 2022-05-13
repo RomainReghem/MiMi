@@ -24,8 +24,9 @@ const Form = () => {
             Notifs("Erreur taille de fichier", "Le fichier séléctionné doit faire moins de 10Mo", "warning")
             return;
         }
-        formData.append("selectedFile", selectedFile);
-        console.log(selectedFile);
+        formData.append("file", selectedFile);
+        formData.append("filename", selectedFile.name);
+        console.log(selectedFile.name);
         try {
             const response = await axios.post("/saveFile", { mail: auth?.user, cours: "maths", data:formData },
                 {
