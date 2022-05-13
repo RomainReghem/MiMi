@@ -409,40 +409,35 @@ const ChangementPseudo = (req, res) => {
                 } else {
                     // sinon on ne change rien
                     if (eleveToChange.pseudo != pseudo) {
-                        // on vérifie que le pseudo ne soit pas déjà pris
-                        Eleve.findOne({ where: { pseudo: pseudo } })
-                            .then(elevePseudo => {
-                                if (elevePseudo) {
-                                    res.status(408).send("Pseudo déjà pris")
-                                } else {
-                                    Eleve.update(
-                                        {
-                                            pseudo: pseudo,
-                                        },
-                                        {
-                                            where: { ideleve: eleveToChange.ideleve },
-                                        }
-                                    ).then(newEleve => {
-                                        if (newEleve) {
-                                            //res.sendStatus(201)
-                                            return res.status(201).send("Modification de pseudo réussie.")
-                                        } else {
-                                            return res.status(520).send("non défini")
-                                        }
 
-                                    }).catch(err => {
-                                        console.log(err)
-                                        res.status(500).send("Erreur lors de la modification de pseudo.")
-                                    })
-                                }
-                            })
-    } else {
-        //res.send(eleveToChange);
-        res.status(201).send("Pas de modification de pseudo.")
-    }
-}
+                        Eleve.update(
+                            {
+                                pseudo: pseudo,
+                            },
+                            {
+                                where: { ideleve: eleveToChange.ideleve },
+                            }
+                        ).then(newEleve => {
+                            if (newEleve) {
+                                //res.sendStatus(201)
+                                return res.status(201).send("Modification de pseudo réussie.")
+                            } else {
+                                return res.status(520).send("non défini")
+                            }
+
+                        }).catch(err => {
+                            console.log(err)
+                            res.status(500).send("Erreur lors de la modification de pseudo.")
+                        })
+
+                    } else {
+                        //res.send(eleveToChange);
+                        res.status(201).send("Pas de modification de pseudo.")
+                    }
+                }
+
+
             })
-
     }
 }
 

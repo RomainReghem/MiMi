@@ -40,7 +40,7 @@ router.get('/eleves', Classe.getAllStudents)
 // route pour récupèrer l'avatar
 router.get('/avatar', Document.getAvatar)
 // route pour sauvegarder un document d'un élève
-router.post('/saveFile', Document.saveCoursEleve)
+router.post('/saveFile',verifyDoc, Document.saveCoursEleve)
 // route pour récupèrer un document d'un élève
 router.get('/getFile', Document.getCoursEleve)
 // route pour récupèrer le nom de tous les fichiers qu'un élève possède
@@ -48,8 +48,8 @@ router.get('/getFiles', Document.getAllCoursEleve)
 // route pour récupèrer le nom de toutes les matières qu'un élève possède
 router.get('/getFiles', Document.getAllMatieresEleve)
 
-// route pour changer le pseudo : seulement pour l'élève
-// router.post('/changeUsername', Modification.ChangementPseudo)
+//route pour changer le pseudo : seulement pour l'élève
+router.post('/changePseudo', Modification.ChangementPseudo)
 // route pour changer les préférences (comment l'élève sera représenté)
 // router.post('/changePref', Modification.ChangementPreference)
 
