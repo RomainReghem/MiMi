@@ -25,9 +25,9 @@ const Form = () => {
             return;
         }
         formData.append("selectedFile", selectedFile);
-        console.log(formData);
+        console.log(selectedFile);
         try {
-            const response = await axios.post("/saveFile", JSON.stringify({ mail: auth?.user, cours: "maths" }), formData,
+            const response = await axios.post("/saveFile", { mail: auth?.user, cours: "maths", data:formData },
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                 });

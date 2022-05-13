@@ -1,4 +1,4 @@
-import Avatar, { AvatarFullConfig, genConfig } from 'react-nice-avatar'
+import Avatar, { genConfig } from 'react-nice-avatar'
 import Notifs from '../components/Notifs';
 import { useState, useEffect } from 'react'
 import axios from '../api/axios';
@@ -7,7 +7,6 @@ import useAuth from "../hooks/useAuth";
 import { GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
 import { AiOutlineBgColors } from 'react-icons/ai';
 import { RiSave3Fill } from 'react-icons/ri';
-import { BsGenderAmbiguous } from 'react-icons/bs';
 import { FaTshirt } from 'react-icons/fa';
 import { FaHatCowboy } from 'react-icons/fa';
 import { FaGlasses } from 'react-icons/fa';
@@ -111,7 +110,7 @@ const AvatarComponent = () => {
                     withCredentials: true
                 });
             console.log(response?.data)
-            Notifs("Avatar sauvegardé !", "Recharger la page s'il ne s'affiche pas correctement", "Success")
+            Notifs("Avatar sauvegardé !", "Rechargez la page s'il ne s'affiche pas correctement", "Success")
             
 
         } catch (err) { console.log("couldnt save avatar"); }
@@ -132,16 +131,16 @@ const AvatarComponent = () => {
                     <div className="controls">
                         <div className="controls-firstRow">
                             <button className="controls-btn" onClick={changeBg}><AiOutlineBgColors size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, glassesStyle: glasses[(glasses.findIndex((e) => e == config.glassesStyle) + 1) % glasses.length] })}><FaGlasses size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, shirtStyle: shirts[(shirts.findIndex((e) => e == config.shirtStyle) + 1) % shirts.length], shirtColor: randomColor() })}><FaTshirt size={iconSize} /></button>
+                            <button className="controls-btn" onClick={() => setConfig({ ...config, glassesStyle: glasses[(glasses.findIndex((e) => e === config.glassesStyle) + 1) % glasses.length] })}><FaGlasses size={iconSize} /></button>
+                            <button className="controls-btn" onClick={() => setConfig({ ...config, shirtStyle: shirts[(shirts.findIndex((e) => e === config.shirtStyle) + 1) % shirts.length], shirtColor: randomColor() })}><FaTshirt size={iconSize} /></button>
                             <button className="controls-btn" onClick={changeHat}><FaHatCowboy size={iconSize} /></button>
                         </div>
 
                         <div className="controls-secondRow">
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, faceColor: faces[(faces.findIndex((e) => e == config.faceColor) + 1) % faces.length] })}><BiFace size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, mouthStyle: mouths[(mouths.findIndex((e) => e == config.mouthStyle) + 1) % mouths.length] })}><GiLips size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, eyeStyle: eyes[(eyes.findIndex((e) => e == config.eyeStyle) + 1) % eyes.length] })}><GiAngryEyes size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, noseStyle: noses[(noses.findIndex((e) => e == config.noseStyle) + 1) % noses.length] })}><GiNoseSide size={iconSize} /></button>
+                            <button className="controls-btn" onClick={() => setConfig({ ...config, faceColor: faces[(faces.findIndex((e) => e === config.faceColor) + 1) % faces.length] })}><BiFace size={iconSize} /></button>
+                            <button className="controls-btn" onClick={() => setConfig({ ...config, mouthStyle: mouths[(mouths.findIndex((e) => e === config.mouthStyle) + 1) % mouths.length] })}><GiLips size={iconSize} /></button>
+                            <button className="controls-btn" onClick={() => setConfig({ ...config, eyeStyle: eyes[(eyes.findIndex((e) => e === config.eyeStyle) + 1) % eyes.length] })}><GiAngryEyes size={iconSize} /></button>
+                            <button className="controls-btn" onClick={() => setConfig({ ...config, noseStyle: noses[(noses.findIndex((e) => e === config.noseStyle) + 1) % noses.length] })}><GiNoseSide size={iconSize} /></button>
 
                         </div>
                         <div className="controls-thirdRow">

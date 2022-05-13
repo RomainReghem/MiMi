@@ -3,7 +3,7 @@ import Notifs from '../components/Notifs';
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import useAuth from "../hooks/useAuth";
-import Avatar, { AvatarFullConfig, genConfig } from 'react-nice-avatar'
+import Avatar from 'react-nice-avatar'
 import useLogout from "../hooks/useLogout";
 import { GrGamepad } from 'react-icons/gr';
 import { BiPowerOff } from 'react-icons/bi';
@@ -14,8 +14,25 @@ import { HiOutlineDocumentText } from 'react-icons/hi';
 const Nav = () => {
     const { auth } = useAuth();
     const [pseudo, setPseudo] = useState("Profil");
-    const [avatar, setAvatar] = useState(auth?.avatarconfig);
-    const color = "blue";
+    let avatar_base = {
+        bgColor: "#E0DDFF",
+        earSize: "small",
+        eyeBrowStyle: "up",
+        eyeStyle: "oval",
+        faceColor: "#AC6651",
+        glassesStyle: "none",
+        hairColor: "#000",
+        hairStyle: "thick",
+        hatColor: "#000",
+        hatStyle: "none",
+        mouthStyle: "laugh",
+        noseStyle: "round",
+        shirtColor: "#6BD9E9",
+        shirtStyle: "polo",
+        shape: "square"
+    };
+
+    const [avatar, setAvatar] = useState(avatar_base);
 
 
     const iconSize = 18;
@@ -26,7 +43,7 @@ const Nav = () => {
         await logout();
         navigate('/')
         Notifs('Déconnexion', '', 'info')
-        
+
     }
 
     const getPseudo = async (e) => {
@@ -82,21 +99,38 @@ const Nav = () => {
                         </li>
                         <li>|</li>
                         <li>
-                            <Link to="/login">Connexion</Link>
+                            <Link to="/tests">Tests</Link>
                         </li>
                         <li>|</li>
-                        <li>
-                            <Link to="/Tests">tests</Link>
+
+                        <li className="connexion">
+                            <Link to="/login">
+                                <button>
+                                    <p className="navText">Connexion</p>
+                                </button>
+                            </Link>
                         </li>
+
                     </ul>
                 </nav>
             ) : (
                 <nav className="navNav">
                     <ul>
-                        <li style={{background:avatar?.bgColor, marginRight:"0rem", paddingRight:"1.2rem" }}>
-                            <Link to="/Profile" className="navNavProfile"><Avatar style={{ width: '3rem', height: '3rem', marginRight: "1rem" }} {...avatar} />
-                                <p className="navText pseudo">{pseudo}</p></Link>
-                        </li>
+                        {auth?.role == "eleve" ? (
+                            <li style={{ background: avatar?.bgColor, marginRight: "0rem", paddingRight: "1.2rem" }}>
+                                <Link to="/Profile" className="navNavProfile">
+                                    <Avatar style={{ width: '3rem', height: '3rem', marginRight: "1rem" }} {...avatar} />
+                                    <p className="navText pseudo">{pseudo}</p>
+                                </Link>
+                            </li>
+                        ) : (
+                            <li style={{ background: avatar_base?.bgColor, marginRight: "0rem", paddingRight: "1.2rem" }}>
+                                <Link to="/Profile" className="navNavProfile">
+                                    <Avatar style={{ width: '3rem', height: '3rem', marginRight: "1rem" }} {...avatar_base} />
+                                    <p className="navText pseudo">Classe</p>
+                                </Link>
+                            </li>
+                        )}
                         <li>|</li>
                         <li>
                             <Link to="/documents" >
@@ -121,10 +155,12 @@ const Nav = () => {
                         <li className="deconnexion">
                             <button onClick={signOut}>
                                 <p className="navText">Déconnexion</p>
-                                <BiPowerOff size={iconSize} className="navIcon" /></button>
+                                <BiPowerOff size={iconSize} className="navIcon" />
+                            </button>
                         </li>
                     </ul>
-                </nav>)}
+                </nav>)
+            }
         </>
     );
 }

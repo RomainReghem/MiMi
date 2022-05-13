@@ -59,7 +59,7 @@
 }
 
 .profileSettings h3,
-.profileContainer h3 {
+.pcChild h3 {
     font-family: Abril Fatface;
     margin-bottom: 0px;
 }
@@ -69,6 +69,12 @@
 
 }
 
+.pcMain h2{
+    font-family: Abril Fatface;
+}
+.pcSettings {
+    margin-right: 5rem;
+}
 .profileSettings button, .pcMain button {
     width: 3rem;
     padding: 5px 5px;
@@ -123,10 +129,6 @@
     flex-direction: row;
 }
 
-.pcChild .profilePwd,
-.pcChild .profileMail {
-    margin: 20px;
-}
 
 .controls {
     display: flex;

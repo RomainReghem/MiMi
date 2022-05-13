@@ -48,11 +48,32 @@
     border:none;
     color:#F2F2F2;
     cursor: pointer;    
-    box-shadow: 1px 1px #8D1D16;
+    box-shadow: 2px 2px #8D1D16;
 }
 
 .deconnexion button:hover{    
-    box-shadow: 2px 2px #8D1D16;
+    box-shadow: 3px 3px #8D1D16;
+    transition-duration: 300ms;
+    transition-property: box-shadow;
+}
+
+.connexion{
+    margin-left: auto;
+}
+
+.connexion button {
+    font-family: Abril Fatface;
+    background-color: #258A54;
+    font-size: 0.9rem;
+    padding: 0.7rem 1rem;
+    border:none;
+    color:#EAFADD;
+    cursor: pointer;    
+    box-shadow: 2px 2px #25633D;
+}
+
+.connexion button:hover{    
+    box-shadow: 3px 3px #25633D;
     transition-duration: 300ms;
     transition-property: box-shadow;
 }
