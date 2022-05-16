@@ -30,6 +30,7 @@ import '../styles/documents.css'
 import 'react-notifications-component/dist/theme.css'
 import '../styles/identity.css'
 import '../styles/settings.css'
+import '../styles/users.css'
 
 
 

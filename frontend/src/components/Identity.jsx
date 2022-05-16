@@ -15,18 +15,14 @@ const Identity = () => {
 
     const [mail, setMail] = useState(auth?.user);
     const [newPseudo, setNewPseudo] = useState('');
-    const [validNewPseudo, setValidNewPseudo] = useState(false);
     const [selectedPicture, setSelectedPicture] = useState();
-
-    useEffect(() => {
-        setValidNewPseudo(PSEUDO_REGEX.test(newPseudo));
-    }, [newPseudo])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMail(auth?.user);
 
         if (!PSEUDO_REGEX.test(newPseudo)) {
+            Notifs('Erreur', 'Le pseudo doit comporter entre 4 et 24 caractères alphanumériques ', 'Danger');
             return;
         }
 
@@ -44,11 +40,11 @@ const Identity = () => {
         } catch (err) {
             if (!err?.response) {
                 Notifs('Erreur', 'Pas de réponse du serveur', 'Danger')
-            } else if (err.response?.status === 406 || err.response?.status === 407) {
-                Notifs('Erreur', 'Mauvais format de mail', 'Danger')
+            } else if (err.response?.status === 407 || err.response?.status === 401) {
+                Notifs('Erreur', "Problème d'authentification, reconnectez-vous", 'Danger')
             }
-            else if (err.response?.status === 400) {
-                Notifs('Erreur', 'Mauvais mot de passe', 'Danger')
+            else if (err.response?.status === 405) {
+                Notifs('Erreur', 'Pseudo incorrect', 'Danger')
             } else {
                 Notifs('Erreur', 'Veuillez réessayer', 'Danger')
             }
@@ -57,13 +53,27 @@ const Identity = () => {
     }
 
     const handlePictureSelect = (event) => {
-        setSelectedPicture(event.target.files[0])
+        const img = {
+            preview: URL.createObjectURL(event.target.files[0]),
+            data: event.target.files[0],
+        }
+        setSelectedPicture(img)
     }
+
+    const pictureSubmit = async () => {
+        let formData = new FormData()
+        formData.append('file', selectedPicture.data)
+        const response = await fetch('/image', {
+          method: 'POST',
+          body: formData,
+        })
+        console.log(response)
+      }
 
     return (
         <div className="identity">
             <h3>Préférences</h3>
-            
+
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
@@ -73,12 +83,12 @@ const Identity = () => {
                     required
                     placeholder="Nouveau pseudo"
                 />
-                <button className="pseudoSubmit"><FontAwesomeIcon icon={faCheck}/></button>
+                <button className="pseudoSubmit"><FontAwesomeIcon icon={faCheck} /></button>
             </form>
-            
+
             <div className="importProfilePic">
-                    <input type="file" id="picture" className="pictureInput" onChange={handlePictureSelect} />
-                    <label htmlFor="picture" className="pictureLabel"><FontAwesomeIcon icon={faUpload} /><p>Importer une image de profil</p></label></div>
+                <input type="file" id="picture" className="pictureInput" onChange={handlePictureSelect} />
+                <label htmlFor="picture" className="pictureLabel"><FontAwesomeIcon icon={faUpload} /><p>Importer une image de profil</p></label></div>
             <div className="preferences">
                 <button className="chooseImage">Choisir l'image</button>
                 <button className="chooseAvatar">Choisir l'avatar</button>

@@ -22,16 +22,7 @@ const Profile = () => {
                     <AvatarComponent/>
                 </div>) : (
                 <div className="pcMain">
-                    <h2>Tableau de bord classe #4234</h2>
-                    <div className="pcChild">
-                        <section className="pcSettings">
-                        <ChangePwd /><br />
-                        <ChangeMail />
-                        </section>
-                        <section className="pcUsers">
-                            <Users />
-                        </section>
-                    </div>
+                        <Users />
                 </div>)}
         </>
     )

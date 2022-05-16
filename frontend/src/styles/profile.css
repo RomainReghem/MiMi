@@ -27,8 +27,6 @@
     }
 }
 
-
-
 .profileGraphics {
     display: flex;
     flex-direction: column;
@@ -45,9 +43,6 @@
     margin-top: 0;
 }
 
-.pcMain h2{
-    font-family: Abril Fatface;
-}
 .pcSettings {
     margin-right: 5rem;
 }
@@ -61,21 +56,14 @@
 
 .pcMain {
     display: flex;
-    flex-grow: 1;
+    flex-grow: 1;    
     flex-shrink: 1;
     flex-basis: auto;
     justify-content: center;
     align-items: center;
-    width: 100%;
     flex-direction: column;
 
 }
-
-.pcChild {
-    display: flex;
-    flex-direction: row;
-}
-
 
 .controls {
     display: flex;

@@ -25,13 +25,16 @@ const Form = () => {
         }
         formData.append("file", selectedFile);
         formData.append("filename", selectedFile.name);
+        formData.append("cours", "maths");
+        formData.append("mail", auth?.user)
         console.log(selectedFile.name);
         try {
-            const response = await axios.post("/saveFile", { mail: auth?.user, cours: "maths", data:formData },
+            const response = await axios.post("/saveFile", formData,
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
             Notifs("Fichier ajouté !", "", "success")
+            console.log(response)
         } catch (error) {
             console.log(error)
         }
