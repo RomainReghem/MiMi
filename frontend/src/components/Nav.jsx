@@ -86,12 +86,12 @@ const Nav = () => {
             setImageURL(URL.createObjectURL(JSON.parse(response.data.image)));
         } catch (err) { console.log("Erreur du chargement de l'image de profil"); }
     }
-
     // On ne récupère l'avatar que s'il y a eu un changement, ou une connexion. Pour ne pas spammer les requetes
     useEffect(() => {
-        if (auth?.user != undefined)
+        if (auth?.user != undefined){
             getAvatar();
             getImage();
+        }
     }, [auth?.user, auth?.avatarconfig])
 
     // On ne récupère le pseudo qu'a la connexion

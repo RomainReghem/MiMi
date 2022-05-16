@@ -24,7 +24,7 @@
 
 .identity input {
     background-color: #F2E3D5;
-    width: 11.5rem;
+    width: 11.4rem;
     padding: 0.8rem 1rem;
     margin-top:0.5rem;
     outline: none;
@@ -86,6 +86,7 @@
 
 .importProfilePic{    
     margin-top: 1rem;
+    display: flex;
 }
 .pictureInput{
     display: none;
@@ -96,7 +97,7 @@
     margin-left: 0.5rem;
 }
 
-.pictureLabel{
+.pictureLabel, .pictureSendButton{
     color: #F2E3D5;
     text-align: center;
     display: block;
@@ -106,12 +107,20 @@
     padding: 0.8rem 0rem;
     cursor: pointer;
     border: none;
-    width:17rem;
     box-shadow: 2px 2px #012E40;
     margin-bottom: 1rem;
 }
 
-.pictureLabel:hover{
+.pictureLabel{
+    width:13.9rem;
+}
+
+.pictureSendButton{
+    width:3rem;
+    border-left: 1px solid #F2E3D5;
+}
+
+.pictureLabel:hover, .pictureSendButton:hover{
     box-shadow: 3px 3px #012E40;
     transition-duration: 300ms;
     transition-property: box-shadow;

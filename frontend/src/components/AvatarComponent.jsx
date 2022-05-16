@@ -24,8 +24,7 @@ const AvatarComponent = () => {
     let mail = auth?.user;
 
     useEffect(() => {
-        getAvatar()
-        
+        getAvatar()        
     },[])
 
     const getAvatar = async (e) => {

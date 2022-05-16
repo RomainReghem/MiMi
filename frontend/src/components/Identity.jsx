@@ -3,7 +3,7 @@ import useAuth from "../hooks/useAuth";
 import axios from '../api/axios';
 import Notifs from '../components/Notifs';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faUpload, faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import Avatar from 'react-nice-avatar'
 
 const CHANGEPSEUDO_URL = '/changePseudo';
@@ -12,11 +12,10 @@ const PSEUDO_REGEX = /^[A-z0-9-_]{3,24}$/;
 
 const Identity = () => {
 
-    const { auth, setAuth } = useAuth();
-    
+    const { auth, setAuth } = useAuth();    
     const [mail, setMail] = useState(auth?.user);
     const [newPseudo, setNewPseudo] = useState('');
-    const [selectedPicture, setSelectedPicture] = useState({preview:"https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg", data:""});
+    const [selectedPicture, setSelectedPicture] = useState({preview:"https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg", data:null});
     let avatar_base = {
         bgColor: "#E0DDFF",
         earSize: "small",
@@ -35,6 +34,9 @@ const Identity = () => {
         shape: "square"
     };
     const [avatar, setAvatar] = useState(avatar_base);
+    const [pictureWaitingToBeSent, setPictureWaitingToBeSent] = useState(false);
+
+    const [picture, setPicture] = useState(selectedPicture);
 
     const getAvatar = async (e) => {
         try {
@@ -48,11 +50,29 @@ const Identity = () => {
         } catch (err) { console.log("Erreur du chargement de l'avatar"); }
     }
 
+    const getImage = async (e) => {
+        try {
+            const response = await axios.get("/getImage",
+                {
+                    params: { mail: auth?.user },
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                });
+            console.log(response.data.image);
+            setPicture(response.data.image);
+        } catch (err) { console.log("Erreur du chargement de l'image de profil"); }
+    }
+
     // On ne récupère l'avatar que s'il y a eu un changement, ou une connexion. Pour ne pas spammer les requetes
     useEffect(() => {
         if (auth?.user != undefined)
-            getAvatar()
+            getAvatar();
     }, [auth?.user, auth?.avatarconfig])
+
+    // On ne récupère l'image que si une image a été envoyée
+    useEffect(() => {
+        getImage();
+    }, [pictureWaitingToBeSent])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -90,6 +110,7 @@ const Identity = () => {
     }
 
     const handlePictureSelect = (event) => {
+        setPictureWaitingToBeSent(true);
         const img = {
             preview: URL.createObjectURL(event.target.files[0]),
             data: event.target.files[0],
@@ -108,12 +129,6 @@ const Identity = () => {
         setSelectedPicture(img);
     }
 
-    useEffect(() => {
-        if (selectedPicture) {
-            pictureSubmit();
-        }
-    }, [selectedPicture])
-
     const pictureSubmit = async () => {
         let formData = new FormData()
         formData.append('file', selectedPicture.data);        
@@ -125,6 +140,7 @@ const Identity = () => {
                     headers: { "Content-Type": "image/*" },
                 });
             Notifs("Image de profil sauvegardée !", "", "success")
+            setPictureWaitingToBeSent(false);
             console.log(response)
         } catch (error) {
             console.log(error)
@@ -149,7 +165,8 @@ const Identity = () => {
 
             <div className="importProfilePic">
                 <input type="file" id="picture" className="pictureInput" onChange={handlePictureSelect} />
-                <label htmlFor="picture" className="pictureLabel"><FontAwesomeIcon icon={faUpload} /><p>Importer une image de profil</p></label>
+                <label htmlFor="picture" className="pictureLabel"><FontAwesomeIcon icon={faUpload} /><p>{selectedPicture?.data && pictureWaitingToBeSent ? (selectedPicture?.data.name).substring(0, 10) + "..." : "Importer une image"}</p></label>
+                <button className="pictureSendButton" onClick={pictureSubmit}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></button>
             </div>
             <div className="preferences">
                 <div>
@@ -162,10 +179,6 @@ const Identity = () => {
                 </div>
             </div>
         </div>
-
-
     );
-
 }
-
 export default Identity;
