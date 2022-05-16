@@ -71,18 +71,27 @@ const Nav = () => {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            console.log(JSON.parse(response.data.avatar))
             setAvatar(JSON.parse(response.data.avatar));
-
-
-
         } catch (err) { console.log("Erreur du chargement de l'avatar"); }
+    }
+
+    const getImage = async (e) => {
+        try {
+            const response = await axios.get("/image",
+                {
+                    params: { mail: auth?.user },
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                });
+            setImageURL(URL.createObjectURL(JSON.parse(response.data.image)));
+        } catch (err) { console.log("Erreur du chargement de l'image de profil"); }
     }
 
     // On ne récupère l'avatar que s'il y a eu un changement, ou une connexion. Pour ne pas spammer les requetes
     useEffect(() => {
         if (auth?.user != undefined)
-            getAvatar()
+            getAvatar();
+            getImage();
     }, [auth?.user, auth?.avatarconfig])
 
     // On ne récupère le pseudo qu'a la connexion

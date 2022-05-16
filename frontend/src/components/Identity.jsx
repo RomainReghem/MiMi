@@ -94,6 +94,17 @@ const Identity = () => {
             preview: URL.createObjectURL(event.target.files[0]),
             data: event.target.files[0],
         }
+        // PNG / JPEG only
+        console.log(img)
+        if (img.data.type != "image/png" && img.data.type != "image/jpeg" && img.data.type != "image/jpg") {
+            Notifs("Erreur type de fichier", "Les seules images acceptées sont les PNG et JPEG", "warning")
+            return;
+        }
+        // Fichiers < 10 Mo
+        if(img.data.size > 10_000_000){
+            Notifs("Erreur taille de fichier", "L'image séléctionnée doit faire moins de 10Mo", "warning")
+            return;
+        }
         setSelectedPicture(img);
     }
 
@@ -105,13 +116,19 @@ const Identity = () => {
 
     const pictureSubmit = async () => {
         let formData = new FormData()
-        console.log(selectedPicture)
-        formData.append('file', selectedPicture.data)
-        const response = await fetch('http://localhost:3500/image', {
-            method: 'POST',
-            body: formData,
-        })
-        console.log(response)
+        formData.append('file', selectedPicture.data);        
+        formData.append("filename", selectedPicture.data.name);
+        formData.append("mail", auth?.user);
+        try {
+            const response = await axios.post("/saveImage", formData,
+                {
+                    headers: { "Content-Type": "image/*" },
+                });
+            Notifs("Image de profil sauvegardée !", "", "success")
+            console.log(response)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
