@@ -37,8 +37,8 @@ app.use(
 );
 
 // pour l'enregistrement des documents
-app.use(fileupload());
-app.use(express.static("maths"));
+/*app.use(fileupload());
+app.use(express.static("files"));*/
 //app.use(bodyParser.json());
 
 app.use(express.urlencoded({ extended: true }));

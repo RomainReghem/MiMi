@@ -1,5 +1,5 @@
 const verifyJWT = require('../middleware/verificationJWT.js').verifyJWT
-const verifyDoc = require('../middleware/verificationSauvegardeDoc')
+const verifyDoc = require('../middleware/verificationSauvegardeDoc.js')
 const Connexion = require('../controllers/connexion.js')
 const Inscription = require('../controllers/inscription.js')
 const Deconnexion = require('../controllers/deconnexion.js')
@@ -13,6 +13,20 @@ const Classe = require('../controllers/classe.js')
 
 const express = require('express')
 const router = express.Router();
+
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './Eleves/temp')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname)
+    },
+})
+
+const upload = multer({ storage: storage })
+
 
 // route de la connexion d'un utilisateur
 router.post('/login', Connexion.Connexion);
@@ -36,11 +50,11 @@ router.get('/pseudo', Eleve.getUsernameStudent)
 router.get('/eleves', Classe.getAllStudents)
 
 // route pour sauvegarder l'avatar d'un élève
- router.post('/avatar', Document.saveAvatar)
+router.post('/avatar', Document.saveAvatar)
 // route pour récupèrer l'avatar
 router.get('/avatar', Document.getAvatar)
 // route pour sauvegarder un document d'un élève
-router.post('/saveFile',verifyDoc, Document.saveCoursEleve)
+router.post('/saveFile', upload.single("file"), Document.saveCoursEleve)
 // route pour récupèrer un document d'un élève
 router.get('/getFile', Document.getCoursEleve)
 // route pour récupèrer le nom de tous les fichiers qu'un élève possède

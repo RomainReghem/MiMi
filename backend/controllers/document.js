@@ -2,6 +2,7 @@ const Eleve = require('../models/users').Eleve
 
 const fs = require('fs');
 
+
 const { Storage } = require('@google-cloud/storage');
 
 const google_cloud_project_id = "oceanic-cacao-348707";
@@ -124,26 +125,27 @@ async function getJSON(path, num, res) {
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
  */
-const saveCoursEleve = (req, res) => {
+const saveCoursEleve = (req, res, next) => {
     console.log("\n*** Sauvegarde de cours d'un eleve ***")
-    //pour l'eleve
     const matiere = req.body.cours;
     const email = req.body.mail;
-    const doc = req.body.data;
 
-    console.log("document " + doc + " autre" + req.files + "fg " + req.file)
-    //console.log("test "+req.selectedFile)
-    /*for(r in doc){
-         console.log(" ok "+r)
-     }*/
-    //   console.log(req)
-
-    const nom = "test.pdf" //doc.name;
-
-    if (req.files == null) {
-        console.log("null")
+    const file = req.file
+    /* console.log(" files " + req.files + " file " + file)
+     for (r in file) {
+         console.log("- " + r)
+     }
+ */
+    if (file == null) {
+        console.log("Pas de fichier")
         return res.status(600).send("Erreur serveur")
     }
+    if (file.mimetype != "application/pdf") {
+        console.log("Pas le bon type de fichier")
+        return res.status(403).send("Le fichier n'est pas un pdf.")
+    }
+    const nom = file.originalname;
+    console.log(" nom fichier " + nom + ' type ' + file.mimetype)
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
         // erreur 400
@@ -195,15 +197,31 @@ const saveCoursEleve = (req, res) => {
                 console.error(err);
                 return res.status(600).send("Erreur lors de la création de dossier pour la matiere " + matiere)
             }
-
-            fs.writeFile(path + "/" + nom, doc, 'utf8', function (err) {
+            try {
+                if (!fs.existsSync('./Eleves/temp')) {
+                    fs.mkdirSync('./Eleves/temp');
+                }
+            } catch (err) {
+                console.error(err);
+                return res.status(600).send("Erreur lors de la création de dossier pour la matiere " + matiere)
+            }
+            fs.rename("./Eleves/temp/" + nom, path + "/" + nom, function (err) {
                 if (err) {
                     console.log("Erreur lors de l'enregistrement du document : " + err);
                     return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
                 }
                 console.log("Le fichier a bien été sauvegardé");
                 return res.status(201).send("Enregistrement effectué");
-            });
+            })
+
+            /*  fs.writeFile(path + "/" + nom, file.buffer, 'utf8', function (err) {
+                   if (err) {
+                       console.log("Erreur lors de l'enregistrement du document : " + err);
+                       return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                   }
+                   console.log("Le fichier a bien été sauvegardé");
+                   return res.status(201).send("Enregistrement effectué");
+               });*/
         })
 }
 
@@ -258,17 +276,20 @@ const getCoursEleve = (req, res) => {
                 return res.status(404).send("Élève inexistant");
             }
             const num = eleve.ideleve;
-            const path = "./Eleves/eleve" + num + "/depot/" + matiere;
+            const path = "./Eleves/eleve" + num + "/depot/" + matiere + "/" + name;
             // const files = getAllFiles(path);
-            fs.readFile(path, 'utf-80', function (err, avatar) {
-                if (err) {
-                    console.log('erreur lors de la récupération de l\'avatar')
-                    return res.status(600).send("Problème de lecture de l'avatar.")
-                }
-                console.log("avatar récupéré")
-                // on envoie le fichier json au front
-                res.json({ avatar: avatar })
-            })
+            /* fs.readFile(path, 'utf-80', function (err, avatar) {
+                 if (err) {
+                     console.log('erreur lors de la récupération de l\'avatar')
+                     return res.status(600).send("Problème de lecture de l'avatar.")
+                 }
+                 console.log("avatar récupéré")
+                 // on envoie le fichier json au front
+                 res.json({ avatar: avatar })
+             })*/
+            const file = fs.createReadStream(path)
+            res.setHeader('Content-Disposition', 'attachment: filename="' + name + (new Date()).toISOString() + '"')
+            file.pipe(res)
         })
 }
 

@@ -79,124 +79,114 @@ const InscriptionEleve = (req, res) => {
             console.log(err)
             return res.status(600)
         }
-        Eleve.findOne({ where: { pseudo: pseudo } })
+
+        // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
+        Eleve.findOne({ where: { courriel: email } })
             .then(eleve => {
-                // si on trouve un élève qui a déjà ce pseudo
                 if (eleve) {
-                    console.log("Pseudo pas unique");
-                    return res.sendStatus(408)
+                    console.log("Mail pas unique");
+                    return res.sendStatus(409)
                 } else {
-                    console.log("pseudo valide")
-                    // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
-                    Eleve.findOne({ where: { courriel: email } })
-                        .then(eleve => {
-                            if (eleve) {
-                                console.log("Mail pas unique");
-                                return res.sendStatus(409)
+                    console.log("mail unique pour eleves");
+                    Classe.findOne({ where: { courriel: email } })
+                        .then(classe => {
+                            if (classe) {
+                                console.log("Mail existant pour la classe");
+                                return res.sendStatus(410)
                             } else {
-                                console.log("mail unique pour eleves");
-                                Classe.findOne({ where: { courriel: email } })
-                                    .then(classe => {
-                                        if (classe) {
-                                            console.log("Mail existant pour la classe");
-                                            return res.sendStatus(410)
-                                        } else {
-                                            console.log("inscription ok")
-                                            console.log("mdp" + hash)
-                                            const neweleve = Eleve.create(({
-                                                pseudo: pseudo,
-                                                courriel: email,
-                                                motdepasse: hash,
-                                                nom: nom,
-                                                prenom: prenom
-                                            }))
-                                                .then((eleve) => {
-                                                    console.log("Création de compte élève réussie")
-                                                    const num = eleve.ideleve
-                                                    //const path = "./testeleve/eleve" + num + "/avatar"
-                                                    // console.log("*** Création d'un dossier ***")
+                                console.log("inscription ok")
+                                console.log("mdp" + hash)
+                                const neweleve = Eleve.create(({
+                                    pseudo: pseudo,
+                                    courriel: email,
+                                    motdepasse: hash,
+                                    nom: nom,
+                                    prenom: prenom
+                                }))
+                                    .then((eleve) => {
+                                        console.log("Création de compte élève réussie")
+                                        const num = eleve.ideleve
+                                        //const path = "./testeleve/eleve" + num + "/avatar"
+                                        // console.log("*** Création d'un dossier ***")
 
-                                                    /*   try {
-                                                           if (!fs.existsSync('./testeleve')) {
-                                                               fs.mkdirSync('./testeleve');
-                                                           }
-                                                       } catch (err) {
-                                                           console.error(err);
-                                                           return res.status(600).send("Erreur lors de la création de dossier test")
-                                                       }
-   
-                                                       try {
-                                                           if (!fs.existsSync('./testeleve/eleve' + num)) {
-                                                               fs.mkdirSync('./testeleve/eleve' + num);
-                                                           }
-                                                       } catch (err) {
-                                                           console.error(err);
-                                                           return res.status(600).send("Erreur lors de la création de dossier classe")
-                                                       }
-   
-                                                       try {
-                                                           if (!fs.existsSync(path)) {
-                                                               fs.mkdirSync(path);
-                                                           }
-                                                       } catch (err) {
-                                                           console.error(err);
-                                                           return res.status(600).send("Erreur lors de la création de dossier avatar")
-                                                       }*/
+                                        /*   try {
+                                               if (!fs.existsSync('./testeleve')) {
+                                                   fs.mkdirSync('./testeleve');
+                                               }
+                                           } catch (err) {
+                                               console.error(err);
+                                               return res.status(600).send("Erreur lors de la création de dossier test")
+                                           }
+ 
+                                           try {
+                                               if (!fs.existsSync('./testeleve/eleve' + num)) {
+                                                   fs.mkdirSync('./testeleve/eleve' + num);
+                                               }
+                                           } catch (err) {
+                                               console.error(err);
+                                               return res.status(600).send("Erreur lors de la création de dossier classe")
+                                           }
+ 
+                                           try {
+                                               if (!fs.existsSync(path)) {
+                                                   fs.mkdirSync(path);
+                                               }
+                                           } catch (err) {
+                                               console.error(err);
+                                               return res.status(600).send("Erreur lors de la création de dossier avatar")
+                                           }*/
 
-                                                    // enregistrement de l'avatar par défaut
-                                                    let avatar = {
-                                                        bgColor: "#E0DDFF",
-                                                        earSize: "small",
-                                                        eyeBrowStyle: "up",
-                                                        eyeStyle: "oval",
-                                                        faceColor: "#AC6651",
-                                                        glassesStyle: "none",
-                                                        hairColor: "#000",
-                                                        hairStyle: "thick",
-                                                        hatColor: "#000",
-                                                        hatStyle: "none",
-                                                        mouthStyle: "laugh",
-                                                        noseStyle: "round",
-                                                        shape: "square",
-                                                        shirtColor: "#6BD9E9",
-                                                        shirtStyle: "polo"
-                                                    }
-                                                    // avatar=JSON.parse(avatar)
-                                                    //  console.log("\n2."+avatar)
-                                                    avatar = JSON.stringify(avatar)
-                                                    /*
-                                                                                                     console.log("dossiers créés")
-                                                    
-                                                                                                        console.log("enregistrement d'un avatar")
-                                                                                                        fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
-                                                                                                            if (err) {
-                                                                                                                console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
-                                                                                                                return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-                                                                                                            }
-                                                                                                            console.log("Le fichier JSON a bien été sauvegardé");
-                                                                                                            //res.status(201).send("Enregistrement effectué");
-                                                                                                        });
-                                                    */
-                                                     bucket.file(path + "/avatar" + num + ".json").save(avatar, function (err) {
-                                                        if (err) {
-                                                            return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
-                                                        }
-                                                        console.log("Le fichier JSON a bien été sauvegardé");
-                                                        return res.status(201).send("Enregistrement effectué");
-                                                    })
-
-                                            //return res.send(neweleve);
+                                        // enregistrement de l'avatar par défaut
+                                        let avatar = {
+                                            bgColor: "#E0DDFF",
+                                            earSize: "small",
+                                            eyeBrowStyle: "up",
+                                            eyeStyle: "oval",
+                                            faceColor: "#AC6651",
+                                            glassesStyle: "none",
+                                            hairColor: "#000",
+                                            hairStyle: "thick",
+                                            hatColor: "#000",
+                                            hatStyle: "none",
+                                            mouthStyle: "laugh",
+                                            noseStyle: "round",
+                                            shape: "square",
+                                            shirtColor: "#6BD9E9",
+                                            shirtStyle: "polo"
+                                        }
+                                        // avatar=JSON.parse(avatar)
+                                        //  console.log("\n2."+avatar)
+                                        avatar = JSON.stringify(avatar)
+                                        /*console.log("dossiers créés")
+                                        console.log("enregistrement d'un avatar")
+                                        fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
+                                        if (err) {
+                                            console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+                                            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                                        }
+                                        console.log("Le fichier JSON a bien été sauvegardé");
+                                        //res.status(201).send("Enregistrement effectué");
+                                                                                            });
+                                        */
+                                        bucket.file(path + "/avatar" + num + ".json").save(avatar, function (err) {
+                                            if (err) {
+                                                return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
+                                            }
+                                            console.log("Le fichier JSON a bien été sauvegardé");
+                                            return res.status(201).send("Enregistrement effectué");
                                         })
+
+                                        //return res.send(neweleve);
+                                    })
                                     .catch(err => {
                                         console.log("erreur inscription eleve : " + err)
                                     })
                             }
                         }
                         )
-                }
-            })
 
-    }
+
+                }
             }
             )
     }
