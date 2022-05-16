@@ -46,7 +46,7 @@ router.get('/avatar', Image.getAvatar)
 // route pour sauvegarder l'image de profil d'un élève
 router.post('/saveImage', verifyImg.single("file"), Image.savePicture)
 // route pour récupèrer l'image de profil d'un élève
-// router.get('/picture', Image.getPicture)
+router.get('/getImage', Image.getPicture)
 
 // route pour sauvegarder un document d'un élève
 router.post('/saveFile', verifyDoc.single("file"), Document.saveCoursEleve)
@@ -55,7 +55,7 @@ router.get('/getFile', Document.getCoursEleve)
 // route pour récupèrer le nom de tous les fichiers qu'un élève possède
 router.get('/getFiles', Document.getAllCoursEleve)
 // route pour récupèrer le nom de toutes les matières qu'un élève possède
-router.get('/getFiles', Document.getAllMatieresEleve)
+router.get('/getCours', Document.getAllMatieresEleve)
 
 //route pour changer le pseudo : seulement pour l'élève
 router.post('/changePseudo', Modification.ChangementPseudo)

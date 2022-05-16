@@ -109,8 +109,8 @@ const getAllMatieresEleve = (req, res) => {
 }
 
 const getAllCoursEleve = (req, res) => {
-    const email = req.body.mail;
-    const matiere = req.body.cours;
+    const email = req.query.mail;
+    const matiere = req.query.cours;
 
     Eleve.findOne({
         where: { courriel: email }
@@ -128,8 +128,8 @@ const getAllCoursEleve = (req, res) => {
 }
 
 const getCoursEleve = (req, res) => {
-    const email = req.body.mail;
-    const matiere = req.body.cours;
+    const email = req.query.mail;
+    const matiere = req.query.cours;
     const name = req.body.name;
     console.log(name)
     Eleve.findOne({
@@ -152,7 +152,7 @@ const getCoursEleve = (req, res) => {
                  // on envoie le fichier json au front
                  res.json({ avatar: avatar })
              })*/
-            const file = fs.createReadStream(path)
+            const file = fs.createReadStream(path);
             res.setHeader('Content-Disposition', 'attachment: filename="' + name + (new Date()).toISOString() + '"')
             file.pipe(res)
         })
@@ -163,7 +163,7 @@ const getCoursEleve = (req, res) => {
  * @param {*} path le chemin du répertoire à lister
  */
 async function getAllFiles(path) {
-    fs.readdirSync(dir, function (err, files) {
+    fs.readdirSync(path, function (err, files) {
         if (err) {
             console.log("erreur durant la récupération " + err)
             return [];

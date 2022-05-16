@@ -117,8 +117,8 @@ async function getJSON(path, num, res) {
         })
 }
 
-const savePicture=(req,res)=>{
-    console.log("\nSauvegarde de l'image de profil de l'élève")
+const savePicture = (req, res) => {
+    console.log("\n*** Sauvegarde de l'image de profil de l'élève ***")
     const img = req.file
     const email = req.body.mail;
 
@@ -132,7 +132,7 @@ const savePicture=(req,res)=>{
     }
     const nom = img.originalname;
     console.log(" nom fichier " + nom + ' type ' + img.mimetype)
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+    if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
         console.log("forme mail incorrect")
         // erreur 400
         return res.sendStatus(407)
@@ -147,11 +147,11 @@ const savePicture=(req,res)=>{
             }
             const num = eleve.ideleve;
             const path = "./Eleves/eleve" + num + "/avatar/";
-           
+
             verificationChemin(path)
-            const type=img.mimetype.split("/")[1]
-             console.log("type "+type)
-            fs.writeFile(path + "/photo."+type, img.buffer, 'utf8', function (err) {
+            const type = img.mimetype.split("/")[1]
+            console.log("type " + type)
+            fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err) {
                 if (err) {
                     console.log("Erreur lors de l'enregistrement de la photo : " + err);
                     return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
@@ -162,8 +162,8 @@ const savePicture=(req,res)=>{
         })
 }
 
-const getPicture=(req,res)=>{
-    console.log("\nRécupération de l'image de profil de l'élève")
+const getPicture = (req, res) => {
+    console.log("\n*** Récupération de l'image de profil de l'élève ***")
     const email = req.query.mail;
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
@@ -180,19 +180,44 @@ const getPicture=(req,res)=>{
                 return res.status(404).send("Élève pas trouvé")
             }
             const num = eleve.ideleve;
-            const path = "./Eleves/eleve" + num + "/avatar/photo.jpg";
-           
-            const file = fs.createReadStream(path)
-            res.send({img:file}).status(201)
+            const path = "./Eleves/eleve" + num + "/avatar";
+
+            fs.readdir(path, function (err, files) {
+                if (err) {
+                    console.log("erreur durant la récupération " + err)
+                    return res.status(600).send('Erreur lors de la récupèration de la pp.');
+                } else {
+                    for (const f of files) {
+                        console.log(f)
+                        if (f.startsWith('photo')) {
+                           /* res.writeHead(200, {
+                                 "Content-Type": "image/" + f.split('/')[1]
+                             });*/
+                            fs.readFile(path + "/" + f, function (err, image) {
+                                if(err){
+                                    console.log("erreur lors de la recup de pp "+err)
+                                    return res.status(520).send(err)
+                                }
+                                console.log("Récupération ok")
+                                return res.send({ image: image });
+                            });
+                        }
+
+                    }
+                }
+            })
+//console.log("pas d'image")
+           // return res.status(204).send("L'élève n'a pas de photo de profil.")
+
         })
 }
- 
-function verificationChemin(pathToVerify){
+
+function verificationChemin(pathToVerify) {
     let dossiers = pathToVerify.split('/')
-    let path=dossiers[0]
-    for (var i=1 ; i< dossiers.length ; i++){
+    let path = dossiers[0]
+    for (var i = 1; i < dossiers.length; i++) {
         try {
-            path+="/"+dossiers[i]
+            path += "/" + dossiers[i]
             if (!fs.existsSync(path)) {
                 fs.mkdirSync(path);
             }
@@ -203,4 +228,4 @@ function verificationChemin(pathToVerify){
     }
 }
 
-module.exports = { saveAvatar, getAvatar, savePicture}
+module.exports = { saveAvatar, getAvatar, savePicture, getPicture }
