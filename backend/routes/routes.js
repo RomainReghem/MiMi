@@ -1,11 +1,15 @@
+// MIDDLEWARES
 const verifyJWT = require('../middleware/verificationJWT.js').verifyJWT
 const verifyDoc = require('../middleware/verificationSauvegardeDoc.js')
+const verifyImg = require('../middleware/verificationImage.js')
+// CONTROLLERS
 const Connexion = require('../controllers/connexion.js')
 const Inscription = require('../controllers/inscription.js')
 const Deconnexion = require('../controllers/deconnexion.js')
 const refreshToken = require('../controllers/refreshToken.js')
 const Modification = require('../controllers/modification.js')
 const Document = require('../controllers/document.js')
+const Image = require('../controllers/image.js')
 
 // controlleurs spécifiques en fonction du type d'utilisateur
 const Eleve = require('../controllers/eleve.js')
@@ -13,20 +17,6 @@ const Classe = require('../controllers/classe.js')
 
 const express = require('express')
 const router = express.Router();
-
-const multer = require("multer");
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, './Eleves/temp')
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname)
-    },
-})
-
-const upload = multer({ storage: storage })
-
 
 // route de la connexion d'un utilisateur
 router.post('/login', Connexion.Connexion);
@@ -50,11 +40,16 @@ router.get('/pseudo', Eleve.getUsernameStudent)
 router.get('/eleves', Classe.getAllStudents)
 
 // route pour sauvegarder l'avatar d'un élève
-router.post('/avatar', Document.saveAvatar)
+router.post('/avatar', Image.saveAvatar)
 // route pour récupèrer l'avatar
-router.get('/avatar', Document.getAvatar)
+router.get('/avatar', Image.getAvatar)
+// route pour sauvegarder l'image de profil d'un élève
+router.post('/saveImage', verifyImg.single("file"), Image.savePicture)
+// route pour récupèrer l'image de profil d'un élève
+// router.get('/picture', Image.getPicture)
+
 // route pour sauvegarder un document d'un élève
-router.post('/saveFile', upload.single("file"), Document.saveCoursEleve)
+router.post('/saveFile', verifyDoc.single("file"), Document.saveCoursEleve)
 // route pour récupèrer un document d'un élève
 router.get('/getFile', Document.getCoursEleve)
 // route pour récupèrer le nom de tous les fichiers qu'un élève possède
