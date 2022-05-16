@@ -77,7 +77,7 @@ const Nav = () => {
 
     const getImage = async (e) => {
         try {
-            const response = await axios.get("/image",
+            const response = await axios.get("/getImage",
                 {
                     params: { mail: auth?.user },
                     headers: { 'Content-Type': 'application/json' },
