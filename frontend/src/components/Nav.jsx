@@ -11,6 +11,7 @@ import { AiOutlineVideoCamera } from 'react-icons/ai';
 import { HiOutlineDocumentText } from 'react-icons/hi';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
+import useLocalStorageState from 'use-local-storage-state'
 
 
 const Nav = () => {
@@ -35,7 +36,7 @@ const Nav = () => {
     };
 
     const [avatar, setAvatar] = useState(avatar_base);
-
+    const [imageURL, setImageURL] = useState("https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg");
 
     const iconSize = 18;
 
@@ -119,9 +120,13 @@ const Nav = () => {
                 <nav className="navNav">
                     <ul>
                         {auth?.role == "eleve" ? (
-                            <li style={{ background: avatar?.bgColor, marginRight: "0rem", paddingRight: "1.2rem" }}>
+                            <li style={auth?.preference === "avatar" ? ({background: avatar?.bgColor, marginRight: "0rem", paddingRight: "1.2rem" }) : ({marginRight: "0rem", paddingRight: "1.2rem" })}>
                                 <Link to="/Profile" className="navNavProfile">
-                                    <Avatar style={{ width: '3rem', height: '3rem', marginRight: "1rem" }} {...avatar} />
+                                    {auth?.preference === "avatar" ?
+                                        (<Avatar style={{ width: '3rem', height: '3rem', marginRight: "1rem" }} {...avatar} />) :
+                                        (
+                                            <img className="navImage" src={imageURL}></img>
+                                        )}
                                     <p className="navText pseudo">{pseudo}</p>
                                 </Link>
                             </li>
@@ -156,9 +161,9 @@ const Nav = () => {
                         </li>
                         <span className="navRightSide">
                             <li className="settings">
-                            <Link to="/settings" >
-                                <button><FontAwesomeIcon icon={faGear} className="gearIcon" /></button>
-                            </Link>
+                                <Link to="/settings" >
+                                    <button><FontAwesomeIcon icon={faGear} className="gearIcon" /></button>
+                                </Link>
                             </li>
                             <li className="deconnexion">
                                 <button onClick={signOut}>

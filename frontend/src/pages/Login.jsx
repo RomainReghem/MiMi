@@ -32,13 +32,18 @@ const Connexion = () => {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            console.log(JSON.stringify(response?.data));
             //const accessToken = response?.data?.accessToken;
             const accessToken = response?.data?.accessToken;
             const role = response?.data?.role;
-            console.log(role);
 
-            setAuth({ user, accessToken, role });
+            // Au login, si rien ne correspond dans le local storage, on attribue "avatar" à "préférence"
+            // On ajoute aussi la variable au localstorage, default "avatar"
+            let preference = JSON.parse(localStorage.getItem("preference"+user)) || "avatar";
+            if(!localStorage.getItem("preference"+user)){
+                localStorage.setItem("preference"+user, "avatar");
+            }
+
+            setAuth({ user, accessToken, role, preference });
             setPwd('');
             setUser('');
             Notifs("Bienvenue !", "Vous êtes connecté", "success");
