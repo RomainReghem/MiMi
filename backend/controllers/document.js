@@ -73,24 +73,40 @@ const saveCoursEleve = (req, res, next) => {
         })
 }
 
+/**
+ * Cette fonction permet de vérifier si le chemin donné en paramètre existe déjà, sinon crée les dossiers nécessaires
+ * @param {String} pathToVerify le chemin à vérifier
+ * @returns 
+ */
 function verificationChemin(pathToVerify) {
+    // on divise les dossiers du chemin
     let dossiers = pathToVerify.split('/')
+    // on commence = la base
     let path = dossiers[0]
+    // on parcourt le reste des dossiers
     for (var i = 1; i < dossiers.length; i++) {
         try {
-            path +="/"+ dossiers[i]
+            // on ajoute les dossiers au chemin
+            path += "/" + dossiers[i]
+            // si le chemin existe, alors le dossier est déjà présent
             if (!fs.existsSync(path)) {
+                // sinon on crée le dossier
                 fs.mkdirSync(path);
             }
         } catch (err) {
             console.error(err);
             return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
         }
-        //console.log("Chemin " + path + " fait")
     }
 }
 
+/**
+ * Retourne le nom de toutes les matières d'un élève
+ * @param {*} req 
+ * @param {*} res 
+ */
 const getAllMatieresEleve = (req, res) => {
+    console.log("\n*** Récupération des matières ***")
     const email = req.body.mail;
 
     Eleve.findOne({
@@ -108,7 +124,13 @@ const getAllMatieresEleve = (req, res) => {
         })
 }
 
+/**
+ * Retourne le nom de tous les fichiers concernant une matiére donnée, pour un élève
+ * @param {*} req 
+ * @param {*} res 
+ */
 const getAllCoursEleve = (req, res) => {
+    console.log("\n*** Récupération des cours d'une matiere***")
     const email = req.query.mail;
     const matiere = req.query.cours;
 
@@ -127,7 +149,13 @@ const getAllCoursEleve = (req, res) => {
         })
 }
 
+/**
+ * Retourne un fichier précis, selon la matière et le nom du fichier donné
+ * @param {*} req 
+ * @param {*} res 
+ */
 const getCoursEleve = (req, res) => {
+    console.log("\n*** Récupération de cours ***")
     const email = req.query.mail;
     const matiere = req.query.cours;
     const name = req.body.name;
@@ -141,9 +169,9 @@ const getCoursEleve = (req, res) => {
                 return res.status(404).send("Élève inexistant");
             }
             const num = eleve.ideleve;
-            const path = "./Eleves/eleve" + num + "/depot/" + matiere + "/" + name;
+            const path = "./Eleves/eleve" + num + "/depot/" + matiere + "/" + name + ".pdf";
             // const files = getAllFiles(path);
-            /* fs.readFile(path, 'utf-80', function (err, avatar) {
+            /* fs.readFile(path, 'utf-8', function (err, avatar) {
                  if (err) {
                      console.log('erreur lors de la récupération de l\'avatar')
                      return res.status(600).send("Problème de lecture de l'avatar.")
@@ -152,9 +180,21 @@ const getCoursEleve = (req, res) => {
                  // on envoie le fichier json au front
                  res.json({ avatar: avatar })
              })*/
-            const file = fs.createReadStream(path);
-            res.setHeader('Content-Disposition', 'attachment: filename="' + name + (new Date()).toISOString() + '"')
-            file.pipe(res)
+            /*  const file = fs.createReadStream(path);
+              res.setHeader('Content-Disposition', 'attachment: filename="' + name + (new Date()).toISOString() + '"')
+              file.pipe(res)*/
+            fs.readFile(path, function (err, fichier) {
+                if (err) {
+                    console.log("erreur lors de la recup de fichier " + err)
+                    return res.status(520).send(err)
+                }
+                res.writeHead(200, { 'Content-Type': 'application/pdf' });
+                res.write(fichier);
+                console.log("Récupération ok")
+
+                return res.end();
+                // return res.send({ file: fichier });
+            });
         })
 }
 

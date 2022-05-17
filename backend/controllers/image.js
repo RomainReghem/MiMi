@@ -151,7 +151,27 @@ const savePicture = (req, res) => {
             verificationChemin(path)
             const type = img.mimetype.split("/")[1]
             console.log("type " + type)
-            fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err) {
+            // avant de sauvegarder on va supprimer les anciennes photos de profil, s'il en existe
+            fs.readdir(path, function (err, files) {
+                if (err) {
+                    console.log("erreur durant la récupération " + err)
+                    return res.status(600).send('Erreur lors de la récupèration de la pp.');
+                }
+                for (const f of files) {
+                    if (f.startsWith('photo')) {
+                        fs.unlink(path+"/"+f, function (err) {
+                            if (err) {
+                                console.log("erreur lors de la suppression de pp " + err)
+                                return res.status(520).send(err)
+                            }
+                            //console.log("Suppression ok")
+                        });
+                    }
+                }
+             
+            })
+               // sauvegarde image
+               fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err) {
                 if (err) {
                     console.log("Erreur lors de l'enregistrement de la photo : " + err);
                     return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
@@ -162,6 +182,12 @@ const savePicture = (req, res) => {
         })
 }
 
+/**
+ * Renvoie au client la photo de profil de l'utilisateur dont le mail est donné
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const getPicture = (req, res) => {
     console.log("\n*** Récupération de l'image de profil de l'élève ***")
     const email = req.query.mail;
@@ -181,33 +207,42 @@ const getPicture = (req, res) => {
             }
             const num = eleve.ideleve;
             const path = "./Eleves/eleve" + num + "/avatar";
-
+            let file = "";
+            verificationChemin(path)
             fs.readdir(path, function (err, files) {
                 if (err) {
                     console.log("erreur durant la récupération " + err)
                     return res.status(600).send('Erreur lors de la récupèration de la pp.');
                 } else {
-                    for (const f of files) {
-                        console.log(f)
+                    for (f in files) {
+                        //console.log(f)
                         if (f.startsWith('photo')) {
-                           /* res.writeHead(200, {
-                                 "Content-Type": "image/" + f.split('/')[1]
-                             });*/
-                            fs.readFile(path + "/" + f, function (err, image) {
-                                if(err){
-                                    console.log("erreur lors de la recup de pp "+err)
-                                    return res.status(520).send(err)
-                                }
-                                console.log("Récupération ok")
-                                return res.send({ image: image });
-                            });
-                        }
+                            /* res.writeHead(200, {
+                                  "Content-Type": "image/" + f.split('/')[1]
+                              });*/
+                            file = f;
 
+                        }
                     }
+                    if (file == "") {
+                        console.log("pas d'image")
+                        return res.status(204).send("L'élève n'a pas de photo de profil.")
+                    }
+                    fs.readFile(path + "/" + file, function (err, image) {
+                        if (err) {
+                            console.log("erreur lors de la recup de pp " + err)
+                            return res.status(520).send(err)
+                        }
+                        res.writeHead(200, { 'Content-Type': 'image/' + file.split('/')[1] });
+                        res.write(image);
+                        console.log("Récupération ok")
+
+                        return res.end();
+                        // return res.send({ image: image });
+                    });
                 }
             })
-//console.log("pas d'image")
-           // return res.status(204).send("L'élève n'a pas de photo de profil.")
+
 
         })
 }

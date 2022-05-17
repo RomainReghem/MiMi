@@ -52,10 +52,10 @@ router.get('/getImage', Image.getPicture)
 router.post('/saveFile', verifyDoc.single("file"), Document.saveCoursEleve)
 // route pour récupèrer un document d'un élève
 router.get('/getFile', Document.getCoursEleve)
-// route pour récupèrer le nom de tous les fichiers qu'un élève possède
-router.get('/getFiles', Document.getAllCoursEleve)
+// route pour récupèrer le nom de tous les cours qu'un élève possède dans une matière donnée
+router.get('/getCours', Document.getAllCoursEleve)
 // route pour récupèrer le nom de toutes les matières qu'un élève possède
-router.get('/getCours', Document.getAllMatieresEleve)
+router.get('/getMatieres', Document.getAllMatieresEleve)
 
 //route pour changer le pseudo : seulement pour l'élève
 router.post('/changePseudo', Modification.ChangementPseudo)
