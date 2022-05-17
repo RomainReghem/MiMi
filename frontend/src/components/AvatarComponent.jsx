@@ -34,23 +34,7 @@ const AvatarComponent = () => {
         } catch (err) { console.log("Erreur du chargement de l'avatar"); }
     }
     
-    const [config, setConfig] = useState({
-        bgColor: "#E0DDFF",
-        earSize: "small",
-        eyeBrowStyle: "up",
-        eyeStyle: "oval",
-        faceColor: "#AC6651",
-        glassesStyle: "none",
-        hairColor: "#000",
-        hairStyle: "thick",
-        hatColor: "#000",
-        hatStyle: "none",
-        mouthStyle: "laugh",
-        noseStyle: "round",
-        shirtColor: "#6BD9E9",
-        shirtStyle: "polo",
-        shape: "square"
-    });
+    const [config, setConfig] = useState(JSON.parse(localStorage.getItem("avatar")));
 
     const shirts = ["hoody", "short", "polo"]
     const glasses = ["none", "round", "square"]
@@ -92,6 +76,7 @@ const AvatarComponent = () => {
     }
 
     const Save = () => {
+        localStorage.setItem("avatar", JSON.stringify(config))
         setAuth({
             ...auth,
             somethingchanged: (0 + Math.random() * (10000 - 0))      

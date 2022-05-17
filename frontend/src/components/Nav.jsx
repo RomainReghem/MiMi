@@ -39,7 +39,7 @@ const Nav = () => {
         shape: "square"
     };
 
-    const [avatar, setAvatar] = useState(avatar_base);
+    const [avatar, setAvatar] = useState(JSON.parse(localStorage.getItem("avatar")) || avatar_base);
     const [imageURL, setImageURL] = useState("https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg");
 
     const iconSize = 18;
@@ -90,6 +90,7 @@ const Nav = () => {
                 setAvatar(a);
             }
         }
+        avatar();
         avatar();
     }, [auth?.user, auth?.somethingchanged])
 

@@ -18,6 +18,7 @@ const Identity = () => {
     const [mail, setMail] = useState(auth?.user);
     const [newPseudo, setNewPseudo] = useState('');
     const [selectedPicture, setSelectedPicture] = useState({ preview: "https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg", data: null });
+
     let avatar_base = {
         bgColor: "#E0DDFF",
         earSize: "small",
@@ -35,7 +36,8 @@ const Identity = () => {
         shirtStyle: "polo",
         shape: "square"
     };
-    const [avatar, setAvatar] = useState(avatar_base);
+    
+    const [avatar, setAvatar] = useState(JSON.parse(localStorage.getItem("avatar")) || avatar_base);
     const [pictureWaitingToBeSent, setPictureWaitingToBeSent] = useState(false);
 
     const [picture, setPicture] = useState(selectedPicture.preview);
