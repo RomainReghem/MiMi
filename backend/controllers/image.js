@@ -159,7 +159,7 @@ const savePicture = (req, res) => {
                 }
                 for (const f of files) {
                     if (f.startsWith('photo')) {
-                        fs.unlink(path+"/"+f, function (err) {
+                        fs.unlink(path + "/" + f, function (err) {
                             if (err) {
                                 console.log("erreur lors de la suppression de pp " + err)
                                 return res.status(520).send(err)
@@ -168,17 +168,18 @@ const savePicture = (req, res) => {
                         });
                     }
                 }
-             
+                // sauvegarde image
+                fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err) {
+                    if (err) {
+                        console.log("Erreur lors de l'enregistrement de la photo : " + err);
+                        return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                    }
+                    console.log("La photo a bien été sauvegardée");
+                    return res.status(201).send("Enregistrement effectué");
+                });
+
             })
-               // sauvegarde image
-               fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err) {
-                if (err) {
-                    console.log("Erreur lors de l'enregistrement de la photo : " + err);
-                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-                }
-                console.log("La photo a bien été sauvegardée");
-                return res.status(201).send("Enregistrement effectué");
-            });
+
         })
 }
 
@@ -233,12 +234,13 @@ const getPicture = (req, res) => {
                             console.log("erreur lors de la recup de pp " + err)
                             return res.status(520).send(err)
                         }
-                        res.writeHead(200, { 'Content-Type': 'image/' + file.split('/')[1] });
+                        /*res.writeHead(200, { 'Content-Type': 'image/' + file.split('/')[1] });
                         res.write(image);
                         console.log("Récupération ok")
 
-                        return res.end();
-                        // return res.send({ image: image });
+                        return res.end();*/
+                        res.contentType("image/" + file.split('/')[1]);
+                        return res.send(image);
                     });
                 }
             })

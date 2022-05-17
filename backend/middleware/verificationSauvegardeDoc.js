@@ -42,7 +42,7 @@ const storage = multer.memoryStorage();
  * @returns 
  */
 function fileFilter(req, file, cb) {
-  console.log("** Verification de type **")
+  console.log("** Verification de type de document **")
   // Allowed ext
   const filetypes = /pdf/;
 

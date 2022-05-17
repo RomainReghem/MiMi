@@ -102,8 +102,8 @@ function verificationChemin(pathToVerify) {
 
 /**
  * Retourne le nom de toutes les matières d'un élève
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
  */
 const getAllMatieresEleve = (req, res) => {
     console.log("\n*** Récupération des matières ***")
@@ -126,8 +126,8 @@ const getAllMatieresEleve = (req, res) => {
 
 /**
  * Retourne le nom de tous les fichiers concernant une matiére donnée, pour un élève
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
  */
 const getAllCoursEleve = (req, res) => {
     console.log("\n*** Récupération des cours d'une matiere***")
@@ -151,11 +151,11 @@ const getAllCoursEleve = (req, res) => {
 
 /**
  * Retourne un fichier précis, selon la matière et le nom du fichier donné
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
  */
 const getCoursEleve = (req, res) => {
-    console.log("\n*** Récupération de cours ***")
+    console.log("\n*** Récupération d'un cours ***")
     const email = req.query.mail;
     const matiere = req.query.cours;
     const name = req.body.name;
@@ -214,7 +214,20 @@ async function getAllFiles(path) {
             return files;
         }
     })
+}
 
+async function verifyUnique(path, name) {
+    fs.readdirSync(path+"/"+name, function (err, files) {
+        if (err) {
+            console.log("erreur durant la récupération " + err)
+            return [];
+        } else {
+            for (const file of files) {
+                console.log(file)
+            }
+            return files;
+        }
+    })
 }
 
 module.exports = { saveCoursEleve, getAllCoursEleve, getAllMatieresEleve, getCoursEleve }
