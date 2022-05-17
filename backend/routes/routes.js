@@ -59,8 +59,6 @@ router.get('/getMatieres', Document.getAllMatieresEleve)
 
 //route pour changer le pseudo : seulement pour l'élève
 router.post('/changePseudo', Modification.ChangementPseudo)
-// route pour changer les préférences (comment l'élève sera représenté)
-// router.post('/changePref', Modification.ChangementPreference)
 
 // route pour supprimer l'élève
 // router.delete("/eleve", Eleve.deleteStudent)

@@ -119,8 +119,14 @@ const getAllMatieresEleve = (req, res) => {
             }
             const num = eleve.ideleve;
             const path = "./Eleves/eleve" + num + "/depot";
-            const folders = getAllFiles(path);
-            return res.json({ matieres: folders })
+            fs.readdir(path, function (err, folders) {
+                if (err) {
+                    console.log("erreur durant la récupération " + err)
+                    return res.status(520);
+                } else {
+                    return res.json({ matieres: folders })
+                }
+            })
         })
 }
 
@@ -154,10 +160,10 @@ const getAllCoursEleve = (req, res) => {
                     console.log("erreur durant la récupération " + err)
                     return res.status(520);
                 } else {
-               /*     for (const file of files) {
-                        //console.log(file)
-                        list.push(file)
-                    }*/
+                    /*     for (const file of files) {
+                             //console.log(file)
+                             list.push(file)
+                         }*/
                     return res.send({ files }).status(201)
 
                     // console.log("lecture du chemin"+path+"fini")
@@ -222,28 +228,6 @@ const getCoursEleve = (req, res) => {
                 return res.send({ file: fichier });
             });
         })
-}
-
-/**
- * Retourne tous les fichiers ou les répertoires en fonction du chemin donné
- * @param {*} path le chemin du répertoire à lister
- */
-async function getAllFiles(path) {
-    console.log('getallfiles ' + path)
-    let list = []
-    fs.readdir(path, function (err, files) {
-        if (err) {
-            console.log("erreur durant la récupération " + err)
-            return list;
-        } else {
-            for (const file of files) {
-                //console.log(file)
-                list.push(file)
-            }
-            // console.log("lecture du chemin"+path+"fini")
-            return list;
-        }
-    })
 }
 
 async function verifyUnique(path, name) {

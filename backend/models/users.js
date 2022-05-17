@@ -24,18 +24,13 @@ const Eleve = db.define('eleve', {
         type: Sequelize.STRING,
         allowNull: false
     },
-    preference: {
-        type: Sequelize.ENUM('photo', 'facecam', 'avatar'),
-        defaultValue: "photo"
+    invitation: {
+        type: Sequelize.ENUM('acceptee', 'en attente', 'aucune'),
+        defaultValue: "aucune"
     },
     motdepasse: {
         type: Sequelize.STRING,
         allowNull: false,
-    },
-    nomphoto:{
-        type: Sequelize.STRING,
-        defaultValue:"",
-        allowNull: false
     },
     idclasse: {
         type: Sequelize.INTEGER,

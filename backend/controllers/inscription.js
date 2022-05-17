@@ -109,33 +109,6 @@ const InscriptionEleve = (req, res) => {
                                         //const path = "./testeleve/eleve" + num + "/avatar"
                                         // console.log("*** Création d'un dossier ***")
 
-                                        /*   try {
-                                               if (!fs.existsSync('./testeleve')) {
-                                                   fs.mkdirSync('./testeleve');
-                                               }
-                                           } catch (err) {
-                                               console.error(err);
-                                               return res.status(600).send("Erreur lors de la création de dossier test")
-                                           }
- 
-                                           try {
-                                               if (!fs.existsSync('./testeleve/eleve' + num)) {
-                                                   fs.mkdirSync('./testeleve/eleve' + num);
-                                               }
-                                           } catch (err) {
-                                               console.error(err);
-                                               return res.status(600).send("Erreur lors de la création de dossier classe")
-                                           }
- 
-                                           try {
-                                               if (!fs.existsSync(path)) {
-                                                   fs.mkdirSync(path);
-                                               }
-                                           } catch (err) {
-                                               console.error(err);
-                                               return res.status(600).send("Erreur lors de la création de dossier avatar")
-                                           }*/
-
                                         // enregistrement de l'avatar par défaut
                                         let avatar = {
                                             bgColor: "#E0DDFF",

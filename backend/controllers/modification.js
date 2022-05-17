@@ -442,77 +442,6 @@ const ChangementPseudo = (req, res) => {
 }
 
 /**
- * Change la préférence de l'élève pour se représenter.
- * Utilise l'email, la nouvelle préférence et le mot de passe donnés par le client.
- * Vérifie la validité des informations.
- * 
- * @param {*} req la requête du client
- * @param {*} res la réponse du serveur
- */
-const ChangementPreference = (req, res) => {
-    console.log("\n*** Changement des préférences d'un élève. ***")
-    const email = req.body.mail;
-    const pseudo = req.body.newPseudo;
-    const preference = req.body.pref;
-
-    console.log("** Vérification pseudo **")
-    if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
-        console.log("taille mdp pas ok")
-        // erreur 400
-        res.sendStatus(406)
-    } else if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        res.sendStatus(407)
-    } else if (preference != "photo" || preference != "camera" || preference != "avatar") {
-        console.log("Pref pas dans les valeurs possibles (photo, camera ou avatar)")
-        // erreur 400
-        res.status(413).send("Préférence incorrecte.")
-    } else {
-        console.log("Tout est bon pour la modification de préférences")
-        Eleve.findOne({ where: { courriel: email } })
-            .then(eleveToChange => {
-                if (!eleveToChange) {
-                    // erreur 404
-                    res.status(401).send("Eleve pas trouvé")
-                } else {
-                    // si la preference n'a pas changé, on ne change rien
-                    if (eleveToChange.preference != preference) {
-                        bcrypt.compare(mdp, eleveToChange.motdepasse, function (err, estValide) {
-                            if (err) {
-                                res.status(500).send("erreur lors du hashage")
-                            } else if (estValide) {
-                                Eleve.update(
-                                    {
-                                        preference: preference,
-                                    },
-                                    {
-                                        where: { ideleve: eleveToChange.ideleve },
-                                    }
-                                ).then(newEleve => {
-                                    if (newEleve) {
-                                        //res.sendStatus(201)
-                                        res.status(201).send("Modification de préférence réussie.")
-                                    } else {
-                                        res.status(520).send("Aucun élève modifié.")
-                                    }
-
-                                }).catch(err => {
-                                    console.log(err)
-                                    res.status(500).send("Erreur lors de la modification de préférence.")
-                                })
-                            }
-                        });
-                    } else {
-                        //res.send(eleveToChange);
-                        res.status(201).send("Pas de modification de préférence.")
-                    }
-                }
-            })
-    }
-}
-
-/**
  * Change la classe de l'élève.
  * Utilise l'email fourni par le client pour retrouver la classe correspondante et l'ajouter à l'élève.
  * Vérifie la validité des informations.
@@ -577,4 +506,4 @@ const ChangementClasse = (req, res) => {
 
 }
 
-module.exports = { ChangementMdp, ChangementMail, ChangementPseudo, ChangementPreference }
+module.exports = { ChangementMdp, ChangementMail, ChangementPseudo }
