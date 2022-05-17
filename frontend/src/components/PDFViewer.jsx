@@ -19,7 +19,6 @@ const PDFViewer = (props) => {
 
     useEffect(() => {
         async function convertingFile() {
-            console.log(props.clickedFile)
             let data = await getFile()
             let binary = '';
             let bytes = new Uint8Array(data)
@@ -37,8 +36,9 @@ const PDFViewer = (props) => {
 
             setFile(URL.createObjectURL(blob))
         }
-        convertingFile();
-        console.log(file)
+
+        if(props.clickedFile)
+            convertingFile();
 
     }, [props.clickedFile])
 
