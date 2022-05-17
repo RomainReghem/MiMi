@@ -5,6 +5,7 @@ import Notifs from '../components/Notifs';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import Avatar from 'react-nice-avatar'
+import useGetImage from "../hooks/useGetImage";
 
 const CHANGEPSEUDO_URL = '/changePseudo';
 const PSEUDO_REGEX = /^[A-z0-9-_]{3,24}$/;
@@ -12,10 +13,11 @@ const PSEUDO_REGEX = /^[A-z0-9-_]{3,24}$/;
 
 const Identity = () => {
 
-    const { auth, setAuth } = useAuth();    
+    const { auth, setAuth } = useAuth();
+    const getImage = useGetImage();
     const [mail, setMail] = useState(auth?.user);
     const [newPseudo, setNewPseudo] = useState('');
-    const [selectedPicture, setSelectedPicture] = useState({preview:"https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg", data:null});
+    const [selectedPicture, setSelectedPicture] = useState({ preview: "https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg", data: null });
     let avatar_base = {
         bgColor: "#E0DDFF",
         earSize: "small",
@@ -36,7 +38,7 @@ const Identity = () => {
     const [avatar, setAvatar] = useState(avatar_base);
     const [pictureWaitingToBeSent, setPictureWaitingToBeSent] = useState(false);
 
-    const [picture, setPicture] = useState(selectedPicture);
+    const [picture, setPicture] = useState(selectedPicture.preview);
 
     const getAvatar = async (e) => {
         try {
@@ -50,28 +52,26 @@ const Identity = () => {
         } catch (err) { console.log("Erreur du chargement de l'avatar"); }
     }
 
-    const getImage = async (e) => {
-        try {
-            const response = await axios.get("/getImage",
-                {
-                    params: { mail: auth?.user },
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                });
-            console.log(response.data.image);
-            setPicture({preview: URL.createObjectURL(response.data.image.data), data:response.data.image.data});
-        } catch (err) { console.log("Erreur du chargement de l'image de profil"); }
-    }
-
     // On ne récupère l'avatar que s'il y a eu un changement, ou une connexion. Pour ne pas spammer les requetes
     useEffect(() => {
         if (auth?.user != undefined)
             getAvatar();
-    }, [auth?.user, auth?.avatarconfig])
+    }, [auth?.user, auth?.somethingchanged])
 
     // On ne récupère l'image que si une image a été envoyée
     useEffect(() => {
-        getImage();
+        async function image() {
+            // On reçoit la réponse en Buffer.
+            // Il faut la convertir en base64 pour pouvoir l'afficher.
+            let data = await getImage()
+            let binary = '';
+            let bytes = new Uint8Array(data);
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            setPicture({ ...picture, preview:"data:image/png;base64,"+window.btoa(binary)})
+        }
+        image();
     }, [pictureWaitingToBeSent])
 
     const handleSubmit = async (e) => {
@@ -93,6 +93,10 @@ const Identity = () => {
                 }
             );
             Notifs('Pseudo modifié', 'Votre nouveau pseudo est : ' + newPseudo, 'Success');
+            setAuth({
+                ...auth,
+                somethingchanged: (0 + Math.random() * (10000 - 0))      
+            });
 
         } catch (err) {
             if (!err?.response) {
@@ -122,7 +126,7 @@ const Identity = () => {
             return;
         }
         // Fichiers < 10 Mo
-        if(img.data.size > 10_000_000){
+        if (img.data.size > 10_000_000) {
             Notifs("Erreur taille de fichier", "L'image séléctionnée doit faire moins de 10Mo", "warning")
             return;
         }
@@ -131,7 +135,7 @@ const Identity = () => {
 
     const pictureSubmit = async () => {
         let formData = new FormData()
-        formData.append('file', selectedPicture.data);        
+        formData.append('file', selectedPicture.data);
         formData.append("filename", selectedPicture.data.name);
         formData.append("mail", auth?.user);
         try {
@@ -141,6 +145,10 @@ const Identity = () => {
                 });
             Notifs("Image de profil sauvegardée !", "", "success")
             setPictureWaitingToBeSent(false);
+            setAuth({
+                ...auth,
+                somethingchanged: (0 + Math.random() * (10000 - 0))      
+            });
             console.log(response)
         } catch (error) {
             console.log(error)
@@ -170,12 +178,12 @@ const Identity = () => {
             </div>
             <div className="preferences">
                 <div>
-                <img className="previewImage" src={picture?.preview}></img>
-                    <button onClick={() => {setAuth({...auth, preference:"image"}); localStorage.setItem("preference"+auth?.user, JSON.stringify("image"))}} className="chooseImage">Choisir l'image</button>
+                    <img className="previewImage" src={picture?.preview}></img>
+                    <button onClick={() => { setAuth({ ...auth, preference: "image" }); localStorage.setItem("preference" + auth?.user, JSON.stringify("image")) }} className="chooseImage">Choisir l'image</button>
                 </div>
                 <div>
                     <Avatar className="previewAvatar"  {...avatar} />
-                    <button onClick={() => {setAuth({...auth, preference:"avatar"}); localStorage.setItem("preference"+auth?.user, JSON.stringify("avatar"))}} className="chooseAvatar">Choisir l'avatar</button>
+                    <button onClick={() => { setAuth({ ...auth, preference: "avatar" }); localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar")) }} className="chooseAvatar">Choisir l'avatar</button>
                 </div>
             </div>
         </div>
