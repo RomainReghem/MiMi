@@ -188,12 +188,13 @@ const getCoursEleve = (req, res) => {
                     console.log("erreur lors de la recup de fichier " + err)
                     return res.status(520).send(err)
                 }
-                res.writeHead(200, { 'Content-Type': 'application/pdf' });
+                /*res.writeHead(200, { 'Content-Type': 'application/pdf' });
                 res.write(fichier);
+
+                return res.end();*/
                 console.log("Récupération ok")
 
-                return res.end();
-                // return res.send({ file: fichier });
+                return res.send({ file: fichier });
             });
         })
 }
@@ -223,6 +224,7 @@ async function verifyUnique(path, name) {
             return name;
         } else {
             let isUnique=true;
+            let i=1;
             for (const file of files) {
                 if(file==name){
                     name=name.split(".")[0]+"-1"+name.split(".")[1]

@@ -234,12 +234,6 @@ const getPicture = (req, res) => {
                             console.log("erreur lors de la recup de pp " + err)
                             return res.status(520).send(err)
                         }
-                        /*res.writeHead(200, { 'Content-Type': 'image/' + file.split('/')[1] });
-                        res.write(image);
-                        console.log("Récupération ok")
-
-                        return res.end();*/
-                      //  res.contentType("image/" + file.split('/')[1]);
                         return res.send({image:image});
                     });
                 }
