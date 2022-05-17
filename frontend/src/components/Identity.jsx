@@ -19,7 +19,7 @@ const Identity = () => {
     const getAvatar = useGetAvatar();
     const [mail, setMail] = useState(auth?.user);
     const [newPseudo, setNewPseudo] = useState('');
-    const [selectedPicture, setSelectedPicture] = useState({ preview: "https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg", data: null });
+    const [selectedPicture, setSelectedPicture] = useState(null);
 
     let avatar_base = {
         bgColor: "#E0DDFF",
@@ -38,15 +38,15 @@ const Identity = () => {
         shirtStyle: "polo",
         shape: "square"
     };
-    
+
     const [avatar, setAvatar] = useState(JSON.parse(localStorage.getItem("avatar")) || avatar_base);
     const [pictureWaitingToBeSent, setPictureWaitingToBeSent] = useState(false);
 
-    const [picture, setPicture] = useState(selectedPicture.preview);
+    const [picture, setPicture] = useState("https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg");
 
     useEffect(() => {
         async function avatar() {
-            if (auth?.user != undefined){
+            if (auth?.user != undefined) {
                 let a = await getAvatar();
                 setAvatar(a);
             }
@@ -66,9 +66,12 @@ const Identity = () => {
             for (let i = 0; i < bytes.byteLength; i++) {
                 binary += String.fromCharCode(bytes[i]);
             }
-            setPicture({ ...picture, preview:"data:image/png;base64,"+window.btoa(binary)})
+
+            if (data != undefined)
+                setPicture("data:image/png;base64," + window.btoa(binary))
         }
-        image();
+            image();
+        
     }, [pictureWaitingToBeSent])
 
     // Submit du pseudo
@@ -91,7 +94,7 @@ const Identity = () => {
             Notifs('Pseudo modifié', 'Votre nouveau pseudo est : ' + newPseudo, 'Success');
             setAuth({
                 ...auth,
-                somethingchanged: (0 + Math.random() * (10000 - 0))      
+                somethingchanged: (0 + Math.random() * (10000 - 0))
             });
 
         } catch (err) {
@@ -145,7 +148,7 @@ const Identity = () => {
             setPictureWaitingToBeSent(false);
             setAuth({
                 ...auth,
-                somethingchanged: (0 + Math.random() * (10000 - 0))      
+                somethingchanged: (0 + Math.random() * (10000 - 0))
             });
             console.log(response)
         } catch (error) {
@@ -176,7 +179,7 @@ const Identity = () => {
             </div>
             <div className="preferences">
                 <div>
-                    <img className="previewImage" src={picture?.preview}></img>
+                    <img className="previewImage" src={picture}></img>
                     <button onClick={() => { setAuth({ ...auth, preference: "image" }); localStorage.setItem("preference" + auth?.user, JSON.stringify("image")) }} className="chooseImage">Choisir l'image</button>
                 </div>
                 <div>
