@@ -94,7 +94,7 @@ const AvatarComponent = () => {
     const Save = () => {
         setAuth({
             ...auth,
-            avatarconfig:config            
+            somethingchanged: (0 + Math.random() * (10000 - 0))      
         });
 
         

@@ -1,6 +1,4 @@
 // Composant qui ne sert qu'a envoyer les notifs.
-
-
 import { Store } from 'react-notifications-component';
 
 function useNotif(titre, msg, t){

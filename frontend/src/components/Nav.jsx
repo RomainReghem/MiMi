@@ -12,10 +12,14 @@ import { HiOutlineDocumentText } from 'react-icons/hi';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 import useLocalStorageState from 'use-local-storage-state'
+import useGetImage from "../hooks/useGetImage";
+import useGetAvatar from "../hooks/useGetAvatar"
 
 
 const Nav = () => {
     const { auth } = useAuth();
+    const getImage = useGetImage();
+    const getAvatar = useGetAvatar();
     const [pseudo, setPseudo] = useState("Profil");
     let avatar_base = {
         bgColor: "#E0DDFF",
@@ -63,43 +67,36 @@ const Nav = () => {
         } catch (err) { console.log("Erreur du chargement du pseudo"); }
     }
 
-    const getAvatar = async (e) => {
-        try {
-            const response = await axios.get("/avatar",
-                {
-                    params: { mail: auth?.user },
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                });
-            setAvatar(JSON.parse(response.data.avatar));
-        } catch (err) { console.log("Erreur du chargement de l'avatar"); }
-    }
+    useEffect(() => {
+        async function image() {
+            let data = await getImage()
+            let binary = '';
+            let bytes = new Uint8Array(data);
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            setImageURL("data:image/png;base64,"+window.btoa(binary))
+        }
+        image();
+    }, [auth?.user, auth?.somethingchanged])
 
-    const getImage = async (e) => {
-        try {
-            const response = await axios.get("/getImage",
-                {
-                    params: { mail: auth?.user },
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                });
-            setImageURL(URL.createObjectURL(JSON.parse(response.data.image)));
-        } catch (err) { console.log("Erreur du chargement de l'image de profil"); }
-    }
+
+
     // On ne récupère l'avatar que s'il y a eu un changement, ou une connexion. Pour ne pas spammer les requetes
     useEffect(() => {
-        if (auth?.user != undefined){
-            getAvatar();
-            getImage();
+        async function avatar() {
+            if (auth?.user != undefined){
+                let a = await getAvatar();
+                setAvatar(a);
+            }
         }
-    }, [auth?.user, auth?.avatarconfig])
+        avatar();
+    }, [auth?.user, auth?.somethingchanged])
 
-    // On ne récupère le pseudo qu'a la connexion
-    // Changer si on peut changePseudo()
     useEffect(() => {
         if (auth?.user != undefined)
             getPseudo()
-    }, [auth?.user])
+    }, [auth?.user, auth?.somethingchanged])
 
     return (
         <>
