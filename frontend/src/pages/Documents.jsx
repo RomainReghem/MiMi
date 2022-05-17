@@ -1,4 +1,4 @@
-import Form from "../components/Form"
+import PDFSender from "../components/PDFSender"
 import FileList from "../components/FileList"
 import PDFViewer from "../components/PDFViewer";
 import axios from "../api/axios";
@@ -8,8 +8,11 @@ import { useState, useEffect } from "react";
 const Documents = () => {
 
     const { auth } = useAuth();
+
+    // Tableau de tous les noms des fichiers 
     const [files, setFiles] = useState([]);
-    console.log(files?.length)
+
+    // Le fichier actuellement séléctionné dans la liste. On le passera à PDFViewer.
     const [file, setFile] = useState(null);
 
     useEffect(() => {
@@ -22,10 +25,8 @@ const Documents = () => {
                 params: { mail: auth?.user, cours: "maths" },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
-            });
-            console.log("↓ Réponse fichiers ↓")
-            console.log(response)
-            
+            });            
+            setFiles(response.data.files)            
         } catch (error) {
             console.log(error)
         }
@@ -35,14 +36,12 @@ const Documents = () => {
         <div className="fileMain">
             <section className="fileManager">
                 <div className="fileList">
-                    <div onClick={() => setFile("https://curve.fi/files/stableswap-paper.pdf")} className="file">Cours 1</div>
-                    <div onClick={() => setFile("https://uniswap.org/whitepaper.pdf")} className="file">Cours 2</div>
-                    {/* {Array.from(Array(files?.length), (e, i) => {
-                        return <div onClick={() => setFile(URL.createObjectURL(files[i]))} className="file">{files[i].name}</div>
-                    })} */}
+                    {Array.from(Array(files?.length), (e, i) => {
+                        return <div key={i} onClick={() => setFile(files[i])} className="file">{files[i]}</div>
+                    })}
                 </div>
                 <div className="fileUploadFormContainer">
-                    <Form />
+                    <PDFSender />
                 </div>
             </section>
             <section className="fileViewer">

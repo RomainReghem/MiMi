@@ -40,7 +40,8 @@ const Users = () => {
     }, [])
 
     const handleSubmit = async (e) => {
-
+        e.preventDefault();
+        console.log(newEleve);
     }
 
     return (

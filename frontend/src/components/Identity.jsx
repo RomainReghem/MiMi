@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import Avatar from 'react-nice-avatar'
 import useGetImage from "../hooks/useGetImage";
+import useGetAvatar from "../hooks/useGetAvatar";
 
 const CHANGEPSEUDO_URL = '/changePseudo';
 const PSEUDO_REGEX = /^[A-z0-9-_]{3,24}$/;
@@ -15,6 +16,7 @@ const Identity = () => {
 
     const { auth, setAuth } = useAuth();
     const getImage = useGetImage();
+    const getAvatar = useGetAvatar();
     const [mail, setMail] = useState(auth?.user);
     const [newPseudo, setNewPseudo] = useState('');
     const [selectedPicture, setSelectedPicture] = useState({ preview: "https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg", data: null });
@@ -42,22 +44,15 @@ const Identity = () => {
 
     const [picture, setPicture] = useState(selectedPicture.preview);
 
-    const getAvatar = async (e) => {
-        try {
-            const response = await axios.get("/avatar",
-                {
-                    params: { mail: auth?.user },
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                });
-            setAvatar(JSON.parse(response.data.avatar));
-        } catch (err) { console.log("Erreur du chargement de l'avatar"); }
-    }
-
-    // On ne récupère l'avatar que s'il y a eu un changement, ou une connexion. Pour ne pas spammer les requetes
     useEffect(() => {
-        if (auth?.user != undefined)
-            getAvatar();
+        async function avatar() {
+            if (auth?.user != undefined){
+                let a = await getAvatar();
+                setAvatar(a);
+            }
+        }
+        avatar();
+        avatar();
     }, [auth?.user, auth?.somethingchanged])
 
     // On ne récupère l'image que si une image a été envoyée
@@ -76,15 +71,14 @@ const Identity = () => {
         image();
     }, [pictureWaitingToBeSent])
 
+    // Submit du pseudo
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMail(auth?.user);
-
         if (!PSEUDO_REGEX.test(newPseudo)) {
             Notifs('Erreur', 'Le pseudo doit comporter entre 4 et 24 caractères alphanumériques ', 'Danger');
             return;
         }
-
         try {
             console.log(JSON.stringify({ mail, newPseudo }))
             const response = await axios.post(CHANGEPSEUDO_URL,
@@ -115,6 +109,7 @@ const Identity = () => {
         }
     }
 
+    // Selection d'une image
     const handlePictureSelect = (event) => {
         setPictureWaitingToBeSent(true);
         const img = {
@@ -135,6 +130,7 @@ const Identity = () => {
         setSelectedPicture(img);
     }
 
+    // Submit de l'image
     const pictureSubmit = async () => {
         let formData = new FormData()
         formData.append('file', selectedPicture.data);

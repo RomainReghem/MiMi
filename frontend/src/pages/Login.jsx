@@ -40,7 +40,7 @@ const Connexion = () => {
             // On ajoute aussi la variable au localstorage, default "avatar"
             let preference = JSON.parse(localStorage.getItem("preference"+user)) || "avatar";
             if(!localStorage.getItem("preference"+user)){
-                localStorage.setItem("preference"+user, "avatar");
+                localStorage.setItem("preference"+user, JSON.stringify("avatar"));
             }
 
             setAuth({ user, accessToken, role, preference });

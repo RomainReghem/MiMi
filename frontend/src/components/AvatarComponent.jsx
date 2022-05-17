@@ -50,7 +50,6 @@ const AvatarComponent = () => {
             ...config,
             bgColor: randomColor()
         });
-        console.log(config)
     }
 
     const RandomC = (e) => {
@@ -86,14 +85,13 @@ const AvatarComponent = () => {
     }
 
     const SaveDB = async (e) => {
-        console.log(JSON.stringify({ mail, config }))
         try {
             const response = await axios.post("/avatar", JSON.stringify({ mail, avatar:config }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            console.log(response?.data)
+            
             Notifs("Avatar sauvegardé !", "Rechargez la page s'il ne s'affiche pas correctement", "Success")
             
 
