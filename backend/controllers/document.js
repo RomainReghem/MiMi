@@ -133,7 +133,11 @@ const getAllCoursEleve = (req, res) => {
     console.log("\n*** Récupération des cours d'une matiere***")
     const email = req.query.mail;
     const matiere = req.query.cours;
-
+    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+        console.log("forme mail incorrect")
+        // erreur 400
+        return res.sendStatus(407)
+    }
     Eleve.findOne({
         where: { courriel: email }
     })
@@ -143,9 +147,30 @@ const getAllCoursEleve = (req, res) => {
                 return res.status(404).send("Élève inexistant");
             }
             const num = eleve.ideleve;
-            const path = "./Eleves/eleve" + num + "/depot/" + matiere;
-            const files = getAllFiles(path);
-            return res.json({ cours: files })
+            const path = "./Eleves/eleve" + num + "/depot/" + matiere + "/";
+            //let list = []
+            fs.readdir(path, function (err, files) {
+                if (err) {
+                    console.log("erreur durant la récupération " + err)
+                    return res.status(520);
+                } else {
+               /*     for (const file of files) {
+                        //console.log(file)
+                        list.push(file)
+                    }*/
+                    return res.send({ files }).status(201)
+
+                    // console.log("lecture du chemin"+path+"fini")
+                }
+            })
+            /*
+                            files+="test.xd"
+                            console.log("you"+files)*/
+            /* for(const f of files){
+                 console.log(f)
+             }*/
+            //   })
+
         })
 }
 
@@ -204,15 +229,19 @@ const getCoursEleve = (req, res) => {
  * @param {*} path le chemin du répertoire à lister
  */
 async function getAllFiles(path) {
-    fs.readdirSync(path, function (err, files) {
+    console.log('getallfiles ' + path)
+    let list = []
+    fs.readdir(path, function (err, files) {
         if (err) {
             console.log("erreur durant la récupération " + err)
-            return [];
+            return list;
         } else {
             for (const file of files) {
-                console.log(file)
+                //console.log(file)
+                list.push(file)
             }
-            return files;
+            // console.log("lecture du chemin"+path+"fini")
+            return list;
         }
     })
 }
@@ -223,11 +252,11 @@ async function verifyUnique(path, name) {
             console.log("erreur durant la vérification d'unicité " + err)
             return name;
         } else {
-            let isUnique=true;
-            let i=1;
+            let isUnique = true;
+            let i = 1;
             for (const file of files) {
-                if(file==name){
-                    name=name.split(".")[0]+"-1"+name.split(".")[1]
+                if (file == name) {
+                    name = name.split(".")[0] + "-1" + name.split(".")[1]
                 }
             }
             return name;
