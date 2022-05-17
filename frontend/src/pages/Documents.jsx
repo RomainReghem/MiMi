@@ -17,15 +17,15 @@ const Documents = () => {
     }, [])
 
     const loadFiles = async () => {
-        try {
-            console.log(auth?.user)
-            const response = await axios.get("/getFiles", {
+        try {            
+            const response = await axios.get("/getCours", {
                 params: { mail: auth?.user, cours: "maths" },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
-            console.log(response.data)
-            setFiles(response.data.files);
+            console.log("↓ Réponse fichiers ↓")
+            console.log(response)
+            
         } catch (error) {
             console.log(error)
         }
