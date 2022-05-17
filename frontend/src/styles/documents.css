@@ -165,3 +165,7 @@
 .react-pdf__message {
     display: none;
 }
+
+.fileRefresh:hover{
+    cursor: pointer;
+}
