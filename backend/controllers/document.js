@@ -217,15 +217,18 @@ async function getAllFiles(path) {
 }
 
 async function verifyUnique(path, name) {
-    fs.readdirSync(path+"/"+name, function (err, files) {
+    fs.readdirSync(path, function (err, files) {
         if (err) {
-            console.log("erreur durant la récupération " + err)
-            return [];
+            console.log("erreur durant la vérification d'unicité " + err)
+            return name;
         } else {
+            let isUnique=true;
             for (const file of files) {
-                console.log(file)
+                if(file==name){
+                    name=name.split(".")[0]+"-1"+name.split(".")[1]
+                }
             }
-            return files;
+            return name;
         }
     })
 }

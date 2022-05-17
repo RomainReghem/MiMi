@@ -215,7 +215,7 @@ const getPicture = (req, res) => {
                     console.log("erreur durant la récupération " + err)
                     return res.status(600).send('Erreur lors de la récupèration de la pp.');
                 } else {
-                    for (f in files) {
+                    for (const f of files) {
                         //console.log(f)
                         if (f.startsWith('photo')) {
                             /* res.writeHead(200, {
