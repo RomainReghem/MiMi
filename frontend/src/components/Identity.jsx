@@ -59,7 +59,7 @@ const Identity = () => {
                     withCredentials: true
                 });
             console.log(response.data.image);
-            setPicture(response.data.image);
+            setPicture({preview: URL.createObjectURL(response.data.image.data), data:response.data.image.data});
         } catch (err) { console.log("Erreur du chargement de l'image de profil"); }
     }
 
@@ -170,7 +170,7 @@ const Identity = () => {
             </div>
             <div className="preferences">
                 <div>
-                <img className="previewImage" src={selectedPicture?.preview}></img>
+                <img className="previewImage" src={picture?.preview}></img>
                     <button onClick={() => {setAuth({...auth, preference:"image"}); localStorage.setItem("preference"+auth?.user, JSON.stringify("image"))}} className="chooseImage">Choisir l'image</button>
                 </div>
                 <div>
