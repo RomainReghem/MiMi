@@ -239,8 +239,8 @@ const getPicture = (req, res) => {
                         console.log("Récupération ok")
 
                         return res.end();*/
-                        res.contentType("image/" + file.split('/')[1]);
-                        return res.send(image);
+                      //  res.contentType("image/" + file.split('/')[1]);
+                        return res.send({image:image});
                     });
                 }
             })
