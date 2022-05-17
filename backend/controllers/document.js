@@ -189,7 +189,7 @@ const getCoursEleve = (req, res) => {
     console.log("\n*** Récupération d'un cours ***")
     const email = req.query.mail;
     const matiere = req.query.cours;
-    const name = req.body.name;
+    const name = req.query.name;
     console.log(name)
     Eleve.findOne({
         where: { courriel: email }
@@ -200,7 +200,7 @@ const getCoursEleve = (req, res) => {
                 return res.status(404).send("Élève inexistant");
             }
             const num = eleve.ideleve;
-            const path = "./Eleves/eleve" + num + "/depot/" + matiere + "/" + name + ".pdf";
+            const path = "./Eleves/eleve" + num + "/depot/" + matiere + "/" + name ;
             // const files = getAllFiles(path);
             /* fs.readFile(path, 'utf-8', function (err, avatar) {
                  if (err) {
