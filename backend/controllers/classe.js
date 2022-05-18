@@ -8,12 +8,13 @@ const Eleve = require('../models/users').Eleve
  * @param {*} res la réponse du serveur
  */
 const getAllStudents = (req, res) => {
+    console.log("\n*** Récuperation des eleves ***")
     const mail = req.query.mail
     // on cherche tous les élèves qui appartiennent à la classe dont l'email est donné
     // on veut spécifiquement l'attribut courriel
     Eleve.findAll({
         attributes: ['courriel'],
-
+        where: {invitation:"acceptee"},
         // jointure avec la table eleve
         include: [{
             model: Classe,

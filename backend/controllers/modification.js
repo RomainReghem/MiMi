@@ -429,6 +429,10 @@ function setInvitation (invitation, emailEleve, emailClass,callback){
                 });
             }else{
                 console.log("invitation : changement/ajout de l'id de la classe")
+                if((eleve.invitation!="aucune" && invitation=="en attente")||(invitation=="acceptee" && eleve.invitation!="en attente")){
+                    console.log("Invitation impossible")
+                    return callback(403)
+                }
                 Classe.findOne({where:{courriel:emailClasse}})
                 .then(classe=>{
                     if(!classe){
