@@ -109,7 +109,7 @@ function getInvitation(emailEleve, cb) {
                         return cb({ invitation: invitation, classe: classe.idclasse })
                     })
             } else {
-                return cb({ statut: invitation })
+                return cb({ invitation: invitation })
             }
         })
 }
