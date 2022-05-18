@@ -71,13 +71,15 @@ const ChangementPseudo = (req, res) => {
  */
 const SuppressionClasse = (req, res) => {
     console.log("\n*** Suppression de classe d'un élève ***")
-    const email = req.body.mail;
-    const code = Modification.setInvitation("aucune", email, "")
-
-    if (code == 201) {
-        return res.status(201).send("Suppression de classe réussie !")
-    }
-    return res.status(code).send("Erreur")
+    const email = req.body.user;
+    console.log("ok "+req.body)
+    Modification.setInvitation("aucune", email, "", function(code){
+        console.log("Code "+code)
+        if (code == 201) {
+            return res.status(201).send("Suppression de classe réussie !")
+        }
+        return res.status(code).send("Erreur")
+    })
 }
 
 /**
@@ -87,79 +89,28 @@ const SuppressionClasse = (req, res) => {
  */
 const AcceptationInvitation = (req, res) => {
     console.log("\n*** Acceptation de l'invitation d'une classe ***")
-    const email = req.body.mail;
-    const emailClasse = req.body.mailClass;
-    const code = Modification.setInvitation("acceptee", email, emailClasse)
-
-    if (code == 201) {
-        return res.status(201).send("Acceptation de la classe réussie !")
-    }
-    return res.status(code).send("Erreur")
-}
-
-
-/**
- * Change la classe de l'élève.
- * Utilise l'email fourni par le client pour retrouver la classe correspondante et l'ajouter à l'élève.
- * Vérifie la validité des informations.
- * 
- * @param {*} req la requête du client
- * @param {*} res la réponse du serveur
- */
-const ChangementClasse = (req, res) => {
-    console.log("\n*** Changement de classe ***")
-    const emailEleve = req.body.mail;
-    const emailClasse = req.body.mailClasse;
-    if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
-        console.log("forme mail élève incorrect")
-        // erreur 400
-        return res.status(407).send("Le mail de l'élève n'est pas de la bonne forme.")
-    }
-    if (!(emailClasse.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailClasse.length) {
-        console.log("forme mail classe incorrect")
-        // erreur 400
-        return res.status(407).send("Le mail fourni de la classe n'est pas de la bonne forme.")
-    }
-
-    Classe.findOne({
-        where: { courriel: emailClasse }
-    }).then(classe => {
-        if (!classe) {
-            console.log("Pas de classe trouvée !")
-            return res.status(404).send("Aucune classe trouvée correspondant à ce mail : " + emailClasse)
-        }
-        Eleve.findOne({
-            where: { courriel: emailEleve }
-        }).then(eleve => {
+    const email = req.body.user;
+    /// RECUP MAIL CLASSE 
+    Eleve.findOne({ courriel: email })
+        .then(eleve => {
             if (!eleve) {
-                console.log("Pas d'élève trouvé !")
-                return res.status(404).send("Aucun élève trouvé correspondant à ce mail : " + emailEleve)
+                return res.sendStatus(404)
             }
-            console.log("Début modification ")
-            if (eleve.idclasse == classe.idclasse) {
-                console.log("classe déjà enregistrée")
-                return res.status(204).send("Cet élève est déjà enregistré avec cet classe.")
-            }
-            Eleve.update(
-                {
-                    idclasse: classe.idclasse,
-                },
-                {
-                    where: { ideleve: eleve.ideleve },
+            Users.Classe.findOne({where:{ idclasse: eleve.idclasse }})
+                .then(classe => {
+                    if (!classe) {
+                        return res.sendStatus(404)
+                    }
+                    Modification.setInvitation("acceptee", email, classe.courriel, function(code){
+                        if (code == 201) {
+                            return res.status(201).send("Acceptation de la classe réussie !")
+                        }
+                        return res.status(code).send("Erreur")
+                    })
                 }
-            ).then(newEleve => {
-                if (newEleve) {
-                    //res.sendStatus(201)
-                    console.log("Modification de la classe réussie")
-                    res.status(201).send("Modification de classe réussie.")
-                } else {
-                    res.status(520).send("Aucun élève modifié.")
-                }
-            })
+                )
         })
 
-    })
 }
-
 
 module.exports = { ChangementPseudo, SuppressionClasse, AcceptationInvitation }

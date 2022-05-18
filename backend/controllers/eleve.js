@@ -84,34 +84,32 @@ const deleteStudent = async (req, res) => {
 /**
  * Retourne l'invitation et la classe associée
  * 
- * @param {*} req la requête du client
- * @param {*} res la réponse du serveur
+ * @param {*} emailEleve l'email de l'èleve dont on veut l'invitation
  */
-const getInvitation = (req, res) => {
-    const emailEleve = req.query.mail;
+function getInvitation(emailEleve, cb) {
 
     if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
         console.log("forme mail incorrect")
-        return res.status(407).send("Mail incorrect")
+        return cb(407)
     }
 
-    Eleve.findOne({ courriel: email })
+    Eleve.findOne({ where: { courriel: emailEleve } })
         .then(eleve => {
             // si aucun élève n'a été trouvé
             if (!eleve) {
-                return res.status(404).send("Pas d'élève trouvé avec cet adresse mail.");
+                return cb(404)
             }
             const invitation = eleve.invitation;
             if (invitation != "aucune") {
-                Classe.findOne({ idclasse: eleve.idclasse })
+                Classe.findOne({ where: { idclasse: eleve.idclasse } })
                     .then(classe => {
                         if (!classe) {
-                            return res.status(404).send("Pas de classe trouvée avec cet identifiant.");
+                            return cb(404);
                         }
-                        return res.json({ statut: invitation, idclass: classe.idclasse, mailclass: classe.courriel })
+                        return cb({ invitation: invitation, classe: classe.idclasse })
                     })
             } else {
-                return res.json({ statut: invitation })
+                return cb({ statut: invitation })
             }
         })
 }

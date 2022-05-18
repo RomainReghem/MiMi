@@ -388,18 +388,18 @@ const ChangementMail = (req, res) => {
  * @param {*} emailClass le mail de la classe qui a donné l'invitation (s'il y en a une)
  * @returns un nombre correspond au code http à renvoyer 
  */
- function setInvitation (invitation, emailEleve, emailClass){
+function setInvitation (invitation, emailEleve, emailClass,callback){
     console.log("\n*** Changement d'invitation ***")
-
+    console.log("invitation "+invitation+ " eleve "+emailEleve+" classe "+emailClass)
     // vérification du mail
     if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
         console.log("forme mail incorrecte")
-        return 407
+        return callback(407)
     }
     // vérification de l'invitation (n'a que 3 valeurs possible)
     if (invitation != "aucune" && invitation != "en attente" && invitation != "acceptee") {
         console.log("forme invitation incorrecte")
-        return 403
+        return callback(403)
     }
     let emailClasse="";
     // if invitation isn't set to aucune, then the request body has to contain the mail of the class
@@ -407,11 +407,11 @@ const ChangementMail = (req, res) => {
         emailClasse=emailClass
     }
     // on cherche dans la bd l'eleve qui correspond au mail fourni
-    Eleve.findOne({ courriel: emailEleve })
+    Eleve.findOne({where : { courriel: emailEleve }})
         .then(eleve => {
             if (!eleve) {
                 console.log("Aucun élève trouvé avec cette adresse.");
-                return 404;
+                return callback(404);
             }
             if(emailClasse==""){
                 console.log("pas d'invitation : suppression des valeurs antérieures")
@@ -425,12 +425,15 @@ const ChangementMail = (req, res) => {
                     }
                 ).then(newEleve => {
                     console.log("Modification de l'invitation effectuée !")
-                    return 201
+                    return callback(201);
                 });
             }else{
                 console.log("invitation : changement/ajout de l'id de la classe")
-                Classe.findOne({courriel:emailClasse})
+                Classe.findOne({where:{courriel:emailClasse}})
                 .then(classe=>{
+                    if(!classe){
+                        return callback(404);
+                    }
                     Eleve.update(
                         {
                             idclasse: classe.idclasse,
@@ -441,7 +444,7 @@ const ChangementMail = (req, res) => {
                         }
                     ).then(newEleve => {
                         console.log("Modification de l'invitation effectuée !")
-                        return 201
+                        return callback(201);
                     });     
                 })
             }

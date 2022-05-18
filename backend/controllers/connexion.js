@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken")
 
 const Users = require('../models/users');
+const { getInvitation } = require('./eleve');
+const { response } = require('express');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
@@ -53,9 +55,19 @@ const Connexion = (req, res) => {
                         refreshTokens.push(refreshToken);
                         //console.log("refresh token connexion " + refreshToken)
                         console.log("** Connexion de l'élève effectuée **")
-
-                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                        res.status(200).json({ role: "eleve", accessToken: accessToken })
+                        getInvitation(eleve.courriel, function(reponse) {
+                            console.log('dans la fonciton')
+                            if(reponse==404||reponse==407){
+                                return res.sendStatus(reponse)
+                            }else{
+                                console.log("test "+response)
+                                res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                const json=Object.assign(response, { role: "eleve", accessToken: accessToken })
+                                console.log(json)
+                                res.status(200).json(json)
+                            }
+                        })
+                     
                         // si le mot de passe entré correspond bien au mot de passe dans la base de données
                         //res.send(eleve)
                     } else {
