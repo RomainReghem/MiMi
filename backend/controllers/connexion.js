@@ -31,12 +31,13 @@ const Connexion = (req, res) => {
         res.sendStatus(402)
     }
     Eleve.findOne({
-        where: 
-            { courriel: pseudo } 
+        where:
+            { courriel: pseudo }
     })
         .then(eleve => {
             if (eleve) {
                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
+                    // si le mot de passe entré correspond bien au mot de passe dans la base de données
                     if (estValide) {
                         console.log("** Création des cookies pour l'élève **")
                         // cookie 
@@ -53,24 +54,17 @@ const Connexion = (req, res) => {
                         refreshTokens.push(refreshToken);
                         //console.log("refresh token connexion " + refreshToken)
                         console.log("** Connexion de l'élève effectuée **")
-                        getInvitation(eleve.courriel, function(reponse) {
+                        getInvitation(eleve.courriel, function (reponse) {
                             console.log('dans la fonciton')
-                            if(reponse==404||reponse==407){
+                            if (reponse == 404 || reponse == 407) {
                                 return res.sendStatus(reponse)
-                            }else{
-                               // let json=JSON.stringify(reponse)
-                               let json=reponse
-                                console.log("test "+reponse)
-                                //response=JSON.parse(response)
+                            } else {
+                                let json = reponse
                                 res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                               json=Object.assign({role: "eleve", accessToken: accessToken}, json)
-                               console.log("json "+json)
+                                json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
                                 res.status(200).json(json)
                             }
                         })
-                     
-                        // si le mot de passe entré correspond bien au mot de passe dans la base de données
-                        //res.send(eleve)
                     } else {
                         console.log("Mauvais mot de passe ELEVE")
                         // sinon, si ce n'est pas le bon mdp mais le bon pseudo

@@ -91,7 +91,7 @@ const AcceptationInvitation = (req, res) => {
     console.log("\n*** Acceptation de l'invitation d'une classe ***")
     const email = req.body.user;
     /// RECUP MAIL CLASSE 
-    Eleve.findOne({ courriel: email })
+    Eleve.findOne({where:{ courriel: email }})
         .then(eleve => {
             if (!eleve) {
                 return res.sendStatus(404)

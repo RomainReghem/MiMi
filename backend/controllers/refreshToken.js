@@ -1,6 +1,7 @@
 const connexion = require('./connexion')
 let refreshTokens = connexion.refreshTokens;
 const jwt = require('jsonwebtoken');
+const { getInvitation } = require('./eleve');
 
 require('dotenv').config()
 
@@ -30,7 +31,7 @@ const refreshToken = (req, res) => {
             if (err || decoded == undefined) {
                 console.log(err);
                 // accès interdit
-                res.sendStatus(403);
+                return res.sendStatus(403);
             } else {
                 console.log("decoded " + decoded.mail + " : " + decoded.role)
                 const accessToken = jwt.sign(
@@ -42,7 +43,14 @@ const refreshToken = (req, res) => {
                     },
                     process.env.ACCESS_TOKEN_SECRET,
                     { expiresIn: '10m' });
-                res.json({role:decoded.role, accessToken:accessToken});
+                    getInvitation(decoded.mail, function (reponse) {
+                        console.log('dans la fonciton')
+                        if (reponse == 404 || reponse == 407) {
+                            return res.sendStatus(reponse)
+                        } else {
+                            return res.status(201).json(Object.assign({role:decoded.role, accessToken:accessToken},reponse));
+                        }
+                    })
             }
         }
     )
