@@ -13,8 +13,11 @@ const Image = require('../controllers/image.js')
 
 // controlleurs spécifiques en fonction du type d'utilisateur
 const Eleve = require('../controllers/eleve.js')
+const ModificationEleve = require('../controllers/modificationEleve.js')
 const Classe = require('../controllers/classe.js')
+const ModificationClasse = require('../controllers/modificationClasse.js')
 
+// LIBRAIRIES
 const express = require('express')
 const router = express.Router();
 
@@ -28,6 +31,7 @@ router.post('/registerClass', Inscription.InscriptionClasse);
 router.get('/logout', Deconnexion)
 // Pour réactualiser les tokens
 router.get('/refresh', refreshToken.refreshToken);
+
 // Pour changer le mot de passe 
 router.post('/changePwd', Modification.ChangementMdp)
 // route pour changer le mail
@@ -36,8 +40,26 @@ router.post('/changeMail', Modification.ChangementMail)
 
 // route qui permet de retourner un pseudo à partir du mail
 router.get('/pseudo', Eleve.getUsernameStudent)
+// PAS IMPLEMENTE
+// route qui permet de retourner le statut de l'invitation et la classe liée à partir du mail de l'élève
+//router.get('/invitation', Eleve.getInvitation)
+// PAS IMPLEMENTE
+// route qui permet de supprimer la classe d'un eleve
+//router.post('/deleteClass', ModificationEleve.SuppressionClasse)
+// route pour changer le pseudo : seulement pour l'élève
+router.post('/changePseudo', ModificationEleve.ChangementPseudo)
+// PAS IMPLEMENTE
+// route qui permet d'accepter l'invitation d'un eleve par une classe
+//router.post('/acceptInvitation', ModificationEleve.AcceptationInvitation)
+
 // route qui permet de retourner la liste d'emails des eleves d'une classe
 router.get('/eleves', Classe.getAllStudents)
+// PAS IMPLEMENTE
+// route qui permet d'envoyer une invitation à un élève
+//router.post('/invitation', ModificationClasse.ajoutInvitation)
+// PAS IMPLEMENTE
+// route permettant de supprimer un élève de la classe
+// router.delete('/studentClass', ModificationClasse.suppressionEleve)
 
 // route pour sauvegarder l'avatar d'un élève
 router.post('/avatar', Image.saveAvatar)
@@ -56,10 +78,11 @@ router.get('/getFile', Document.getCoursEleve)
 router.get('/getCours', Document.getAllCoursEleve)
 // route pour récupèrer le nom de toutes les matières qu'un élève possède
 router.get('/getMatieres', Document.getAllMatieresEleve)
+// PAS IMPLEMENTE
+// route pour ajouter une matiere à l'élève
+// router.post('matiere', Document.addMatiereEleve)
 
-//route pour changer le pseudo : seulement pour l'élève
-router.post('/changePseudo', Modification.ChangementPseudo)
-
+// PAS IMPLEMENTE
 // route pour supprimer l'élève
 // router.delete("/eleve", Eleve.deleteStudent)
 

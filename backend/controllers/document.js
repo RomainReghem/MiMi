@@ -61,8 +61,22 @@ const saveCoursEleve = (req, res, next) => {
                  console.log("Le fichier a bien été sauvegardé");
                  return res.status(201).send("Enregistrement effectué");
              })*/
-
-            fs.writeFile(path + "/" + nom, file.buffer, 'utf8', function (err) {
+             let name=nom;
+             let isNotUnique = true;
+             let i = 1;
+             const newnom = name.split(".")[0]
+             const extension = name.split(".")[1]
+         
+             while (isNotUnique) {
+                 if (fs.existsSync(path + "/" + name)) {
+                     name = newnom + "-" + i + "." + extension
+                     i++;
+                 }else{
+                     isNotUnique = false
+                 }
+             }
+            //nom= verifyUnique(path, nom)
+            fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
                 if (err) {
                     console.log("Erreur lors de l'enregistrement du document : " + err);
                     return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
@@ -200,7 +214,7 @@ const getCoursEleve = (req, res) => {
                 return res.status(404).send("Élève inexistant");
             }
             const num = eleve.ideleve;
-            const path = "./Eleves/eleve" + num + "/depot/" + matiere + "/" + name ;
+            const path = "./Eleves/eleve" + num + "/depot/" + matiere + "/" + name;
             // const files = getAllFiles(path);
             /* fs.readFile(path, 'utf-8', function (err, avatar) {
                  if (err) {
@@ -230,22 +244,53 @@ const getCoursEleve = (req, res) => {
         })
 }
 
-async function verifyUnique(path, name) {
-    fs.readdirSync(path, function (err, files) {
-        if (err) {
-            console.log("erreur durant la vérification d'unicité " + err)
-            return name;
-        } else {
-            let isUnique = true;
-            let i = 1;
-            for (const file of files) {
-                if (file == name) {
-                    name = name.split(".")[0] + "-1" + name.split(".")[1]
-                }
-            }
-            return name;
-        }
+/**
+ * Ajoute dans les dossiers de l'élève donné la matière précisée
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
+ */
+const addMatiereEleve = (req, res) => {
+    console.log("\n*** Ajout d'une matière ***")
+    const email = req.query.mail;
+    const matiere = req.query.cours;
+
+    Eleve.findOne({
+        where: { courriel: email }
     })
+        .then(eleve => {
+            if (!eleve) {
+                console.log("Utilisateur pas trouvé");
+                return res.status(404).send("Élève inexistant");
+            }
+            const num = eleve.ideleve;
+            const path = "./Eleves/eleve" + num + "/depot/" + matiere;
+            verificationChemin(path)
+            return res.status(200);
+        });
 }
 
-module.exports = { saveCoursEleve, getAllCoursEleve, getAllMatieresEleve, getCoursEleve }
+/**
+ * Fonction qui vérifie si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
+ * @param {} path 
+ * @param {*} name 
+ * @returns 
+ */
+async function verifyUnique(path, name) {
+    let isNotUnique = true;
+    let i = 1;
+    const nom = name.split(".")[0]
+    const extension = name.split(".")[1]
+
+    while (isNotUnique) {
+        if (fs.existsSync(path + "/" + name)) {
+            name = nom + "-" + i + "." + extension
+            i++;
+        }else{
+            isNotUnique = false
+        }
+    }
+    console.log("nouveau nom "+name)
+    return name;
+}
+
+module.exports = { saveCoursEleve, getAllCoursEleve, getAllMatieresEleve, getCoursEleve, addMatiereEleve }
