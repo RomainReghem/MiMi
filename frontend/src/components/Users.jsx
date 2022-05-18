@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import useAuth from "../hooks/useAuth";
+import axios from "../api/axios";
+import Notifs from "./Notifs"
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,6 +11,7 @@ import 'reactjs-popup/dist/index.css';
 
 const Users = () => {
     const [users, setUsers] = useState();
+    const { auth } = useAuth();
     const [newEleve, setNewEleve] = useState();
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
@@ -22,8 +26,7 @@ const Users = () => {
                 const response = await axiosPrivate.get('/eleves', {
                     params: { mail: "test@classe.fr" },
                     signal: controller.signal
-                });
-                console.log(response.data.eleves);
+                });                
                 isMounted && setUsers(response.data.eleves);
             } catch (err) {
                 console.error(err);
@@ -41,7 +44,36 @@ const Users = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(newEleve);
+        try {
+            await axios.post("/quitClass", JSON.stringify({ classe:auth?.user, eleve:newEleve }),
+                { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
+            Notifs("Eleve invité", "", "success");
+        }
+        catch (err) {
+            if (!err?.response) {
+                Notifs("Erreur", "Pas de réponse du serveur", "danger");
+            } else if (err.response?.status === 400) {
+                Notifs("Erreur", "Eleve introuvable, vérifiez l'adresse mail", "danger");
+            } else {
+                Notifs("Erreur", "Erreur", "danger");
+            }
+        }
+    }
+
+    const deleteEleve = async (eleveToDelete) => {
+        try {
+            await axios.post("/deleteEleve", JSON.stringify({ classe:auth?.user, eleve:eleveToDelete }),
+                { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
+            Notifs("Eleve supprimé", "", "success");
+        }
+        catch (err) {
+            if (!err?.response) {
+                Notifs("Erreur", "Pas de réponse du serveur", "danger");
+            } else {
+                Notifs("Erreur", "Erreur", "danger");
+            }
+        }
+
     }
 
     return (
@@ -68,7 +100,7 @@ const Users = () => {
                                 {close => (<div className="popupMsg">
                                     <h2>Supprimer cet élève ?</h2>
                                     <p>Il n'aura plus accès aux documents partagés</p>
-                                    <div><button onClick={close}>Oui</button><button onClick={close}>Non</button></div>
+                                    <div><button onClick={() => {deleteEleve(user?.courriel);close()}}>Oui</button><button onClick={close}>Non</button></div>
                                 </div>)}
                             </Popup>
                         </div>)}

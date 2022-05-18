@@ -5,6 +5,8 @@ const useGetImage = () => {
     const { auth } = useAuth();
 
     const getImage = async () => {
+        if (auth?.role == "classe")
+            return;
         try {
             const response = await axios.get("/getImage",
                 {

@@ -3,8 +3,9 @@ import useAuth from "../hooks/useAuth";
 import axios from '../api/axios';
 import Notifs from '../components/Notifs';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import Avatar from 'react-nice-avatar'
+import { faUpload, faCheck, faPaperPlane, faDoorOpen, faXmark } from "@fortawesome/free-solid-svg-icons";
+import Avatar from 'react-nice-avatar';
+import Invitations from "./Invitations";
 import useGetImage from "../hooks/useGetImage";
 import useGetAvatar from "../hooks/useGetAvatar";
 
@@ -70,8 +71,8 @@ const Identity = () => {
             if (data != undefined)
                 setPicture("data:image/png;base64," + window.btoa(binary))
         }
-            image();
-        
+        image();
+
     }, [pictureWaitingToBeSent])
 
     // Submit du pseudo
@@ -187,6 +188,7 @@ const Identity = () => {
                     <button onClick={() => { setAuth({ ...auth, preference: "avatar" }); localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar")) }} className="chooseAvatar">Choisir l'avatar</button>
                 </div>
             </div>
+            <Invitations />
         </div>
     );
 }

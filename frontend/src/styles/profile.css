@@ -82,6 +82,10 @@
     margin-bottom: 10px;
 }
 
+.controls-thirdRow{
+    margin-bottom: 0;
+}
+
 .controls-firstRow button,
 .controls-secondRow button {
     border-radius: 3px;

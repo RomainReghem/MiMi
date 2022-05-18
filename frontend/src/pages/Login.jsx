@@ -35,6 +35,9 @@ const Connexion = () => {
             //const accessToken = response?.data?.accessToken;
             const accessToken = response?.data?.accessToken;
             const role = response?.data?.role;
+            const invitation = response?.data?.invitation;
+            const classe = response?.data?.classe;
+
 
             // Au login, si rien ne correspond dans le local storage, on attribue "avatar" à "préférence"
             // On ajoute aussi la variable au localstorage, default "avatar"
@@ -43,7 +46,7 @@ const Connexion = () => {
                 localStorage.setItem("preference"+user, JSON.stringify("avatar"));
             }
 
-            setAuth({ user, accessToken, role, preference });
+            setAuth({ user, accessToken, role, preference, invitation, classe });
             setPwd('');
             setUser('');
             Notifs("Bienvenue !", "Vous êtes connecté", "success");

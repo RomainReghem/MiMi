@@ -5,6 +5,8 @@ const useGetAvatar = () => {
     const { auth } = useAuth();
 
     const getAvatar = async () => {
+        if (auth?.role == "classe")
+            return;
         try {
             const response = await axios.get("/avatar",
                 {
