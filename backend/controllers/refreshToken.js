@@ -43,14 +43,19 @@ const refreshToken = (req, res) => {
                     },
                     process.env.ACCESS_TOKEN_SECRET,
                     { expiresIn: '10m' });
-                    getInvitation(decoded.mail, function (reponse) {
-                        console.log('dans la fonciton')
-                        if (reponse == 404 || reponse == 407) {
-                            return res.sendStatus(reponse)
-                        } else {
-                            return res.status(201).json(Object.assign({role:decoded.role, accessToken:accessToken},reponse));
-                        }
-                    })
+                    if(decoded.role=="eleve"){
+                        getInvitation(decoded.mail, function (reponse) {
+                            console.log('dans la fonciton')
+                            if (reponse == 404 || reponse == 407) {
+                                return res.sendStatus(reponse)
+                            } else {
+                                return res.status(201).json(Object.assign({role:decoded.role, accessToken:accessToken},reponse));
+                            }
+                        })
+                    }else{
+                        return res.status(201).json({role:decoded.role, accessToken:accessToken});
+                    }
+
             }
         }
     )

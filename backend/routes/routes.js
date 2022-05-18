@@ -75,15 +75,18 @@ router.get('/getImage', Image.getPicture)
 
 // route pour sauvegarder un document d'un élève
 router.post('/saveFile', verifyDoc.single("file"), AjoutDoc.saveCoursEleve)
-// PAS IMPLEMENTE
 // route pour sauvegarder un document d'une classe
-// router.post('/fileClass', verifyDoc.single("file"), AjoutDoc.saveCoursClasse)
+router.post('/saveFileClass', verifyDoc.single("file"), AjoutDoc.saveCoursClasse)
 // route pour récupèrer un document d'un élève
 router.get('/getFile', Document.getCoursEleve)
 // route pour récupèrer le nom de tous les cours qu'un élève possède dans une matière donnée
 router.get('/getCours', Document.getAllCoursEleve)
 // route pour récupèrer le nom de toutes les matières qu'un élève possède
 router.get('/getMatieres', Document.getAllMatieresEleve)
+/*
+getFileClass
+getCoursClass
+getMatieresClass*/
 // PAS IMPLEMENTE
 // route pour ajouter une matiere à l'élève
 // router.post('matiereEleve', AjoutDoc.addMatiereEleve)
