@@ -45,7 +45,7 @@ const Users = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("/quitClass", JSON.stringify({ classe:auth?.user, eleve:newEleve }),
+            await axios.post("/inviteEleve", JSON.stringify({ classe:auth?.user, eleve:newEleve }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
             Notifs("Eleve invité", "", "success");
         }
