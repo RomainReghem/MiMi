@@ -12,6 +12,7 @@ import 'reactjs-popup/dist/index.css';
 
 const Users = () => {
     const [users, setUsers] = useState();
+    const [usersUpdated, setUsersUpdated] = useState();
     const { auth } = useAuth();
     const [newEleve, setNewEleve] = useState();
     const axiosPrivate = useAxiosPrivate();
@@ -25,7 +26,7 @@ const Users = () => {
         const getUsers = async () => {
             try {
                 const response = await axiosPrivate.get('/eleves', {
-                    params: { mail: "test@classe.fr" },
+                    params: { mail: auth?.user },
                     signal: controller.signal
                 });                
                 isMounted && setUsers(response.data.eleves);
@@ -41,7 +42,7 @@ const Users = () => {
             isMounted = false;
             controller.abort();
         }
-    }, [])
+    }, [usersUpdated])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -101,13 +102,13 @@ const Users = () => {
                                 {close => (<div className="popupMsg">
                                     <h2>Supprimer cet élève ?</h2>
                                     <p>Il n'aura plus accès aux documents partagés</p>
-                                    <div><button onClick={() => {deleteEleve(user?.courriel);close()}}>Oui</button><button onClick={close}>Non</button></div>
+                                    <div><button onClick={() => {deleteEleve(user?.courriel);close();setUsersUpdated(!usersUpdated)}}>Oui</button><button onClick={close}>Non</button></div>
                                 </div>)}
                             </Popup>
                         </div>)}
 
                     </div>
-                ) : <p>No users to display</p>
+                ) : <p>Invitez un élève pour le voir apparaître ici lorsqu'il acceptera</p>
             }
         </section>
     );

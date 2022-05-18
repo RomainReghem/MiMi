@@ -170,22 +170,22 @@ const Identity = () => {
                     required
                     placeholder="Nouveau pseudo"
                 />
-                <button className="pseudoSubmit"><FontAwesomeIcon icon={faCheck} /></button>
+                <button className="pseudoSubmit" onClick={(e) => e.currentTarget.blur()}><FontAwesomeIcon className="pseudoSubmitIcon" icon={faCheck} /></button>
             </form>
 
             <div className="importProfilePic">
                 <input type="file" id="picture" className="pictureInput" onChange={handlePictureSelect} />
                 <label htmlFor="picture" className="pictureLabel"><FontAwesomeIcon icon={faUpload} /><p>{selectedPicture?.data && pictureWaitingToBeSent ? (selectedPicture?.data.name).substring(0, 10) + "..." : "Importer une image"}</p></label>
-                <button className="pictureSendButton" onClick={pictureSubmit}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></button>
+                <button className="pictureSendButton" onClick={(e) => {pictureSubmit(e); e.currentTarget.blur()}}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></button>
             </div>
             <div className="preferences">
                 <div>
                     <img className="previewImage" src={picture}></img>
-                    <button onClick={() => { setAuth({ ...auth, preference: "image" }); localStorage.setItem("preference" + auth?.user, JSON.stringify("image")) }} className="chooseImage">Choisir l'image</button>
+                    <button onClick={(e) => { setAuth({ ...auth, preference: "image" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("image")) }} className="chooseImage">Choisir l'image</button>
                 </div>
                 <div>
                     <Avatar className="previewAvatar"  {...avatar} />
-                    <button onClick={() => { setAuth({ ...auth, preference: "avatar" }); localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar")) }} className="chooseAvatar">Choisir l'avatar</button>
+                    <button onClick={(e) => { setAuth({ ...auth, preference: "avatar" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar")) }} className="chooseAvatar">Choisir l'avatar</button>
                 </div>
             </div>
             <Invitations />

@@ -89,8 +89,8 @@
 .controls-firstRow button,
 .controls-secondRow button {
     border-radius: 3px;
-    background-color: #026773;
-    box-shadow: 2px 2px #024959;
+    background-color: #024959;
+    box-shadow: 2px 2px #012E40;
     display: flex;
     align-items: center;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -100,8 +100,8 @@
 
 .controls-thirdRow button {
     border-radius: 3px;
-    background-color: #026773;
-    box-shadow: 2px 2px #024959;
+    background-color: #024959;
+    box-shadow: 2px 2px #012E40;
     display: flex;
     align-items: center;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
