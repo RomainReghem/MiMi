@@ -3,7 +3,8 @@ const Sequelize = require('sequelize')
 
 const db = new Sequelize('db_mimi', 'projetmimi', 'mdpmimi!', {
     dialect: 'mysql',
-    host: '35.187.74.158'
+    host: '35.187.74.158',
+    logging: false
 } )
 
 /* On crée une connexion à la database : pour l'instant elle est stockée sur un cloud google

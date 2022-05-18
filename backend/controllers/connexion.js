@@ -31,10 +31,8 @@ const Connexion = (req, res) => {
         res.sendStatus(402)
     }
     Eleve.findOne({
-        where: //Sequelize.or(
-            //{ pseudo: pseudo },
-            { courriel: pseudo }
-        //) 
+        where: 
+            { courriel: pseudo } 
     })
         .then(eleve => {
             if (eleve) {
@@ -60,10 +58,13 @@ const Connexion = (req, res) => {
                             if(reponse==404||reponse==407){
                                 return res.sendStatus(reponse)
                             }else{
-                                console.log("test "+response)
+                               // let json=JSON.stringify(reponse)
+                               let json=reponse
+                                console.log("test "+reponse)
+                                //response=JSON.parse(response)
                                 res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                const json=Object.assign(response, { role: "eleve", accessToken: accessToken })
-                                console.log(json)
+                               json=Object.assign({role: "eleve", accessToken: accessToken}, json)
+                               console.log("json "+json)
                                 res.status(200).json(json)
                             }
                         })
