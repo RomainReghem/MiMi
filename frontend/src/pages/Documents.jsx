@@ -44,7 +44,7 @@ const Documents = () => {
     return (
         <div className="fileMain">
             <section className="fileManager">
-                <Tooltip title="Refresh" placement="right" sx={{bgColor:'primary.main'}}>                
+                <Tooltip title="Refresh" placement="right">                
                     <IconButton size="small" onClick={loadFiles} style={{ alignSelf: "flex-start", marginBottom: "0.5rem" }}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></IconButton>
                 </Tooltip>
                 <div className="fileList">

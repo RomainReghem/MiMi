@@ -16,6 +16,8 @@ const useRefreshToken = () => {
                 user:jwt_decode(response?.data?.accessToken).UserInfo.mail,
                 role: response.data.role,
                 accessToken: response.data.accessToken,
+                invitation: response.data.invitation,
+                classe: response.data.classe,
                 preference:JSON.parse(localStorage.getItem("preference"+jwt_decode(response?.data?.accessToken).UserInfo.mail))
             }
         });
