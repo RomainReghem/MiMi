@@ -33,10 +33,12 @@ const Connexion = () => {
                     withCredentials: true
                 });
             //const accessToken = response?.data?.accessToken;
+            console.log(response)
             const accessToken = response?.data?.accessToken;
             const role = response?.data?.role;
             const invitation = response?.data?.invitation;
             const classe = response?.data?.classe;
+            
 
 
             // Au login, si rien ne correspond dans le local storage, on attribue "avatar" à "préférence"

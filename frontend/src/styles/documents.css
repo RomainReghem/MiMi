@@ -169,3 +169,7 @@
 .fileRefresh:hover{
     cursor: pointer;
 }
+
+.fileRefresh{
+    color:black;
+}

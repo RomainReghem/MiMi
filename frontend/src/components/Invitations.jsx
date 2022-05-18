@@ -8,6 +8,7 @@ const Invitations = () => {
     const { auth, setAuth } = useAuth();
     const classe = "";
     const user = auth?.user;
+    console.log(auth);
 
     const acceptInvite = async () => {
         try {
@@ -43,11 +44,11 @@ const Invitations = () => {
     }
 
     return (
-        auth?.invitation == "none" ? (
+        auth?.invitation == "aucune" ? (
             <div style={{ backgroundColor: "#C05946", color: "#F2E3D5" }} className="membreMsg">
                 <p>Aucune invitation de classe en attente</p>
             </div>)
-            : auth?.invitation == "pending" ? (
+            : auth?.invitation == "en attente" ? (
                 <div style={{ backgroundColor: "#F2C12E", color: "black", border: "0.1rem dashed #012E40" }} className="membreMsg">
                     <p>{auth?.classe} vous a invité !</p>
                     <span>
@@ -59,7 +60,7 @@ const Invitations = () => {
                         </button>
                     </span>
                 </div>)
-                : auth?.invitation == "accepted" ? (
+                : auth?.invitation == "acceptee" ? (
                     <div style={{ backgroundColor: "#258A54", color: "black" }} className="membreMsg">
                         <p>Vous êtes membre de la {auth?.classe}</p>
                         <button onClick={quitClass} className="quitClass">

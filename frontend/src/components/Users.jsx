@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import axios from "../api/axios";
-import Notifs from "./Notifs"
+import Tooltip from "@mui/material/Tooltip";
+import Notifs from "./Notifs";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
