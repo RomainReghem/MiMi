@@ -55,7 +55,6 @@ const Connexion = (req, res) => {
                         //console.log("refresh token connexion " + refreshToken)
                         console.log("** Connexion de l'élève effectuée **")
                         getInvitation(eleve.courriel, function (reponse) {
-                            console.log('dans la fonciton')
                             if (reponse == 404 || reponse == 407) {
                                 return res.sendStatus(reponse)
                             } else {

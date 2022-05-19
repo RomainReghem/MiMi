@@ -82,7 +82,7 @@ const deleteStudent = async (req, res) => {
 }
 
 /**
- * Retourne l'invitation et la classe associée
+ * Retourne l'invitation et la classe associée dans un format JSON
  * 
  * @param {*} emailEleve l'email de l'èleve dont on veut l'invitation
  */
@@ -106,7 +106,7 @@ function getInvitation(emailEleve, cb) {
                         if (!classe) {
                             return cb(404);
                         }
-                        return cb({ invitation: invitation, classe: classe.idclasse })
+                        return cb({ invitation: invitation, idclasse: classe.idclasse })
                     })
             } else {
                 return cb({ invitation: invitation })

@@ -27,6 +27,7 @@ const bucket = storage.bucket("bucket_projet_mimi");
  * @param {*} res la réponse du serveur
  */
 const InscriptionEleve = (req, res) => {
+    console.log("***\n Inscription de l'élève ***")
     /*données de test valides
     const pseudo = "eleve10";
     const prenom = "test";
@@ -180,11 +181,11 @@ const InscriptionClasse = (req, res) => {
     const nom = "test";
     const email = "eleve10@test.fr";
     const mdp = "testoror";*/
-
+    console.log('\n*** Inscription de la classe ***')
     const email = req.body.mail;
     const mdp = req.body.pwd;
 
-    console.log(email + mdp)
+    //console.log(email + mdp)
 
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
