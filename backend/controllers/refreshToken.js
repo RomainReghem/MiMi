@@ -2,6 +2,7 @@ const connexion = require('./connexion')
 let refreshTokens = connexion.refreshTokens;
 const jwt = require('jsonwebtoken');
 const { getInvitation } = require('./eleve');
+const { Classe } = require('../models/users');
 
 require('dotenv').config()
 
@@ -54,8 +55,17 @@ const refreshToken = (req, res) => {
                         }
                     })
                 } else {
-                    // sinon si c'est une classe on retourne juste le role et le nouveau accesstoken
-                    return res.status(201).json({ role: decoded.role, accessToken: accessToken });
+
+                    Classe.findOne({ where: { courriel: decoded.mail } })
+                        .then(classe => {
+                            if (!classe) {
+                                return res.sendStatus(403)
+                            }
+                            // sinon si c'est une classe on retourne juste le role et le nouveau accesstoken + l'id de la classe
+                            return res.status(201).json({ role: decoded.role, accessToken: accessToken, idclasse: classe.idclasse });
+                        }
+                        )
+
                 }
 
             }

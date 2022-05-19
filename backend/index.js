@@ -60,9 +60,9 @@ app.use(router);
 
 
 //db.sequelize.sync().then(() => {
-    // adresse du serveur, pour faire des tests
-    app.listen(3500, () => {
-        console.log("Serveur en marche")
-    }
-    );
+// adresse du serveur, pour faire des tests
+app.listen(3500, () => {
+    console.log("Serveur en marche")
+}
+);
 //});

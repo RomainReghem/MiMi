@@ -192,7 +192,7 @@ const savePicture = (req, res) => {
 const getPicture = (req, res) => {
     console.log("\n*** Récupération de l'image de profil de l'élève ***")
     const email = req.query.mail;
-    if(email==undefined){
+    if (email == undefined) {
         console.log("récupération d'image impossible sans mail!")
         return res.sendStatus(400)
     }
@@ -220,13 +220,9 @@ const getPicture = (req, res) => {
                     return res.status(600).send('Erreur lors de la récupèration de la pp.');
                 } else {
                     for (const f of files) {
-                        //console.log(f)
+                        // les images de profils sont stockées sous le nom de photo
                         if (f.startsWith('photo')) {
-                            /* res.writeHead(200, {
-                                  "Content-Type": "image/" + f.split('/')[1]
-                              });*/
                             file = f;
-
                         }
                     }
                     if (file == "") {
@@ -238,7 +234,7 @@ const getPicture = (req, res) => {
                             console.log("erreur lors de la recup de pp " + err)
                             return res.status(520).send(err)
                         }
-                        return res.send({image:image});
+                        return res.send({ image: image });
                     });
                 }
             })

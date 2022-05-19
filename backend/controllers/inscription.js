@@ -107,7 +107,7 @@ const InscriptionEleve = (req, res) => {
                                     .then((eleve) => {
                                         console.log("Création de compte élève réussie")
                                         const num = eleve.ideleve
-                                        //const path = "./testeleve/eleve" + num + "/avatar"
+                                        //const path = "./Eleves/eleve" + num + "/avatar"
                                         // console.log("*** Création d'un dossier ***")
 
                                         // enregistrement de l'avatar par défaut
