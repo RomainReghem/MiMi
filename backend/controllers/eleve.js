@@ -67,16 +67,16 @@ const deleteStudent = async (req, res) => {
             }).then(result => {
                 // maintenant on doit supprimer les dossiers et les documents de l'élève
                 const num = eleve.ideleve;
-                const path = "./testeleve/eleve" + num
+                const path = "./Eleves/eleve" + num
                 // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
                 fs.rmdir(path, { recursive: true }, (err) => {
                     if (err) {
                         console.log("erreur suppression dossiers : " + err)
                         return res.status(500).send("Erreur lors de la suppression de documents.")
                     }
+                    console.log("Suppression effectuée !")
+                    return res.send(result);
                 })
-                console.log("Suppression effectuée !")
-                return res.send(result);
             });
         });
 }

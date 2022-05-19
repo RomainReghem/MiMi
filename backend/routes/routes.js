@@ -13,6 +13,7 @@ const Image = require('../controllers/image.js')
 const SuppressionDoc = require('../controllers/suppressionDocument.js')
 const AjoutDoc = require('../controllers/ajoutDocument.js')
 const Document = require('../controllers/recuperationDocument.js')
+const ChangeDoc = require('../controllers/changementDocument.js')
 
 // controlleurs spécifiques en fonction du type d'utilisateur
 const Eleve = require('../controllers/eleve.js')
@@ -43,18 +44,14 @@ router.post('/changeMail', Modification.ChangementMail)
 
 // route qui permet de retourner un pseudo à partir du mail
 router.get('/pseudo', Eleve.getUsernameStudent)
-// PAS IMPLEMENTE
-// route qui permet de retourner le statut de l'invitation et la classe liée à partir du mail de l'élève
-//router.get('/invitation', Eleve.getInvitation)
-// route qui permet de refuser l'invitation de la classe
+// route qui permet de refuser l'invitation de la classe (et donc supprime la classe et l'invitation de la bd)
 router.post('/refuseInvite', ModificationEleve.SuppressionClasse)
 // route qui permet de supprimer la classe d'un eleve
 router.post('/quitClass', ModificationEleve.SuppressionClasse)
 
 // route pour changer le pseudo : seulement pour l'élève
 router.post('/changePseudo', ModificationEleve.ChangementPseudo)
-// PAS IMPLEMENTE
-// route qui permet d'accepter l'invitation d'un eleve par une classe
+// route qui permet d'accepter l'invitation d'une classe
 router.post('/acceptInvite', ModificationEleve.AcceptationInvitation)
 
 // route qui permet de retourner la liste d'emails des eleves d'une classe
@@ -75,19 +72,28 @@ router.get('/getImage', Image.getPicture)
 
 // route pour sauvegarder un document d'un élève
 router.post('/saveFile', verifyDoc.single("file"), AjoutDoc.saveCoursEleve)
-// PAS IMPLEMENTE
 // route pour sauvegarder un document d'une classe
-// router.post('/fileClass', verifyDoc.single("file"), AjoutDoc.saveCoursClasse)
+router.post('/saveFileClass', verifyDoc.single("file"), AjoutDoc.saveCoursClasse)
 // route pour récupèrer un document d'un élève
 router.get('/getFile', Document.getCoursEleve)
 // route pour récupèrer le nom de tous les cours qu'un élève possède dans une matière donnée
 router.get('/getCours', Document.getAllCoursEleve)
 // route pour récupèrer le nom de toutes les matières qu'un élève possède
 router.get('/getMatieres', Document.getAllMatieresEleve)
-// PAS IMPLEMENTE
+/*PAS IMPLEMENTE : cours des classes
+// route pour accèder à un fichier précis de la classe, dans une matière donnée
+router.get('/getFileClass', Document.getCoursClasse)
+// route pour récupérer le nom de tous les fichiers présents pour une matière
+router.get('/getCoursClass', Document.getAllCoursClasse)
+// route pour récupèrer le nom de toutes les matières qu'une classe a
+router.get('/getMatiereClass', Document.getAllMatieresClasse)*/
+
+// PAS IMPLEMENTE : ajout de matiere
 // route pour ajouter une matiere à l'élève
 // router.post('matiereEleve', AjoutDoc.addMatiereEleve)
-// PAS IMPLEMENTE
+// route pour ajouter une matiere à la classe
+// router.post('matiereClasse', AjoutDoc.addMatiereClasse)
+// PAS IMPLEMENTE : suppression de matiere/cours
 // route pour supprimer une matiere à l'élève
 //router.delete('matiereEleve', SuppressionDoc.deleteMatiereEleve)
 // PAS IMPLEMENTE
@@ -100,8 +106,21 @@ router.get('/getMatieres', Document.getAllMatieresEleve)
 // route pour supprimer un cours à la classe
 //router.delete('coursClasse', SuppressionDoc.deleteCoursClasse)
 
-// PAS IMPLEMENTE
+/* PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
+// route pour renommer la matière d'une classe
+router.put("matiereClass", ChangeDoc.renameMatiereClasse)
+// route pour renommer la matière d'une classe
+router.put("coursClass", ChangeDoc.renameMatiereClasse)
+// route pour renommer le nom d'un cours(fichier) d'une classe
+router.put("matiereEleve", ChangeDoc.renameMatiereClasse)
+// route pour renommer le nom d'un cours(fichier) d'un élève
+router.put("coursEleve", ChangeDoc.renameMatiereClasse)*/
+
+// PAS IMPLEMENTE : SUPPRESSION
 // route pour supprimer l'élève
 // router.delete("/eleve", Eleve.deleteStudent)
+// PAS IMPLEMENTE
+// route pour supprimer la classe
+// router.delete("/classe", Classe.deleteClass)
 
 module.exports = router;

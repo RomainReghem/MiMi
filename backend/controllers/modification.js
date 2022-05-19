@@ -287,7 +287,7 @@ const ChangementMail = (req, res) => {
                                                 if (eleve) {
                                                     console.log("Mail existant pour un eleve");
                                                     // res.sendStatus(411)
-                                                    res.status(409).send('Adresse déjà utilisée par un élève')
+                                                    res.status(411).send('Adresse déjà utilisée par un élève')
                                                 } else {
                                                     // comparaion du mdp avec celui connu
                                                     bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {
@@ -394,12 +394,12 @@ function setInvitation (invitation, emailEleve, emailClass,callback){
     // vérification du mail
     if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
         console.log("forme mail incorrecte")
-        return callback(407)
+        return callback(400)
     }
     // vérification de l'invitation (n'a que 3 valeurs possible)
     if (invitation != "aucune" && invitation != "en attente" && invitation != "acceptee") {
         console.log("forme invitation incorrecte")
-        return callback(403)
+        return callback(400)
     }
     let emailClasse="";
     // if invitation isn't set to aucune, then the request body has to contain the mail of the class
@@ -429,6 +429,14 @@ function setInvitation (invitation, emailEleve, emailClass,callback){
                 });
             }else{
                 console.log("invitation : changement/ajout de l'id de la classe")
+                if(eleve.invitation!="aucune" && invitation=="en attente"){
+                    console.log("Erreur : l'élève est dans une classe ou a une demande en attente")
+                    return callback(403)
+                }
+                if ((invitation=="acceptee" && eleve.invitation!="en attente")){
+                    console.log("Invitation impossible : l'élève n'a pas de demande en attente")
+                    return callback(409)
+                }
                 Classe.findOne({where:{courriel:emailClasse}})
                 .then(classe=>{
                     if(!classe){

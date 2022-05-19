@@ -229,25 +229,6 @@ const InscriptionClasse = (req, res) => {
 
                                             console.log("Création de compte classe réussie, idclasse : " + num)
 
-                                            console.log("** Création des dossiers **")
-
-                                            try {
-                                                if (!fs.existsSync('./testclasse')) {
-                                                    fs.mkdirSync('./testclasse');
-                                                }
-                                            } catch (err) {
-                                                console.error(err);
-                                                return res.status(600).send("Erreur lors de la création de dossier test")
-                                            }
-                                            try {
-                                                if (!fs.existsSync('./testclasse/classe' + num)) {
-                                                    fs.mkdirSync('./testclasse/classe' + num);
-                                                }
-                                            } catch (err) {
-                                                console.error(err);
-                                                return res.status(600).send("Erreur lors de la création de dossier classe")
-                                            }
-
                                             return res.send(newclasse);
 
                                         })

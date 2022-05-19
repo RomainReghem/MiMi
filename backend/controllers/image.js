@@ -192,6 +192,10 @@ const savePicture = (req, res) => {
 const getPicture = (req, res) => {
     console.log("\n*** Récupération de l'image de profil de l'élève ***")
     const email = req.query.mail;
+    if(email==undefined){
+        console.log("récupération d'image impossible sans mail!")
+        return res.sendStatus(400)
+    }
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
