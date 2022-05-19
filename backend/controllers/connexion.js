@@ -98,7 +98,7 @@ const Connexion = (req, res) => {
                                     //console.log("refresh token connexion " + refreshToken)
 
                                     res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                    res.status(201).json({ role: "classe", accessToken: accessToken })
+                                    res.status(201).json({ role: "classe", accessToken: accessToken, idclasse:classe.idclasse })
                                     console.log("CONNEXION de la classe OK")
                                     // si le mot de passe entré correspond bien au mot de passe dans la base de données
                                     //res.send(classe)
@@ -123,7 +123,9 @@ const Connexion = (req, res) => {
             }
         })
         .catch(err => {
-            console.log("error" + err);
+           // console.log(err);
+           console.log("Erreur : délai d'attente dépassé")
+            res.sendStatus(504)
         })
 }
 
