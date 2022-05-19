@@ -22,6 +22,7 @@ import Success from "./Success"
 import Tests from "./Tests"
 import Construction from "./Construction"
 import Settings from "./Settings";
+import Visio from "./Visio"
 
 // Styles
 import '../styles/App.css'
@@ -60,9 +61,9 @@ export default function App() {
               <Route element={<RequireAuth />}>
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/documents" element={<Documents />} />
-                <Route path="/visio" element={<Construction />} />
+                <Route path="/visio" element={<Visio />} />
                 <Route path="/jeux" element={<Construction />} />
-                <Route path="/settings" element={<Settings/>}/>
+                <Route path="/settings" element={<Settings/>}/>                
               </Route>
             </Route>
 

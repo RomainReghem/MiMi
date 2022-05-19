@@ -141,7 +141,7 @@ const Nav = () => {
                             <li style={{ background: avatar_base?.bgColor, marginRight: "0rem", paddingRight: "1.2rem" }}>
                                 <Link to="/Profile" className="navNavProfile">
                                     <Avatar style={{ width: '3rem', height: '3rem', marginRight: "1rem" }} {...avatar_base} />
-                                    <p className="navText pseudo">Classe</p>
+                                    <p className="navText pseudo">Classe {auth?.idclasse}</p>
                                 </Link>
                             </li>
                         )}

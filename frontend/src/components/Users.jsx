@@ -54,8 +54,10 @@ const Users = () => {
         catch (err) {
             if (!err?.response) {
                 Notifs("Erreur", "Pas de réponse du serveur", "danger");
-            } else if (err.response?.status === 400) {
+            } else if (err.response?.status === 404) {
                 Notifs("Erreur", "Eleve introuvable, vérifiez l'adresse mail", "danger");
+            } else if (err.response?.status === 403) {
+                Notifs("Erreur", "L'élève est déjà dans une classe ou a déjà une invitation en attente", "danger");
             } else {
                 Notifs("Erreur", "Erreur", "danger");
             }
@@ -71,7 +73,8 @@ const Users = () => {
         catch (err) {
             if (!err?.response) {
                 Notifs("Erreur", "Pas de réponse du serveur", "danger");
-            } else {
+            }            
+            else {
                 Notifs("Erreur", "Erreur", "danger");
             }
         }

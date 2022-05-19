@@ -6,7 +6,7 @@ import axios from "../api/axios";
 
 const Invitations = () => {
     const { auth, setAuth } = useAuth();
-    const classe = "";
+    const classe = auth?.idclasse;
     const user = auth?.user;
     console.log(auth);
 
@@ -62,7 +62,7 @@ const Invitations = () => {
             </div>)
             : auth?.invitation == "en attente" ? (
                 <div style={{ backgroundColor: "#F2C12E", color: "black", border: "0.1rem dashed #012E40" }} className="membreMsg">
-                    <p>La classe #{auth?.classe} vous a invité !</p>
+                    <p>La classe #{classe} vous a invité !</p>
                     <span>
                         <button onClick={acceptInvite} className="acceptInvite">
                             <FontAwesomeIcon className="inviteIcons" icon={faCheck} />
@@ -74,7 +74,7 @@ const Invitations = () => {
                 </div>)
                 : auth?.invitation == "acceptee" ? (
                     <div style={{ backgroundColor: "#258A54", color: "black" }} className="membreMsg">
-                        <p>Vous êtes membre de la classe #{auth?.classe}</p>
+                        <p>Vous êtes membre de la classe #{classe}</p>
                         <button onClick={quitClass} className="quitClass">
                             <FontAwesomeIcon icon={faDoorOpen} />
                         </button>

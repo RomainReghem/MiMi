@@ -37,7 +37,7 @@ const Connexion = () => {
             const accessToken = response?.data?.accessToken;
             const role = response?.data?.role;
             const invitation = response?.data?.invitation;
-            const classe = response?.data?.classe;
+            const idclasse = response?.data?.idclasse;
             
 
 
@@ -48,7 +48,7 @@ const Connexion = () => {
                 localStorage.setItem("preference"+user, JSON.stringify("avatar"));
             }
 
-            setAuth({ user, accessToken, role, preference, invitation, classe });
+            setAuth({ user, accessToken, role, preference, invitation, idclasse });
             setPwd('');
             setUser('');
             Notifs("Bienvenue !", "Vous êtes connecté", "success");
