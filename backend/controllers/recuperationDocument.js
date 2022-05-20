@@ -13,6 +13,7 @@ const getAllMatieresEleve = (req, res) => {
     const email = req.body.mail;
 
     Eleve.findOne({
+        attributes: ['ideleve'],
         where: { courriel: email }
     })
         .then(eleve => {
@@ -47,7 +48,10 @@ const getAllCoursEleve = (req, res) => {
         // erreur 400
         return res.sendStatus(407)
     }
+    console.log("matiere "+matiere)
+
     Eleve.findOne({
+        attributes: ['ideleve'],
         where: { courriel: email }
     })
         .then(eleve => {
@@ -63,6 +67,7 @@ const getAllCoursEleve = (req, res) => {
                     console.log("erreur durant la récupération " + err)
                     return res.status(520);
                 } else {
+                    console.log("Récupération réussie")
                     return res.send({ files }).status(201)
                 }
             })
@@ -85,8 +90,10 @@ const getCoursEleve = (req, res) => {
         // erreur 400
         return res.sendStatus(407)
     }
+    console.log("matiere "+matiere)
 
     Eleve.findOne({
+        attributes: ['ideleve'],
         where: { courriel: email }
     })
         .then(eleve => {
@@ -119,12 +126,13 @@ const getCoursEleve = (req, res) => {
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
  */
- const getAllMatieresClasse = (req, res) => {
+const getAllMatieresClasse = (req, res) => {
     console.log("\n*** Récupération des matières de la classe ***")
-    const id = req.body.id;
+    const id = req.query.id;
 
     Classe.findOne({
-        where: { idclasse:id }
+        attributes: ['idclasse'],
+        where: { idclasse: id }
     })
         .then(classe => {
             if (!classe) {
@@ -153,7 +161,8 @@ const getAllCoursClasse = (req, res) => {
     const id = req.query.id;
     const matiere = req.query.cours;
 
-    Classe.findOne({attributes:[],
+    Classe.findOne({
+        attributes: ['idclasse'],
         where: { idclasse: id }
     })
         .then(classe => {
@@ -178,7 +187,7 @@ const getAllCoursClasse = (req, res) => {
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
  */
-const getCoursClasse= (req, res) => {
+const getCoursClasse = (req, res) => {
     console.log("\n*** Récupération d'un cours d'une classe***")
     const id = req.query.id;
     const matiere = req.query.cours;
@@ -186,9 +195,11 @@ const getCoursClasse= (req, res) => {
     //const id =req.query.classe;
 
     Classe.findOne({
-        where: { idclasse: id
-       // idclasse:id
-     }
+        attributes: ['idclasse'],
+        where: {
+            idclasse: id
+            // idclasse:id
+        }
     })
         .then(classe => {
             if (!classe) {

@@ -13,11 +13,11 @@ const Modification = require('../controllers/modification.js')
  * @param {*} res la réponse du serveur
  */
 const ChangementPseudo = (req, res) => {
+    console.log("\n*** Changement du pseudo ***")
     const email = req.body.mail;
     const pseudo = req.body.newPseudo;
     console.log("email " + email + " new " + pseudo)
 
-    console.log("\n*** Vérification pseudo ***")
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
         res.sendStatus(407)
