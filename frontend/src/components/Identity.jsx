@@ -136,11 +136,12 @@ const Identity = () => {
 
     // Submit de l'image
     const pictureSubmit = async () => {
-        let formData = new FormData()
-        formData.append('file', selectedPicture.data);
-        formData.append("filename", selectedPicture.data.name);
-        formData.append("mail", auth?.user);
+
         try {
+            let formData = new FormData()
+            formData.append('file', selectedPicture.data);
+            formData.append("filename", selectedPicture.data.name);
+            formData.append("mail", auth?.user);
             const response = await axios.post("/saveImage", formData,
                 {
                     headers: { "Content-Type": "image/*" },
@@ -176,7 +177,7 @@ const Identity = () => {
             <div className="importProfilePic">
                 <input type="file" id="picture" className="pictureInput" onChange={handlePictureSelect} />
                 <label htmlFor="picture" className="pictureLabel"><FontAwesomeIcon icon={faUpload} /><p>{selectedPicture?.data && pictureWaitingToBeSent ? (selectedPicture?.data.name).substring(0, 10) + "..." : "Importer une image"}</p></label>
-                <button className="pictureSendButton" onClick={(e) => {pictureSubmit(e); e.currentTarget.blur()}}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></button>
+                <button className="pictureSendButton" onClick={(e) => { pictureSubmit(e); e.currentTarget.blur() }}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></button>
             </div>
             <div className="preferences">
                 <div>
