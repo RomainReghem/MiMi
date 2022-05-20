@@ -153,7 +153,7 @@ const getAllCoursClasse = (req, res) => {
     const id = req.query.id;
     const matiere = req.query.cours;
 
-    Classe.findOne({attributes:[],
+    Classe.findOne({
         where: { idclasse: id }
     })
         .then(classe => {

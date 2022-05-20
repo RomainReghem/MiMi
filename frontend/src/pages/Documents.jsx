@@ -27,7 +27,8 @@ const Documents = () => {
 
     let myFilesURL = (auth?.role == "classe" ? "/getCoursClass" : "/getCours");
     let sharedFilesURL = (auth?.role == "classe" ? "/getCours" : "/getCoursClasse")
-
+    let myFilesParams = (auth?.role == "classe" ? {id:auth?.idclasse, cours:"maths"} : {mail:auth?.user, cours:"maths"})
+    let sharedFilesParams = (auth?.role == "classe" ? {mail:localStorage.getItem("mailEleve"), cours:"maths"} : {id:auth?.idclasse, cours:"maths"})
     useEffect(() => {
         loadFiles()
     }, [])
@@ -36,20 +37,22 @@ const Documents = () => {
         try {
             setLoadingFiles(true);
             const myFilesResponse = await axios.get(myFilesURL, {
-                params: { mail: auth?.user, cours: "maths" },
+                params: { ...myFilesParams },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
             setMyFiles(myFilesResponse.data.files)
 
             const sharedFilesResponse = await axios.get(sharedFilesURL, {
-                params: { id: auth?.idclasse, cours: "maths" },
+                params: { ...sharedFilesParams },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
             setSharedFiles(sharedFilesResponse.data.files)
             
-        } catch (error) {
+        }
+        
+        catch (error) {
             console.log(error)
 
         }

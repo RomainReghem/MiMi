@@ -30,6 +30,9 @@ const Users = () => {
                     signal: controller.signal
                 });                
                 isMounted && setUsers(response.data.eleves);
+
+                // On met ça dans le local storage pour la partie shared documents
+                localStorage.setItem("mailEleve", response.data.eleves[0].courriel)
             } catch (err) {
                 console.error(err);
                 {/*navigate('/login', { state: { from: location }, replace: true });*/ }

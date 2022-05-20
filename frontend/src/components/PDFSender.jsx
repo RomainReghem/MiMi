@@ -10,7 +10,6 @@ const PDFSender = () => {
     const [fileWaitingToBeSent, setFileWaitingToBeSent] = useState(false);
     const { auth } = useAuth();
     let saveFileURL = (auth?.role == "classe" ? "/saveFileClass" : "/saveFile");
-    console.log(saveFileURL)
 
     const handleSubmit = async (event) => {
         event.preventDefault()
