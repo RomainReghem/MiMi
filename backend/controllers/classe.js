@@ -25,14 +25,13 @@ const getAllStudents = (req, res) => {
         }]
     }).then(eleves => {
         for (e in eleves) {
-            console.log('élève ' + e.pseudo)
+            console.log('élève ' + e.courriel)
         }
         // res.json({students:eleves})
         res.json({ eleves: eleves })
     })
 }
 
-// pour supprimer une classe, il faut d'abord supprimer ses élèves, tout du moins mettre l'idclasse de la table eleve à null
 /**
  * Supprime une classe et toute ses invitations
  * 

@@ -198,7 +198,7 @@ const renameMatiereEleve = (req, res) => {
  * @param {String} oldname l'ancien nom du fichier/dossier
  * @param {String} newname le nouveau nom du fichier/dossier
  * @param {*} callback 
- * @returns 
+ * @returns une fonction callback, qui contient un code HTTP
  */
 function renameDoc(path, oldname, newname, callback) {
     try {

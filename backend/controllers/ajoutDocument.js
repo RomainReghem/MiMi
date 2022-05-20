@@ -45,7 +45,7 @@ const saveCoursEleve = (req, res, next) => {
 
             // Vérification si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
             let name =verifNom(path, nom);
-
+            // enregistrement du fichier à partir de son buffer
             fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
                 if (err) {
                     console.log("Erreur lors de l'enregistrement du document : " + err);
@@ -176,7 +176,6 @@ const addMatiereClasse = (req, res) => {
 /**
  * Cette fonction permet de vérifier si le chemin donné en paramètre existe déjà, sinon crée les dossiers nécessaires
  * @param {String} pathToVerify le chemin à vérifier
- * @returns 
  */
 function verificationChemin(pathToVerify) {
     // on divise les dossiers du chemin
@@ -195,7 +194,7 @@ function verificationChemin(pathToVerify) {
             }
         } catch (err) {
             console.error(err);
-            return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
+            //return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
         }
     }
 }
@@ -203,7 +202,7 @@ function verificationChemin(pathToVerify) {
 /**
  * Retourne le nom, changé si besoin pour qu'il soit unique lors de sa sauvegarde
  * @param {*} path le chemin où le fichier est sauvegardé
- * @param {*} nom le nom du fichier avant changement
+ * @param {String} nom le nom du fichier avant changement
  * @returns le nom unique du fichier
  */
 function verifNom(path, nom) {

@@ -56,9 +56,10 @@ const refreshToken = (req, res) => {
                     })
                 } else {
 
-                    Classe.findOne({ where: { courriel: decoded.mail } })
+                    Classe.findOne({ attributes: ['idclasse'],  where: { courriel: decoded.mail } })
                         .then(classe => {
                             if (!classe) {
+                                // le mail ne correspond à aucune mail : accès interdit
                                 return res.sendStatus(403)
                             }
                             // sinon si c'est une classe on retourne juste le role et le nouveau accesstoken + l'id de la classe

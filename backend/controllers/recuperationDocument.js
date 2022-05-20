@@ -121,21 +121,17 @@ const getCoursEleve = (req, res) => {
  */
  const getAllMatieresClasse = (req, res) => {
     console.log("\n*** Récupération des matières de la classe ***")
-    const email = req.body.mail;
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        // erreur 400
-        return res.sendStatus(407)
-    }
+    const id = req.body.id;
+
     Classe.findOne({
-        where: { courriel: email }
+        where: { idclasse:id }
     })
         .then(classe => {
             if (!classe) {
                 console.log("Utilisateur pas trouvé");
                 return res.status(404).send("Classe pas trouvée")
             }
-            const num = classe.idclasse;
-            const path = "./Classes/classe" + num + "/depot";
+            const path = "./Classes/classe" + id + "/depot";
             fs.readdir(path, function (err, folders) {
                 if (err) {
                     console.log("erreur durant la récupération " + err)
@@ -154,23 +150,18 @@ const getCoursEleve = (req, res) => {
  */
 const getAllCoursClasse = (req, res) => {
     console.log("\n*** Récupération des cours d'une matiere***")
-    const email = req.query.mail;
+    const id = req.query.id;
     const matiere = req.query.cours;
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(407)
-    }
-    Classe.findOne({
-        where: { courriel: email }
+
+    Classe.findOne({attributes:[],
+        where: { idclasse: id }
     })
         .then(classe => {
             if (!classe) {
                 console.log("Utilisateur pas trouvé");
                 return res.status(404).send("Classe inexistante");
             }
-            const num = classe.idclasse;
-            const path = "./Classes/classe" + num + "/depot/" + matiere + "/";
+            const path = "./Classes/classe" + id + "/depot/" + matiere + "/";
             fs.readdir(path, function (err, files) {
                 if (err) {
                     console.log("erreur durant la récupération " + err)
@@ -189,17 +180,13 @@ const getAllCoursClasse = (req, res) => {
  */
 const getCoursClasse= (req, res) => {
     console.log("\n*** Récupération d'un cours d'une classe***")
-    const email = req.query.mail;
+    const id = req.query.id;
     const matiere = req.query.cours;
     const name = req.query.name;
     //const id =req.query.classe;
 
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        return res.sendStatus(407)
-    }
-
     Classe.findOne({
-        where: { courriel: email
+        where: { idclasse: id
        // idclasse:id
      }
     })
@@ -208,8 +195,7 @@ const getCoursClasse= (req, res) => {
                 console.log("Utilisateur pas trouvé");
                 return res.status(404).send("Classe inexistante");
             }
-            const num = classe.idclasse;
-            const path = "./Classes/classe" + num + "/depot/" + matiere + "/" + name;
+            const path = "./Classes/classe" + id + "/depot/" + matiere + "/" + name;
 
             fs.readFile(path, function (err, fichier) {
                 if (err) {

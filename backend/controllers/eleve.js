@@ -10,6 +10,7 @@ const { Classe } = require('../models/users');
  * @param {*} res la réponse du serveur
  */
 const getUsernameStudent = (req, res) => {
+    console.log("\n*** Récupération du pseudo ***")
     const mail = req.query.mail
 
     if (mail == undefined) {

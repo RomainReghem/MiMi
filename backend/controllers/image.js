@@ -50,6 +50,13 @@ const saveAvatar = (req, res) => {
         });
 }
 
+/**
+ * Sauvegarde le fichier JSON de l'avatar dans le dossier dédié
+ * @param {String} path le chemin où le fichier doit être sauvegardé
+ * @param {Object} json l'avatar en JSON
+ * @param {Number} num l'id de l'élève de qui on sauvegarde l'avatar
+ * @param {*} res la réponse
+ */
 async function saveJSON(path, json, num, res) {
     await bucket.file(path + "/avatar" + num + ".json").save(json, function (err) {
         if (err) {
@@ -99,6 +106,12 @@ const getAvatar = (req, res) => {
         })
 }
 
+/**
+ * Permet de retourner l'avatar au format json, au chemin passé, avec l'identifiant de l'élève donné.
+ * @param {String} path le chemin vers l'avatar
+ * @param {Number} num le numéro de l'élève
+ * @param {*} res la réponse à renvoyer au client
+ */
 async function getJSON(path, num, res) {
     let avatar = "";
     await bucket.file(path + "/avatar" + num + ".json").createReadStream()
@@ -117,6 +130,14 @@ async function getJSON(path, num, res) {
         })
 }
 
+/**
+ * Sauvegarde localement l'image de profil d'un élève dans un dossier dédié, sous le nom "photo".
+ * Vérifie aussi que le fichier passé est bien une image.  
+ * Un middleware se charge de retrouver la photo.
+ * @param {*} req la requête du client, doit contenir le fichier téléchargé et l'adresse mail de l'élève
+ * @param {*} res la réponse du serveur
+ * @returns la réponse
+ */
 const savePicture = (req, res) => {
     console.log("\n*** Sauvegarde de l'image de profil de l'élève ***")
     const img = req.file
@@ -185,9 +206,9 @@ const savePicture = (req, res) => {
 
 /**
  * Renvoie au client la photo de profil de l'utilisateur dont le mail est donné
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req la requête du client 
+ * @param {*} res la réponse du serveur
+ * @returns la réponse du serveur
  */
 const getPicture = (req, res) => {
     console.log("\n*** Récupération de l'image de profil de l'élève ***")
@@ -242,7 +263,10 @@ const getPicture = (req, res) => {
 
         })
 }
-
+/**
+ * Cette fonction permet de vérifier si le chemin passé en paramètre existe, et si ce n'est pas le cas, il le crée
+ * @param {String} pathToVerify le chemin dont l'existence doit être vérifiée
+ */
 function verificationChemin(pathToVerify) {
     let dossiers = pathToVerify.split('/')
     let path = dossiers[0]
@@ -254,7 +278,7 @@ function verificationChemin(pathToVerify) {
             }
         } catch (err) {
             console.error(err);
-            return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
+           // return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
         }
     }
 }
