@@ -9,8 +9,6 @@ const rootElement = document.getElementById("root");
 const root = ReactDOM.createRoot(rootElement);
 
 root.render(
-  <React.StrictMode>
-    
     <div className="container">
       <Router>
         <AuthProvider>
@@ -20,5 +18,4 @@ root.render(
         </AuthProvider>
       </Router>
     </div>
-  </React.StrictMode>
 );

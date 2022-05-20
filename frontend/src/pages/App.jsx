@@ -8,6 +8,7 @@ import Nav from "../components/Nav"
 import RequireAuth from "../components/RequireAuth"
 import { ReactNotifications } from 'react-notifications-component'
 import PersistLogin from "../components/PersistLogin";
+import Jitsi from "../components/jitsi";
 
 // Pages
 import Profile from "./Profile"
@@ -61,7 +62,7 @@ export default function App() {
               <Route element={<RequireAuth />}>
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/documents" element={<Documents />} />
-                <Route path="/visio" element={<Visio />} />
+                <Route path="/visio" element={<Jitsi />} />
                 <Route path="/jeux" element={<Construction />} />
                 <Route path="/settings" element={<Settings/>}/>                
               </Route>

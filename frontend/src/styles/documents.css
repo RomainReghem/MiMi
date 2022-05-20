@@ -9,7 +9,7 @@
     width: 100%;
 }
 
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 71rem) {
     .fileMain {
         flex-direction: column;
     }
@@ -24,7 +24,21 @@
     }
 }
 
-@media screen and (min-width:1000px) {
+@media screen and (max-width: 40rem) {
+    .fileManager {
+        width: 18rem;
+    }
+}
+
+@media screen and (min-width:40rem){
+    .fileManager{
+        width:25rem;
+    }
+
+}
+
+
+@media screen and (min-width:71rem) {
     .fileViewer {        
         min-width: 612px;
         height:34rem;
@@ -34,9 +48,8 @@
 .fileManager {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    width: 18.3rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
 }
 
 .fileViewer {
@@ -110,7 +123,7 @@
     background-color: #3CA6A6;
     border: 1px solid #3CA6A6;
     text-decoration: none;
-    width: 15.7rem;
+    width:90%;
     padding: 0.8rem 1rem;
     margin-bottom: 0.3rem;
     cursor: pointer;
@@ -127,13 +140,9 @@
 }
 
 .fileList {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    width: 18.3rem;
+    max-width: 100%;
     max-height: 30rem;
+    min-height: 10rem;
 }
 
 /* width */
@@ -172,4 +181,18 @@
 
 .fileRefresh{
     color:black;
+}
+
+.fileManagerMenu{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width:100%;
+    flex-direction: row;
+    cursor: pointer;
+}
+
+.fileManagerMenu h4{
+    font-family: Abril Fatface;
+    font-size:small;
 }

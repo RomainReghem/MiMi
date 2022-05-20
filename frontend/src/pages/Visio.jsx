@@ -46,14 +46,8 @@ const Visio = () => {
         iframeRef.style.height = '100%';
     };
 
-    const handleJitsiIFrameRef2 = iframeRef => {
-        iframeRef.style.marginTop = '10px';
-        iframeRef.style.border = '10px dashed #df486f';
-        iframeRef.style.padding = '5px';
-        iframeRef.style.height = '400px';
-    };
-
     const handleApiReady = apiObj => {
+        console.log(apiObj)
         apiRef.current = apiObj;
         apiRef.current.on('knockingParticipant', handleKnockingParticipant);
         apiRef.current.on('audioMuteStatusChanged', payload => handleAudioStatusChange(payload, 'audio'));
@@ -167,7 +161,7 @@ const Visio = () => {
                         onApiReady={externalApi => handleApiReady(externalApi)}
                         onReadyToClose={handleReadyToClose}
                         getIFrameRef={handleJitsiIFrameRef1} />
-                    {renderButtons()}
+                    {/*renderButtons()*/}
                     {/*renderLog()*/}
                 </>
             ) :

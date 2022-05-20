@@ -9,6 +9,8 @@ const PDFSender = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileWaitingToBeSent, setFileWaitingToBeSent] = useState(false);
     const { auth } = useAuth();
+    let saveFileURL = (auth?.role == "classe" ? "/saveFileClass" : "/saveFile");
+    console.log(saveFileURL)
 
     const handleSubmit = async (event) => {
         event.preventDefault()
@@ -29,7 +31,7 @@ const PDFSender = () => {
         formData.append("mail", auth?.user)
         console.log(selectedFile.name);
         try {
-            const response = await axios.post("/saveFile", formData,
+            const response = await axios.post(saveFileURL, formData,
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                 });

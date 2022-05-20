@@ -62,6 +62,7 @@ const Nav = () => {
                     withCredentials: true
                 });
             setPseudo(response?.data.pseudo)
+            localStorage.setItem("pseudo", response?.data.pseudo);
 
 
         } catch (err) { console.log("Erreur du chargement du pseudo"); }

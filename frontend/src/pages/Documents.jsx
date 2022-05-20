@@ -14,12 +14,19 @@ const Documents = () => {
     const { auth } = useAuth();
 
     // Tableau de tous les noms des fichiers 
-    const [files, setFiles] = useState([]);
+    const [myFiles, setMyFiles] = useState([]);
+    const [sharedFiles, setSharedFiles] = useState([]);
+
+    const [menuSelection, setMenuSelection] = useState(myFiles);
+    const [selectedUI, setSelectedUI] = useState("my");
 
     // Le fichier actuellement séléctionné dans la liste. On le passera à PDFViewer.
     const [file, setFile] = useState(null);
 
     const [loadingFiles, setLoadingFiles] = useState(false);
+
+    let myFilesURL = (auth?.role == "classe" ? "/getCoursClass" : "/getCours");
+    let sharedFilesURL = (auth?.role == "classe" ? "/getCours" : "/getCoursClasse")
 
     useEffect(() => {
         loadFiles()
@@ -28,12 +35,20 @@ const Documents = () => {
     const loadFiles = async () => {
         try {
             setLoadingFiles(true);
-            const response = await axios.get("/getCours", {
+            const myFilesResponse = await axios.get(myFilesURL, {
                 params: { mail: auth?.user, cours: "maths" },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
-            setFiles(response.data.files)
+            setMyFiles(myFilesResponse.data.files)
+
+            const sharedFilesResponse = await axios.get(sharedFilesURL, {
+                params: { id: auth?.idclasse, cours: "maths" },
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
+            });
+            setSharedFiles(sharedFilesResponse.data.files)
+            
         } catch (error) {
             console.log(error)
 
@@ -44,12 +59,16 @@ const Documents = () => {
     return (
         <div className="fileMain">
             <section className="fileManager">
+                <div className="fileManagerMenu">
                 <Tooltip title="Refresh" placement="right">                
-                    <IconButton size="small" onClick={loadFiles} style={{ alignSelf: "flex-start", marginBottom: "0.5rem" }}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></IconButton>
+                    <IconButton size="small" onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></IconButton>
                 </Tooltip>
+                <h4 onClick={() => {setMenuSelection(myFiles);setSelectedUI("my")}} style={selectedUI == "my" ? ({textDecoration : "underline"}) : ({textDecoration : "none"})}>Mes documents partagés</h4>
+                <h4 onClick={() => {setMenuSelection(sharedFiles);setSelectedUI("shared")}} style={selectedUI == "shared" ? ({textDecoration : "underline"}) : ({textDecoration : "none"})}>Partagés avec moi</h4>
+                </div>
                 <div className="fileList">
-                    {Array.from(Array(files?.length), (e, i) => {
-                        return <div key={i} onClick={() => setFile(files[i])} className="file">{files[i]}</div>
+                    {Array.from(Array(menuSelection?.length), (e, i) => {
+                        return <div key={i} onClick={() => setFile(menuSelection[i])} className="file">{menuSelection[i]}</div>
                     })}
                 </div>
                 <div className="fileUploadFormContainer">

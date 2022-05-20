@@ -80,13 +80,13 @@ router.get('/getFile', Document.getCoursEleve)
 router.get('/getCours', Document.getAllCoursEleve)
 // route pour récupèrer le nom de toutes les matières qu'un élève possède
 router.get('/getMatieres', Document.getAllMatieresEleve)
-/*PAS IMPLEMENTE : cours des classes
+//PAS IMPLEMENTE : cours des classes
 // route pour accèder à un fichier précis de la classe, dans une matière donnée
 router.get('/getFileClass', Document.getCoursClasse)
 // route pour récupérer le nom de tous les fichiers présents pour une matière
 router.get('/getCoursClass', Document.getAllCoursClasse)
 // route pour récupèrer le nom de toutes les matières qu'une classe a
-router.get('/getMatiereClass', Document.getAllMatieresClasse)*/
+router.get('/getMatiereClass', Document.getAllMatieresClasse)
 
 // PAS IMPLEMENTE : ajout de matiere
 // route pour ajouter une matiere à l'élève

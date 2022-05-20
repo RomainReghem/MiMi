@@ -24,6 +24,15 @@
     align-items: center;
 }
 
+#jitsi-iframe{
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-items: center;
+
+}
+
 .navNav {
     width: 100%;
     display: flex;

@@ -97,6 +97,7 @@ const Inscription = () => {
             console.log(response?.data);
             console.log(response?.accessToken);
             console.log(JSON.stringify(response))
+            localStorage.setItem("pseudo", user);
             setUser('');
             setPwd('');
             setMatchPwd('');

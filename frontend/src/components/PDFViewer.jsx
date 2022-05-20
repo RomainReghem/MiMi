@@ -11,6 +11,7 @@ const PDFViewer = (props) => {
 
     const [numPages, setNumPages] = useState(null);
     const [file, setFile] = useState(null);
+    let getFileURL = (auth?.role == "classe" ? "/getFileClass" : "/getFile");
 
     const onDocumentLoadSuccess = ({ numPages }) => {
         console.log("success")
@@ -44,7 +45,7 @@ const PDFViewer = (props) => {
 
     const getFile = async () => {
         try {
-            const response = await axios.get("/getFile", {
+            const response = await axios.get(getFileURL, {
                 params: { mail: auth?.user, cours: "maths", name: props.clickedFile },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
