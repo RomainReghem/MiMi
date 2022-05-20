@@ -11,6 +11,7 @@ const fs = require('fs');
  */
 const deleteCoursEleve = (req, res) => {
     console.log("\n*** Suppression de cours de l'eleve ***")
+    console.log(req.data)
     const email = req.body.mail;
     const cours = req.body.cours;
     const matiere = req.body.matiere;
