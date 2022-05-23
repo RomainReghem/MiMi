@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import useAuth from "../hooks/useAuth";
 import axios from '../api/axios';
 import Notifs from '../components/Notifs';
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faCheck, faPaperPlane, faDoorOpen, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Avatar from 'react-nice-avatar';
@@ -16,6 +17,8 @@ const PSEUDO_REGEX = /^[A-z0-9-_]{3,24}$/;
 const Identity = () => {
 
     const { auth, setAuth } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
+
     const getImage = useGetImage();
     const getAvatar = useGetAvatar();
     const [mail, setMail] = useState(auth?.user);
@@ -85,7 +88,7 @@ const Identity = () => {
         }
         try {
             console.log(JSON.stringify({ mail, newPseudo }))
-            const response = await axios.post(CHANGEPSEUDO_URL,
+            const response = await axiosPrivate.post(CHANGEPSEUDO_URL,
                 JSON.stringify({ mail, newPseudo }),
                 {
                     headers: { 'Content-Type': 'application/json' },
@@ -142,7 +145,7 @@ const Identity = () => {
             formData.append('file', selectedPicture.data);
             formData.append("filename", selectedPicture.data.name);
             formData.append("mail", auth?.user);
-            const response = await axios.post("/saveImage", formData,
+            const response = await axiosPrivate.post("/saveImage", formData,
                 {
                     headers: { "Content-Type": "image/*" },
                 });

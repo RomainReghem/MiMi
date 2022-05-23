@@ -1,5 +1,4 @@
 import PDFSender from "../components/PDFSender"
-import FileList from "../components/FileList"
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Tooltip from "@mui/material/Tooltip"
 import IconButton from "@mui/material/IconButton"
@@ -56,8 +55,6 @@ const Documents = () => {
             const myFilesResponse = await axiosPrivate.get(myFilesURL, {
                 params: { ...myFilesParams }
             });
-            console.log("fin du try")
-
             setMyFiles(myFilesResponse.data.files)
             if (selectedUI == "my")
                 setMenuSelection(myFilesResponse.data.files)

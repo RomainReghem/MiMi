@@ -1,18 +1,20 @@
 import useAuth from "../hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCheck, faXmark, faDoorOpen } from "@fortawesome/free-solid-svg-icons";
 import Notifs from "./Notifs"
 import axios from "../api/axios";
 
 const Invitations = () => {
     const { auth, setAuth } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
     const classe = auth?.idclasse;
     const user = auth?.user;
     console.log(auth);
 
     const acceptInvite = async () => {
         try {
-            await axios.post("/acceptInvite", JSON.stringify({ user }),
+            await axiosPrivate.post("/acceptInvite", JSON.stringify({ user }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
             await setAuth({
                 ...auth,
@@ -27,7 +29,7 @@ const Invitations = () => {
 
     const refuseInvite = async () => {
         try {
-            await axios.post("/refuseInvite", JSON.stringify({ user }),
+            await axiosPrivate.post("/refuseInvite", JSON.stringify({ user }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
             await setAuth({
                 ...auth,
@@ -42,7 +44,7 @@ const Invitations = () => {
 
     const quitClass = async () => {
         try {
-            await axios.post("/quitClass", JSON.stringify({ user }),
+            await axiosPrivate.post("/quitClass", JSON.stringify({ user }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
             Notifs("Classe quittée", "", "info");
             await setAuth({

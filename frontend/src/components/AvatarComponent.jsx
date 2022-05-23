@@ -3,6 +3,7 @@ import Notifs from '../components/Notifs';
 import { useState, useEffect } from 'react'
 import axios from '../api/axios';
 import randomColor from "randomcolor";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import { GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
 import { AiOutlineBgColors } from 'react-icons/ai';
@@ -20,6 +21,8 @@ const AvatarComponent = () => {
 
     const { auth } = useAuth();
     const { setAuth } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
+
 
     let mail = auth?.user;
 
@@ -29,7 +32,7 @@ const AvatarComponent = () => {
 
     const getAvatar = async (e) => {
         try {
-            const response = await axios.get("/avatar",{params: { mail: auth?.user }});
+            const response = await axiosPrivate.get("/avatar",{params: { mail: auth?.user }});
             setConfig(JSON.parse(response.data.avatar));
         } catch (err) { console.log("Erreur du chargement de l'avatar"); }
     }
@@ -86,7 +89,7 @@ const AvatarComponent = () => {
 
     const SaveDB = async (e) => {
         try {
-            const response = await axios.post("/avatar", JSON.stringify({ mail, avatar:config }),
+            const response = await axiosPrivate.post("/avatar", JSON.stringify({ mail, avatar:config }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true

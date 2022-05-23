@@ -1,6 +1,7 @@
 import axios from '../api/axios';
 import useAuth from '../hooks/useAuth';
 import { Document, Page, pdfjs } from 'react-pdf/dist/esm/entry.webpack'
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useEffect, useState } from "react"
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -8,6 +9,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pd
 const PDFViewer = (props) => {
 
     const { auth } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
 
     const [numPages, setNumPages] = useState(null);
     const [file, setFile] = useState(null);
@@ -63,7 +65,7 @@ const PDFViewer = (props) => {
     const getFile = async () => {
         try {
             console.log(url, parameters)
-            const response = await axios.get(url, {
+            const response = await axiosPrivate.get(url, {
                 params: { ...parameters },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true

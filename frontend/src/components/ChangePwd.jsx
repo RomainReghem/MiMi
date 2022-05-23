@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import useAuth from "../hooks/useAuth";
 import axios from '../api/axios';
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Notifs from '../components/Notifs';
 
 const CHANGEPWD_URL = '/changePwd';
@@ -10,6 +11,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const ChangePwd = () => {
 
     const { auth } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
 
     const [mail, setMail] = useState(auth?.user);
 
@@ -49,15 +51,13 @@ const ChangePwd = () => {
         
         try {
             console.log("Voici le mail :" + auth?.user)
-            const response = await axios.post(CHANGEPWD_URL,
+            const response = await axiosPrivate.post(CHANGEPWD_URL,
                 JSON.stringify({ mail, pwd, newPwd }),
                 {
                     params:{
                         mail:mail
                     },
                     headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-
                 }
             );
             setPwd('');

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "../api/axios";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +9,7 @@ import Notifs from "./Notifs"
 const PDFSender = (props) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileWaitingToBeSent, setFileWaitingToBeSent] = useState(false);
+    const axiosPrivate = useAxiosPrivate();
     const { auth } = useAuth();
     let saveFileURL = (auth?.role == "classe" ? "/saveFileClass" : "/saveFile");
 
@@ -30,7 +32,7 @@ const PDFSender = (props) => {
         formData.append("mail", auth?.user)
         console.log(selectedFile.name);
         try {
-            const response = await axios.post(saveFileURL, formData,
+            const response = await axiosPrivate.post(saveFileURL, formData,
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                 });

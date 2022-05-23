@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import useAuth from "../hooks/useAuth";
 import axios from '../api/axios';
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Notifs from '../components/Notifs';
 
 const CHANGEMAIL_URL = '/changeMail';
@@ -13,6 +14,8 @@ const ChangeMail = () => {
 
     const { auth } = useAuth();
     const { setAuth } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
+
     
 
     const [mail, setMail] = useState(auth?.user);
@@ -46,11 +49,10 @@ const ChangeMail = () => {
         
         try {
             console.log(JSON.stringify({ mail, newMail, pwd }))
-            const response = await axios.post(CHANGEMAIL_URL,
+            const response = await axiosPrivate.post(CHANGEMAIL_URL,
                 JSON.stringify({ mail, newMail, pwd }),
                 {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
+                    headers: { 'Content-Type': 'application/json' }
                 }
             );            
             setMail(newMail);

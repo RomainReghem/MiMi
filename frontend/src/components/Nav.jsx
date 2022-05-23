@@ -3,6 +3,7 @@ import Notifs from '../components/Notifs';
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Avatar from 'react-nice-avatar'
 import useLogout from "../hooks/useLogout";
 import { GrGamepad } from 'react-icons/gr';
@@ -11,13 +12,13 @@ import { AiOutlineVideoCamera } from 'react-icons/ai';
 import { HiOutlineDocumentText } from 'react-icons/hi';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
-import useLocalStorageState from 'use-local-storage-state'
 import useGetImage from "../hooks/useGetImage";
 import useGetAvatar from "../hooks/useGetAvatar"
 
 
 const Nav = () => {
     const { auth } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
     const getImage = useGetImage();
     const getAvatar = useGetAvatar();
     const [pseudo, setPseudo] = useState("Profil");
@@ -55,7 +56,7 @@ const Nav = () => {
 
     const getPseudo = async (e) => {
         try {
-            const response = await axios.get("/pseudo",
+            const response = await axiosPrivate.get("/pseudo",
                 {
                     params: { mail: auth?.user },
                     headers: { 'Content-Type': 'application/json' },
