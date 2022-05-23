@@ -31,6 +31,7 @@ const Connexion = (req, res) => {
         res.sendStatus(402)
     }
     Eleve.findOne({
+        attributes:['motdepasse', 'courriel'],
         where:
             { courriel: pseudo }
     })
@@ -71,7 +72,8 @@ const Connexion = (req, res) => {
                     }
                 });
             } else if (pseudo.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) {
-                Classe.findOne({ where: { courriel: pseudo } })
+                Classe.findOne({
+                    where: { courriel: pseudo } })
                     .then(classe => {
                         if (classe) {
                             bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {

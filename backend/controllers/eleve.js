@@ -18,6 +18,7 @@ const getUsernameStudent = (req, res) => {
         res.status(409).send("Pas de mail")
     } else {
         Eleve.findOne({
+            attributes: ['pseudo'],
             where: {
                 courriel: mail
             }
@@ -30,6 +31,10 @@ const getUsernameStudent = (req, res) => {
                 res.status(409).send("Aucun élève avec cette adresse")
             }
         })
+            .catch(err => {
+                console.log(err)
+                return res.send(err).status(520)
+            });
     }
 }
 
@@ -54,7 +59,10 @@ const deleteStudent = async (req, res) => {
         return res.status(407).send("Mail incorrect")
     }
     // on cherche dans la bd l'eleve qui correspond au mail fourni
-    Eleve.findOne({ courriel: email })
+    Eleve.findOne({
+        attributes: ['ideleve'],
+        where: { courriel: email }
+    })
         .then(eleve => {
             // si aucun élève n'a été trouvé
             if (!eleve) {
@@ -78,27 +86,32 @@ const deleteStudent = async (req, res) => {
                     console.log("Suppression effectuée !")
                     return res.send(result);
                 })
+            }).catch(err => {
+                console.log(err)
+                return res.send(err).status(520)
             });
         })
-        .catch(err=>{
+        .catch(err => {
             console.log(err)
             return res.send(err).status(520)
         });
 }
 
 /**
- * Retourne l'invitation et la classe associée dans un format JSON
+ * Retourne l'invitation et l'id de la classe associée à l'invitation dans un format JSON
  * 
- * @param {*} emailEleve l'email de l'èleve dont on veut l'invitation
+ * @param {String} emailEleve l'email de l'èleve dont on veut l'invitation
  */
 function getInvitation(emailEleve, cb) {
-
+    console.log("\n***Récupération d'invitation.***")
     if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
         console.log("forme mail incorrect")
         return cb(407)
     }
 
-    Eleve.findOne({ where: { courriel: emailEleve } })
+    Eleve.findOne({ 
+        attributes:['invitation','idclasse'],
+        where: { courriel: emailEleve } })
         .then(eleve => {
             // si aucun élève n'a été trouvé
             if (!eleve) {
@@ -106,21 +119,25 @@ function getInvitation(emailEleve, cb) {
             }
             const invitation = eleve.invitation;
             if (invitation != "aucune") {
-                Classe.findOne({ where: { idclasse: eleve.idclasse } })
+                Classe.findOne({attributes:["idclasse"], where: { idclasse: eleve.idclasse } })
                     .then(classe => {
                         if (!classe) {
                             return cb(404);
                         }
                         return cb({ invitation: invitation, idclasse: classe.idclasse })
                     })
+                    .catch(err => {
+                        console.log(err)
+                        return res.send(err).status(520)
+                    });
             } else {
                 return cb({ invitation: invitation })
             }
         })
-        .catch(err=>{
+        .catch(err => {
             console.log(err)
             return res.send(err).status(520)
-        })
+        });
 }
 
 module.exports = {

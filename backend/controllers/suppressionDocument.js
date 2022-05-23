@@ -22,6 +22,7 @@ const deleteCoursEleve = (req, res) => {
         return res.sendStatus(400)
     }
     Eleve.findOne({
+        attributes: ['ideleve'],
         where: { courriel: email }
     })
         .then(eleve => {
@@ -51,6 +52,7 @@ const deleteCoursClasse = (req, res) => {
     const matiere = req.body.matiere;
 
     Classe.findOne({
+        attributes: ['idclasse'],
         where: { idclasse: id }
     })
         .then(classe => {
@@ -61,39 +63,9 @@ const deleteCoursClasse = (req, res) => {
             let path = "./Classes/classe" + id + "/depot/" + matiere + "/" + cours;
 
             const code = deleteCours(path)
-            console.log("code http : "+code)
+            console.log("code http : " + code)
             return res.status(code)
 
-        });
-}
-
-/**
-* Supprime des dossiers de la classe la matière donnée avec tous les cours contenus dedans
-* @param {*} req la requête du client, doit contenir l'email de la classe et le nom de la matière à supprimer.
-* @param {*} res la réponse du serveur
-*/
-const deleteMatiereClasse = (req, res) => {
-    console.log("\n*** Suppression de matiere de la classe ***")
-    const email = req.body.mail;
-    const matiere = req.body.matiere;
-
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        //console.log("forme mail incorrect")
-        return res.sendStatus(400)
-    }
-    Classe.findOne({
-        where: { courriel: email }
-    })
-        .then(eleve => {
-            if (!eleve) {
-                //console.log("Utilisateur pas trouvé");
-                return res.status(404).send("classe inexistante");
-            }
-            const num = classe.idclasse
-            let path = "./Classes/classe" + num + "/depot/" + matiere;
-
-            const code = deleteMatiere(path)
-            return res.status(code)
         });
 }
 
@@ -113,6 +85,7 @@ const deleteMatiereEleve = (req, res) => {
         return res.sendStatus(400)
     }
     Eleve.findOne({
+        attributes: ['ideleve'],
         where: { courriel: email }
     })
         .then(eleve => {
@@ -122,6 +95,32 @@ const deleteMatiereEleve = (req, res) => {
             }
             const num = eleve.ideleve;
             let path = "./Eleves/eleve" + num + "/depot/" + matiere;
+
+            const code = deleteMatiere(path)
+            return res.status(code)
+        });
+}
+
+/**
+* Supprime des dossiers de la classe la matière donnée avec tous les cours contenus dedans
+* @param {*} req la requête du client, doit contenir l'id de la classe et le nom de la matière à supprimer.
+* @param {*} res la réponse du serveur
+*/
+const deleteMatiereClasse = (req, res) => {
+    console.log("\n*** Suppression de matiere de la classe ***")
+    const id = req.body.id;
+    const matiere = req.body.matiere;
+
+    Classe.findOne({
+        attributes: ['idclasse'],
+        where: { idclasse: id }
+    })
+        .then(classe => {
+            if (!classe) {
+                //console.log("Utilisateur pas trouvé");
+                return res.status(404).send("classe inexistante");
+            }
+            let path = "./Classes/classe" + id + "/depot/" + matiere;
 
             const code = deleteMatiere(path)
             return res.status(code)

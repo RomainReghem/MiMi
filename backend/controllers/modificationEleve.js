@@ -1,5 +1,6 @@
 const Users = require('../models/users');
 const Eleve = Users.Eleve;
+const Classe = Users.Classe;
 
 const Modification = require('../controllers/modification.js')
 
@@ -25,14 +26,13 @@ const ChangementPseudo = (req, res) => {
         console.log("forme pseudo incorrect")
         res.sendStatus(405)
     } else {
-        Eleve.findOne({ where: { courriel: email } })
+        Eleve.findOne({attributes:['ideleve', 'pseudo'], where: { courriel: email } })
             .then(eleveToChange => {
                 if (!eleveToChange) {
                     res.status(401).send("Eleve pas trouvé")
                 } else {
-                    // sinon on ne change rien
+                    // si le pseudo actuel est différent de l'ancien, sinon on ne change rien
                     if (eleveToChange.pseudo != pseudo) {
-
                         Eleve.update(
                             {
                                 pseudo: pseudo,
@@ -59,7 +59,7 @@ const ChangementPseudo = (req, res) => {
                     }
                 }
             })
-            .catch(err=>{
+            .catch(err => {
                 console.log(err)
                 return res.send(err).status(520)
             });
@@ -74,9 +74,9 @@ const ChangementPseudo = (req, res) => {
 const SuppressionClasse = (req, res) => {
     console.log("\n*** Suppression de classe d'un élève ***")
     const email = req.body.user;
-    console.log("ok "+req.body)
-    Modification.setInvitation("aucune", email, "", function(code){
-        console.log("Code "+code)
+    console.log("ok " + req.body)
+    Modification.setInvitation("aucune", email, "", function (code) {
+        console.log("Code " + code)
         if (code == 201) {
             return res.status(201).send("Suppression de classe réussie !")
         }
@@ -93,26 +93,32 @@ const AcceptationInvitation = (req, res) => {
     console.log("\n*** Acceptation de l'invitation d'une classe ***")
     const email = req.body.user;
     /// RECUP MAIL CLASSE 
-    Eleve.findOne({where:{ courriel: email }})
+    Eleve.findOne({
+        attributes: ["idclasse"],
+        where: { courriel: email }
+    })
         .then(eleve => {
             if (!eleve) {
                 return res.sendStatus(404)
             }
-            Users.Classe.findOne({where:{ idclasse: eleve.idclasse }})
+            Classe.findOne({ attributes: ['courriel'], where: { idclasse: eleve.idclasse } })
                 .then(classe => {
                     if (!classe) {
                         return res.sendStatus(404)
                     }
-                    Modification.setInvitation("acceptee", email, classe.courriel, function(code){
+                    Modification.setInvitation("acceptee", email, classe.courriel, function (code) {
                         if (code == 201) {
                             return res.status(201).send("Acceptation de la classe réussie !")
                         }
                         return res.status(code).send("Erreur")
                     })
-                }
-                )
+                })
+                .catch(err => {
+                    console.log(err)
+                    return res.send(err).status(520)
+                });
         })
-        .catch(err=>{
+        .catch(err => {
             console.log(err)
             return res.send(err).status(520)
         });

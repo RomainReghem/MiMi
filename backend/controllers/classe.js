@@ -15,7 +15,7 @@ const getAllStudents = (req, res) => {
     Eleve.findAll({
         attributes: ['courriel'],
         where: { invitation: "acceptee" },
-        // jointure avec la table eleve
+        // jointure avec la table classe
         include: [{
             model: Classe,
             attributes: [],
@@ -37,7 +37,7 @@ const getAllStudents = (req, res) => {
 }
 
 /**
- * Supprime une classe et toute ses invitations
+ * Supprime une classe et toutes ses invitations envoyées aux élèves
  * 
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
@@ -48,8 +48,9 @@ const deleteClass = (req, res) => {
 
     // on récupère les infos de la bd sur la classe à partir du mail donné
     Classe.findOne({
-    attributes:['idclasse'],
-    where: { courriel: mail } })
+        attributes: ['idclasse'],
+        where: { courriel: mail }
+    })
         .then(classe => {
             if (!classe) {
                 console.log("Pas de classe trouvé à supprimer")
@@ -59,7 +60,7 @@ const deleteClass = (req, res) => {
             // on va changer toutes les invitations des élèves de la classe
             // on cherche tous les élèves qui appartiennent à la classe dont l'id est donné
             Eleve.update({ idclass: null, invitation: "aucune" }, { where: { idclasse: num } })
-                .then(eleves => {
+                .then(() => {
                     console.log("Suppression des infos sur la classe effectué.")
                     // Delete
                     Classe.destroy({
@@ -82,7 +83,14 @@ const deleteClass = (req, res) => {
                             console.log("Suppression effectuée !")
                             return res.send("Suppression effectuée").status(201)
                         });
-                    });
+                    }).catch(err => {
+                        console.log(err)
+                        return res.status(404).send("Serveur injoignable.")
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                    return res.status(404).send("Serveur injoignable.")
                 })
         }).catch(err => {
             console.log(err)

@@ -122,8 +122,7 @@ const renameMatiereEleve = (req, res) => {
 const renameMatiereClasse = (req, res) => {
     console.log("\n*** Changement de nom de matière d'une classe ***")
 
-    const email = req.body.mail;
-    //const id=req.body.id;
+    const id = req.body.id;
     const nouvMatiere = req.body.newmatiere;
     const ancienneMatiere = req.body.oldmatiere;
 
@@ -135,15 +134,14 @@ const renameMatiereClasse = (req, res) => {
 
     Classe.findOne({
         attributes:['idclasse'],
-        where: { courriel: email }
+        where: { idclasse: id }
     })
         .then(classe => {
             if (!classe) {
                 console.log("Utilisateur pas trouvé");
                 return res.status(404).send("Classe inexistante");
             }
-            const num = classe.idclasse;
-            let path = "./Classes/classe" + num + "/depot/";
+            let path = "./Classes/classe" + id + "/depot/";
             /* try {
                  // on vérifie que l'ancien cours existe bien 
                  if (fs.existsSync(path + ancienneMatiere)) {
@@ -179,28 +177,21 @@ const renameMatiereClasse = (req, res) => {
 const renameCoursClasse = (req, res) => {
     console.log("\n*** Changement de nom de matière ***")
     //const id=req.body.id;
-    const email = req.body.mail;
+    const id = req.body.id;
     const nouvCours = req.body.newcours;
     const ancienCours = req.body.oldcours;
     const matiere = req.body.matiere;
 
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(400)
-    }
-
     Classe.findOne({
         attributes:['idclasse'],
-        where: { courriel: email }
+        where: { idclasse: id }
     })
         .then(classe => {
             if (!classe) {
                 console.log("Utilisateur pas trouvé");
                 return res.status(404).send("Élève inexistant");
             }
-            const num = classe.idclasse;
-            let path = "./Classe/classe" + num + "/depot/" + matiere + "/";
+            let path = "./Classe/classe" + id + "/depot/" + matiere + "/";
 
             renameDoc(path, ancienCours, nouvCours, function (code) {
                 return res.status(code)
