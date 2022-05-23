@@ -99,12 +99,10 @@ router.get('/getMatiereClass', Document.getAllMatieresClasse)
 // PAS IMPLEMENTE
 // route pour supprimer une matiere à la classe
 //router.delete('matiereClasse', SuppressionDoc.deleteMatiereClasse)
-// PAS IMPLEMENTE
 // route pour supprimer un cours à l'élève
-//router.delete('/coursEleve', SuppressionDoc.deleteCoursEleve)
-// PAS IMPLEMENTE
+router.delete('/coursEleve', SuppressionDoc.deleteCoursEleve)
 // route pour supprimer un cours à la classe
-//router.delete('/coursClasse', SuppressionDoc.deleteCoursClasse)
+router.delete('/coursClasse', SuppressionDoc.deleteCoursClasse)
 
 /* PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
 // route pour renommer la matière d'une classe

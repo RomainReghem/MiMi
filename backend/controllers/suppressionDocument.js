@@ -45,27 +45,23 @@ const deleteCoursEleve = (req, res) => {
 */
 const deleteCoursClasse = (req, res) => {
     console.log("\n*** Suppression de cours de la classe ***")
-    const email = req.body.mail;
+
+    const id = req.body.id;
     const cours = req.body.cours;
     const matiere = req.body.matiere;
 
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(400)
-    }
     Classe.findOne({
-        where: { courriel: email }
+        where: { idclasse: id }
     })
         .then(classe => {
             if (!classe) {
                 console.log("Utilisateur pas trouvé");
                 return res.status(404).send("classe inexistante");
             }
-            const num = classe.idclasse;
-            let path = "./Classes/classe" + num + "/depot/" + matiere + "/" + cours;
+            let path = "./Classes/classe" + id + "/depot/" + matiere + "/" + cours;
 
             const code = deleteCours(path)
+            console.log("code http : "+code)
             return res.status(code)
 
         });
