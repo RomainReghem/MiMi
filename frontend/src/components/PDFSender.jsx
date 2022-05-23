@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import Notifs from "./Notifs"
 
-const PDFSender = () => {
+const PDFSender = (props) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileWaitingToBeSent, setFileWaitingToBeSent] = useState(false);
     const { auth } = useAuth();
@@ -38,6 +38,9 @@ const PDFSender = () => {
 
             // Pour l'UI on remet fileWaitingToBeSent à false
             setFileWaitingToBeSent(false);
+
+            // On appelle LoadFiles pour actualiser les fichiers dans l'UI
+            props.reload();
 
         } catch (error) {
             console.log(error)

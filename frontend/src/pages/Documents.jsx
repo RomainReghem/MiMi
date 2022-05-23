@@ -1,7 +1,9 @@
 import PDFSender from "../components/PDFSender"
 import FileList from "../components/FileList"
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Tooltip from "@mui/material/Tooltip"
 import IconButton from "@mui/material/IconButton"
+import Notifs from "../components/Notifs"
 import PDFViewer from "../components/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -10,8 +12,10 @@ import useAuth from "../hooks/useAuth";
 import { useState, useEffect } from "react";
 
 const Documents = () => {
-
+    // Hooks
     const { auth } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
+
 
     // Tableau de tous les noms des fichiers 
     const [myFiles, setMyFiles] = useState([]);
@@ -49,23 +53,24 @@ const Documents = () => {
     const loadFiles = async () => {
         try {
             setLoadingFiles(true);
-            const myFilesResponse = await axios.get(myFilesURL, {
-                params: { ...myFilesParams },
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
+            const myFilesResponse = await axiosPrivate.get(myFilesURL, {
+                params: { ...myFilesParams }
             });
+            console.log("fin du try")
+
             setMyFiles(myFilesResponse.data.files)
             if (selectedUI == "my")
                 setMenuSelection(myFilesResponse.data.files)
 
-            const sharedFilesResponse = await axios.get(sharedFilesURL, {
-                params: { ...sharedFilesParams },
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            });
-            setSharedFiles(sharedFilesResponse.data.files)
-            if (selectedUI == "shared")
-                setMenuSelection(sharedFilesResponse.data.files)
+            // Si la classe possède un élève ou si l'éleve possède une classe, on load aussi les docs partagés
+            if (sharedFilesParams.id || sharedFilesParams.mail) {
+                const sharedFilesResponse = await axiosPrivate.get(sharedFilesURL, {
+                    params: { ...sharedFilesParams }
+                });
+                setSharedFiles(sharedFilesResponse.data.files)
+                if (selectedUI == "shared")
+                    setMenuSelection(sharedFilesResponse.data.files)
+            }
         }
 
         catch (error) {
@@ -76,13 +81,20 @@ const Documents = () => {
         setLoadingFiles(false);
     }
 
+    function timeout(delay) {
+        return new Promise(res => setTimeout(res, delay));
+    }
+
     const deleteFile = async (f) => {
         try {
-            const myFilesResponse = await axios.delete(deleteFileURL, {
+            const response = await axios.delete(deleteFileURL, {
                 headers: { 'Content-Type': 'application/json' },
-                data : {...deleteParams, cours: f },
+                data: { ...deleteParams, cours: f },
                 withCredentials: true
             });
+            loadFiles()
+            Notifs("Fichier supprimé !", "", "success")
+
         }
         catch (err) {
             console.log(err);
@@ -102,11 +114,11 @@ const Documents = () => {
                 <div className="fileList">
                     {Array.from(Array(menuSelection?.length), (e, i) => {
                         return <div key={i} onClick={() => setFile(menuSelection[i])} className="file">{menuSelection[i]}
-                        {selectedUI == "my" ? <IconButton size="small" style={{ color: "white", borderRadius: 0, padding: "0.5rem, 0.5rem" }} onClick={() => deleteFile(menuSelection[i])}><FontAwesomeIcon icon={faXmark} /></IconButton>:<></>}</div>
+                            {selectedUI == "my" ? <IconButton size="small" style={{ color: "white", borderRadius: 0, padding: "0.5rem, 0.5rem" }} onClick={(e) => { deleteFile(menuSelection[i]); e.stopPropagation() }}><FontAwesomeIcon icon={faXmark} /></IconButton> : <></>}</div>
                     })}
                 </div>
                 <div className="fileUploadFormContainer">
-                    <PDFSender />
+                    <PDFSender reload={loadFiles} />
                 </div>
             </section>
             <section className="fileViewer">
