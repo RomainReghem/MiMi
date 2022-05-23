@@ -11,7 +11,26 @@ const PDFViewer = (props) => {
 
     const [numPages, setNumPages] = useState(null);
     const [file, setFile] = useState(null);
-    let getFileURL = (auth?.role == "classe" ? "/getFileClass" : "/getFile");
+    let url;
+    let parameters;
+
+    if (auth?.role == "classe" && props.selected == "my") {
+        url = "/getFileClass"
+        parameters = { id: auth?.idclasse, cours: "maths", name:props.clickedFile}
+
+    } else if (auth?.role == "classe" && props.selected == "shared") {
+        url = "/getFile"
+        parameters = { mail:localStorage.getItem("mailEleve"), cours: "maths", name:props.clickedFile}
+
+    } else if (auth?.role == "eleve" && props.selected == "my") {
+        url = "/getFile"
+        parameters = { mail: auth?.user, cours: "maths", name:props.clickedFile}
+
+    } else if (auth?.role == "eleve" && props.selected == "shared") {
+        url = "/getFileClass"
+        parameters = { id: auth?.idclasse, cours: "maths", name:props.clickedFile}
+    }
+
 
     const onDocumentLoadSuccess = ({ numPages }) => {
         console.log("success")
@@ -33,24 +52,22 @@ const PDFViewer = (props) => {
                 byteNumbers[i] = byteChar.charCodeAt(i);
             }
             const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], {type: "pdf"});
+            const blob = new Blob([byteArray], { type: "pdf" });
 
             setFile(URL.createObjectURL(blob))
         }
-
-        if(props.clickedFile)
+        if (props.clickedFile)
             convertingFile();
-
     }, [props.clickedFile])
 
     const getFile = async () => {
         try {
-            const response = await axios.get(getFileURL, {
-                params: { mail: auth?.user, cours: "maths", name: props.clickedFile },
+            console.log(url, parameters)
+            const response = await axios.get(url, {
+                params: { ...parameters },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
-
             return response.data.file.data;
 
         } catch (error) {

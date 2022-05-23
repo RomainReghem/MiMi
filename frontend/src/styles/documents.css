@@ -123,13 +123,15 @@
 }
 
 .file {
+    display: flex;
+    justify-content: space-between;
     background-color: #3CA6A6;
     border: 1px solid #3CA6A6;
     text-decoration: none;
-    width:90%;
     padding: 0.8rem 1rem;
     margin-bottom: 0.3rem;
     cursor: pointer;
+    word-break:break-all ;
     box-shadow: 2px 2px #026773;
 }
 
@@ -142,10 +144,19 @@
     box-shadow: 0.5px 0.5px #026773;
 }
 
+.deleteFile{
+    background-color: #3CA6A6;
+    padding: 0.5rem, 0.5rem;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
 .fileList {
     max-width: 100%;
     max-height: 30rem;
     min-height: 10rem;
+    overflow-y: auto;
 }
 
 /* width */
