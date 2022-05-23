@@ -31,6 +31,7 @@ const saveCoursEleve = (req, res, next) => {
         return res.sendStatus(407)
     }
     Eleve.findOne({
+        attributes:['ideleve'],
         where: { courriel: email }
     })
         .then(eleve => {
@@ -55,6 +56,10 @@ const saveCoursEleve = (req, res, next) => {
                 return res.status(201).send("Enregistrement effectué");
             });
         })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
+        });
 }
 
 /**
@@ -85,19 +90,20 @@ const saveCoursClasse = (req, res) => {
         return res.sendStatus(407)
     }
     Classe.findOne({
+        attributes:['idclasse'],
         where: { courriel: email }
     })
         .then(classe => {
             if (!classe) {
                 console.log("Utilisateur pas trouvé");
-                return res.status(404).send("Élève pas trouvé")
+                return res.status(404).send("Classe pas trouvée")
             }
             const num = classe.idclasse;
             const path = "./Classes/classe" + num + "/depot/" + matiere;
             // Création des dossiers quand n'existent pas
             verificationChemin(path)
 
-            // Vérification si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
+            // Vérification de si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
             let name =verifNom(path, nom);
       
             fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
@@ -109,6 +115,10 @@ const saveCoursClasse = (req, res) => {
                 return res.status(201).send("Enregistrement effectué");
             });
         })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
+        });
 }
 
 /**
@@ -128,6 +138,7 @@ const addMatiereEleve = (req, res) => {
     }
 
     Eleve.findOne({
+        attributes:['ideleve'],
         where: { courriel: email }
     })
         .then(eleve => {
@@ -159,6 +170,7 @@ const addMatiereClasse = (req, res) => {
     }
 
     Classe.findOne({
+        attributes:['idclasse'],
         where: { courriel: email }
     })
         .then(classe => {
@@ -201,7 +213,7 @@ function verificationChemin(pathToVerify) {
 
 /**
  * Retourne le nom, changé si besoin pour qu'il soit unique lors de sa sauvegarde
- * @param {*} path le chemin où le fichier est sauvegardé
+ * @param {String} path le chemin où le fichier est sauvegardé
  * @param {String} nom le nom du fichier avant changement
  * @returns le nom unique du fichier
  */

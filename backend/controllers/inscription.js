@@ -41,38 +41,31 @@ const InscriptionEleve = (req, res) => {
     const email = req.body.mail;
     const mdp = req.body.pwd;
 
-    console.log(pseudo + prenom + nom + email + mdp)
+    // console.log(pseudo + prenom + nom + email + mdp)
+    // On revérifie la forme des informations données
     // Prenom doit etre compris entre 2 et 24 caractères de l'alphabet, y compris les accents minuscules 
     if (!(prenom.match("^[A-z-àâçéèêëîïôûùüÿñ]{2,24}$"))) {
         console.log("taille prenom pas bonne")
         return res.sendStatus(403)
     }
     //console.log("prenom ok")
-    // Nom doit être compris entre 1 et 44 inclus 
+    // Nom doit être compris entre 2 et 24 inclus et doit être composé uniquement de lettres
     if (!(nom.match("^[A-z-àâçéèêëîïôûùüÿñ]{2,24}$"))) {
         console.log("nom incorrect")
         return res.sendStatus(404)
     }
-    //console.log("nom ok")
-
     if (!(pseudo.match("^[A-z0-9-_]{3,24}$"))) {
         console.log("pseudo pas ok")
         return res.sendStatus(405)
     }
-    //console.log("pseudo ok")
-
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
         return res.sendStatus(406)
     }
-    //console.log("mdp ok")
-
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
         return res.sendStatus(407)
     }
-    //console.log("email ok")
-
 
     // Hashage du mot de passe
     bcrypt.hash(mdp, 10, (err, hash) => {
@@ -158,8 +151,10 @@ const InscriptionEleve = (req, res) => {
                             }
                         }
                         )
-
-
+                        .catch(err => {
+                            console.log(err)
+                            return res.send(err).status(520)
+                        });
                 }
             }
             )
@@ -240,8 +235,16 @@ const InscriptionClasse = (req, res) => {
 
                             });
                         }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return res.send(err).status(520)
                     });
             }
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         });
 }
 

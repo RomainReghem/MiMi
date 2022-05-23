@@ -32,6 +32,10 @@ const getAllMatieresEleve = (req, res) => {
                 }
             })
         })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
+        })
 }
 
 /**
@@ -71,6 +75,10 @@ const getAllCoursEleve = (req, res) => {
                     return res.send({ files }).status(201)
                 }
             })
+        })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
         })
 }
 
@@ -118,6 +126,10 @@ const getCoursEleve = (req, res) => {
                 return res.send({ file: fichier });
             });
         })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
+        })
 }
 
 
@@ -149,6 +161,10 @@ const getAllMatieresClasse = (req, res) => {
                 }
             })
         })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
+        })
 }
 
 /**
@@ -157,7 +173,7 @@ const getAllMatieresClasse = (req, res) => {
  * @param {*} res la réponse du serveur
  */
 const getAllCoursClasse = (req, res) => {
-    console.log("\n*** Récupération des cours d'une matiere***")
+    console.log("\n*** Récupération des cours d'une classe pour une matiere***")
     const id = req.query.id;
     const matiere = req.query.cours;
 
@@ -179,6 +195,10 @@ const getAllCoursClasse = (req, res) => {
                     return res.send({ files }).status(201)
                 }
             })
+        })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
         })
 }
 
@@ -216,6 +236,10 @@ const getCoursClasse = (req, res) => {
                 console.log("Récupération ok")
                 return res.send({ file: fichier });
             });
+        })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
         })
 }
 

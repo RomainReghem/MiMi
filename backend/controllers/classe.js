@@ -30,6 +30,10 @@ const getAllStudents = (req, res) => {
         // res.json({students:eleves})
         res.json({ eleves: eleves })
     })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
+        });
 }
 
 /**
@@ -43,7 +47,9 @@ const deleteClass = (req, res) => {
     const mail = req.body.mail
 
     // on récupère les infos de la bd sur la classe à partir du mail donné
-    Classe.findOne({ where: { courriel: mail } })
+    Classe.findOne({
+    attributes:['idclasse'],
+    where: { courriel: mail } })
         .then(classe => {
             if (!classe) {
                 console.log("Pas de classe trouvé à supprimer")

@@ -12,7 +12,7 @@ const Deconnexion = (req, res) => {
     if (!cookies?.jwt) {
         console.log("pas de cookies")
         // Ne retourne pas d'erreur, il n'y avait pas de cookies
-        res.sendStatus(204);
+        return res.sendStatus(204);
     }
 
     const refreshToken = cookies.jwt;

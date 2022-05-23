@@ -58,9 +58,11 @@ const ChangementPseudo = (req, res) => {
                         res.status(201).send("Pas de modification de pseudo.")
                     }
                 }
-
-
             })
+            .catch(err=>{
+                console.log(err)
+                return res.send(err).status(520)
+            });
     }
 }
 
@@ -110,6 +112,10 @@ const AcceptationInvitation = (req, res) => {
                 }
                 )
         })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
+        });
 
 }
 

@@ -23,6 +23,7 @@ const renameCoursEleve = (req, res) => {
     }
 
     Eleve.findOne({
+        attributes:['ideleve'],
         where: { courriel: email }
     })
         .then(eleve => {
@@ -50,6 +51,10 @@ const renameCoursEleve = (req, res) => {
                 return res.status(520).send("Erreur lors de la vérification des dossiers")
             }
 
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         });
 }
 
@@ -72,6 +77,7 @@ const renameMatiereEleve = (req, res) => {
     }
 
     Eleve.findOne({
+        attributes:['ideleve'],
         where: { courriel: email }
     })
         .then(eleve => {
@@ -98,9 +104,13 @@ const renameMatiereEleve = (req, res) => {
                  console.error(err)
                  return res.status(520).send("Erreur lors de la vérification des dossiers")
              }*/
-             renameDoc(path, ancienneMatiere, nouvMatiere, function(code){
+            renameDoc(path, ancienneMatiere, nouvMatiere, function (code) {
                 return res.status(code)
-             })
+            })
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         });
 }
 
@@ -109,10 +119,11 @@ const renameMatiereEleve = (req, res) => {
  * @param {*} req la requête du client, doit contenir l'email de la classe, l'ancien nom de la matière et le nouveau nom.
  * @param {*} res la réponse du serveur
  */
- const renameMatiereClasse = (req, res) => {
+const renameMatiereClasse = (req, res) => {
     console.log("\n*** Changement de nom de matière d'une classe ***")
 
     const email = req.body.mail;
+    //const id=req.body.id;
     const nouvMatiere = req.body.newmatiere;
     const ancienneMatiere = req.body.oldmatiere;
 
@@ -122,15 +133,16 @@ const renameMatiereEleve = (req, res) => {
         return res.sendStatus(400)
     }
 
-    Eleve.findOne({
+    Classe.findOne({
+        attributes:['idclasse'],
         where: { courriel: email }
     })
-        .then(eleve => {
-            if (!eleve) {
+        .then(classe => {
+            if (!classe) {
                 console.log("Utilisateur pas trouvé");
                 return res.status(404).send("Classe inexistante");
             }
-            const num = eleve.ideleve;
+            const num = classe.idclasse;
             let path = "./Classes/classe" + num + "/depot/";
             /* try {
                  // on vérifie que l'ancien cours existe bien 
@@ -149,9 +161,13 @@ const renameMatiereEleve = (req, res) => {
                  console.error(err)
                  return res.status(520).send("Erreur lors de la vérification des dossiers")
              }*/
-             renameDoc(path, ancienneMatiere, nouvMatiere, function(code){
+            renameDoc(path, ancienneMatiere, nouvMatiere, function (code) {
                 return res.status(code)
-             })
+            })
+        })  
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         });
 }
 
@@ -160,9 +176,9 @@ const renameMatiereEleve = (req, res) => {
  * @param {*} req la requête du client, doit contenir l'email de l'élève, l'ancien nom de la matière et le nouveau nom.
  * @param {*} res la réponse du serveur
  */
- const renameCoursClasse = (req, res) => {
+const renameCoursClasse = (req, res) => {
     console.log("\n*** Changement de nom de matière ***")
-
+    //const id=req.body.id;
     const email = req.body.mail;
     const nouvCours = req.body.newcours;
     const ancienCours = req.body.oldcours;
@@ -174,20 +190,25 @@ const renameMatiereEleve = (req, res) => {
         return res.sendStatus(400)
     }
 
-    Eleve.findOne({
+    Classe.findOne({
+        attributes:['idclasse'],
         where: { courriel: email }
     })
-        .then(eleve => {
-            if (!eleve) {
+        .then(classe => {
+            if (!classe) {
                 console.log("Utilisateur pas trouvé");
                 return res.status(404).send("Élève inexistant");
             }
-            const num = eleve.ideleve;
-            let path = "./Classe/classe" + num + "/depot/"+matiere+"/";
-      
-             renameDoc(path, ancienneMatiere, ancienCours, function(code){
+            const num = classe.idclasse;
+            let path = "./Classe/classe" + num + "/depot/" + matiere + "/";
+
+            renameDoc(path, ancienCours, nouvCours, function (code) {
                 return res.status(code)
-             })
+            })
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         });
 }
 
@@ -219,7 +240,7 @@ function renameDoc(path, oldname, newname, callback) {
     }
 }
 
-module.exports ={
+module.exports = {
     renameCoursClasse,
     renameCoursEleve,
     renameMatiereClasse,

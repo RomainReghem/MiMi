@@ -26,7 +26,7 @@ const Connexion = (req, res) => {
 
     const pseudo = req.body.user;
     const mdp = req.body.pwd;
-    console.log("connexion " + mdp + " " + pseudo)
+    //console.log("connexion " + mdp + " " + pseudo)
     if (mdp == "" || pseudo == "") {
         res.sendStatus(402)
     }

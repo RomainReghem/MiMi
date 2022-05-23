@@ -47,7 +47,11 @@ const saveAvatar = (req, res) => {
 
             saveJSON(path, avatar, num, res);
 
-        });
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
+        })
 }
 
 /**
@@ -103,6 +107,10 @@ const getAvatar = (req, res) => {
                 res.json({ avatar: avatar })
             })*/
             getJSON(path, num, res)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         })
 }
 
@@ -198,9 +206,11 @@ const savePicture = (req, res) => {
                     console.log("La photo a bien été sauvegardée");
                     return res.status(201).send("Enregistrement effectué");
                 });
-
             })
-
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         })
 }
 
@@ -259,8 +269,10 @@ const getPicture = (req, res) => {
                     });
                 }
             })
-
-
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         })
 }
 /**
@@ -278,7 +290,7 @@ function verificationChemin(pathToVerify) {
             }
         } catch (err) {
             console.error(err);
-           // return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
+            // return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
         }
     }
 }

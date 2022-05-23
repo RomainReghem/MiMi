@@ -79,6 +79,10 @@ const deleteStudent = async (req, res) => {
                     return res.send(result);
                 })
             });
+        })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
         });
 }
 
@@ -112,6 +116,10 @@ function getInvitation(emailEleve, cb) {
             } else {
                 return cb({ invitation: invitation })
             }
+        })
+        .catch(err=>{
+            console.log(err)
+            return res.send(err).status(520)
         })
 }
 
