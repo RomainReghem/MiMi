@@ -34,6 +34,9 @@ const deleteCoursEleve = (req, res) => {
             let path = "./Eleves/eleve" + num + "/depot/" + matiere + "/" + cours;
 
             const code = deleteCours(path)
+            if(code==201){
+                return res.status(code).send("suppression réussie")
+            }
             return res.status(code)
 
         });
@@ -64,8 +67,10 @@ const deleteCoursClasse = (req, res) => {
 
             const code = deleteCours(path)
             console.log("code http : " + code)
+            if(code==201){
+                return res.status(code).send("suppression réussie")
+            }
             return res.status(code)
-
         });
 }
 
