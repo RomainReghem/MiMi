@@ -30,36 +30,45 @@ const saveCoursEleve = (req, res, next) => {
         // erreur 400
         return res.sendStatus(407)
     }
-    Eleve.findOne({
-        attributes:['ideleve'],
-        where: { courriel: email }
-    })
-        .then(eleve => {
-            if (!eleve) {
-                console.log("Utilisateur pas trouvé");
-                return res.status(404).send("Élève pas trouvé")
-            }
-            const num = eleve.ideleve;
-            const path = "./Eleves/eleve" + num + "/depot/" + matiere;
-            // Création des dossiers quand n'existent pas
-            verificationChemin(path)
 
-            // Vérification si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
-            let name =verifNom(path, nom);
-            // enregistrement du fichier à partir de son buffer
-            fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
-                if (err) {
-                    console.log("Erreur lors de l'enregistrement du document : " + err);
-                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-                }
-                console.log("Le fichier a bien été sauvegardé");
-                return res.status(201).send("Enregistrement effectué");
-            });
+    const role = req.role;
+    const emailToken = req.mail
+    // seul un eleve peut sauvegarder un fichier ici, celui à qui appartient les cours
+    if (role == "eleve" && emailToken == email) {
+        Eleve.findOne({
+            attributes: ['ideleve'],
+            where: { courriel: email }
         })
-        .catch(err=>{
-            console.log(err)
-            return res.send(err).status(520)
-        });
+            .then(eleve => {
+                if (!eleve) {
+                    console.log("Utilisateur pas trouvé");
+                    return res.status(404).send("Élève pas trouvé")
+                }
+                const num = eleve.ideleve;
+                const path = "./Eleves/eleve" + num + "/depot/" + matiere;
+                // Création des dossiers quand n'existent pas
+                verificationChemin(path)
+
+                // Vérification si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
+                let name = verifNom(path, nom);
+                // enregistrement du fichier à partir de son buffer
+                fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
+                    if (err) {
+                        console.log("Erreur lors de l'enregistrement du document : " + err);
+                        return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                    }
+                    console.log("Le fichier a bien été sauvegardé");
+                    return res.status(201).send("Enregistrement effectué");
+                });
+            })
+            .catch(err => {
+                console.log(err)
+                return res.send(err).status(520)
+            });
+    } else {
+        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
+        return res.status(403).send("Tentative de sauvegarde de cours d'un autre utilisateur")
+    }
 }
 
 /**
@@ -89,36 +98,44 @@ const saveCoursClasse = (req, res) => {
         // erreur 400
         return res.sendStatus(407)
     }
-    Classe.findOne({
-        attributes:['idclasse'],
-        where: { courriel: email }
-    })
-        .then(classe => {
-            if (!classe) {
-                console.log("Utilisateur pas trouvé");
-                return res.status(404).send("Classe pas trouvée")
-            }
-            const num = classe.idclasse;
-            const path = "./Classes/classe" + num + "/depot/" + matiere;
-            // Création des dossiers quand n'existent pas
-            verificationChemin(path)
 
-            // Vérification de si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
-            let name =verifNom(path, nom);
-      
-            fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
-                if (err) {
-                    console.log("Erreur lors de l'enregistrement du document : " + err);
-                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-                }
-                console.log("Le fichier a bien été sauvegardé");
-                return res.status(201).send("Enregistrement effectué");
-            });
+    const role = req.role;
+    const emailToken = req.mail
+    if (role == "classe" && emailToken == email) {
+        Classe.findOne({
+            attributes: ['idclasse'],
+            where: { courriel: email }
         })
-        .catch(err=>{
-            console.log(err)
-            return res.send(err).status(520)
-        });
+            .then(classe => {
+                if (!classe) {
+                    console.log("Utilisateur pas trouvé");
+                    return res.status(404).send("Classe pas trouvée")
+                }
+                const num = classe.idclasse;
+                const path = "./Classes/classe" + num + "/depot/" + matiere;
+                // Création des dossiers quand n'existent pas
+                verificationChemin(path)
+
+                // Vérification de si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
+                let name = verifNom(path, nom);
+
+                fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
+                    if (err) {
+                        console.log("Erreur lors de l'enregistrement du document : " + err);
+                        return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                    }
+                    console.log("Le fichier a bien été sauvegardé");
+                    return res.status(201).send("Enregistrement effectué");
+                });
+            })
+            .catch(err => {
+                console.log(err)
+                return res.send(err).status(520)
+            });
+    } else {
+        console.log('soit pas une classe, soit pas la bonne classe : accès interdit')
+        return res.status(403).send("Tentative de sauvegarde de cours d'un autre utilisateur")
+    }
 }
 
 /**
@@ -137,20 +154,27 @@ const addMatiereEleve = (req, res) => {
         return res.sendStatus(407)
     }
 
-    Eleve.findOne({
-        attributes:['ideleve'],
-        where: { courriel: email }
-    })
-        .then(eleve => {
-            if (!eleve) {
-                console.log("Utilisateur pas trouvé");
-                return res.status(404).send("Élève inexistant");
-            }
-            const num = eleve.ideleve;
-            const path = "./Eleves/eleve" + num + "/depot/" + matiere;
-            verificationChemin(path)
-            return res.status(200);
-        });
+    const role = req.role;
+    const emailToken = req.mail
+    if (role == "eleve" && emailToken == email) {
+        Eleve.findOne({
+            attributes: ['ideleve'],
+            where: { courriel: email }
+        })
+            .then(eleve => {
+                if (!eleve) {
+                    console.log("Utilisateur pas trouvé");
+                    return res.status(404).send("Élève inexistant");
+                }
+                const num = eleve.ideleve;
+                const path = "./Eleves/eleve" + num + "/depot/" + matiere;
+                verificationChemin(path)
+                return res.status(200);
+            });
+    } else {
+        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
+        return res.status(403).send("Tentative de sauvegarde de cours d'un autre utilisateur")
+    }
 }
 
 /**
@@ -169,20 +193,27 @@ const addMatiereClasse = (req, res) => {
         return res.sendStatus(407)
     }
 
-    Classe.findOne({
-        attributes:['idclasse'],
-        where: { courriel: email }
-    })
-        .then(classe => {
-            if (!classe) {
-                console.log("Utilisateur pas trouvé");
-                return res.status(404).send("Classe inexistante");
-            }
-            const num = classe.idclasse;
-            const path = "./Classes/classe" + num + "/depot/" + matiere;
-            verificationChemin(path)
-            return res.status(200);
-        });
+    const role = req.role;
+    const emailToken = req.mail
+    if (role == "classe" && emailToken == email) {
+        Classe.findOne({
+            attributes: ['idclasse'],
+            where: { courriel: email }
+        })
+            .then(classe => {
+                if (!classe) {
+                    console.log("Utilisateur pas trouvé");
+                    return res.status(404).send("Classe inexistante");
+                }
+                const num = classe.idclasse;
+                const path = "./Classes/classe" + num + "/depot/" + matiere;
+                verificationChemin(path)
+                return res.status(200);
+            });
+    } else {
+        console.log('soit pas une classe, soit pas la bonne classe : accès interdit')
+        return res.status(403).send("Tentative de sauvegarde de cours d'un autre utilisateur")
+    }
 }
 
 /**
@@ -226,7 +257,7 @@ function verifNom(path, nom) {
     const extension = name.split(".")[1]
 
     while (isNotUnique) {
-        try{
+        try {
             if (fs.existsSync(path + "/" + name)) {
                 // le nouveau nom sera de la forme : nom-x.type, avec x étant le nombre de fichiers ayant le même nom
                 name = newnom + "-" + i + "." + extension
@@ -234,8 +265,8 @@ function verifNom(path, nom) {
             } else {
                 isNotUnique = false
             }
-        }catch(err){
-            console.log("Erreur verification nom "+err)
+        } catch (err) {
+            console.log("Erreur verification nom " + err)
         }
     }
     return name;

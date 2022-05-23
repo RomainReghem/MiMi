@@ -36,57 +36,60 @@ router.get('/logout', Deconnexion)
 // Pour réactualiser les tokens
 router.get('/refresh', refreshToken.refreshToken);
 
+// pour toutes les routes qui ont besoin d'une authentification : on fait appel au middleware qui vérifie la validité du token
+//router.use(verifyJWT)
+
 // Pour changer le mot de passe 
-router.post('/changePwd', Modification.ChangementMdp)
+router.post('/changePwd', verifyJWT, Modification.ChangementMdp)
 // route pour changer le mail
-router.post('/changeMail', Modification.ChangementMail)
+router.post('/changeMail', verifyJWT, Modification.ChangementMail)
 //router.post('/changeMail', verifyJWT, Modification.ChangementMail)
 
 // route qui permet de retourner un pseudo à partir du mail
-router.get('/pseudo', Eleve.getUsernameStudent)
+router.get('/pseudo', verifyJWT, Eleve.getUsernameStudent)
 // route qui permet de refuser l'invitation de la classe (et donc supprime la classe et l'invitation de la bd)
-router.post('/refuseInvite', ModificationEleve.SuppressionClasse)
-// route qui permet de supprimer la classe d'un eleve
-router.post('/quitClass', ModificationEleve.SuppressionClasse)
+router.post('/refuseInvite', verifyJWT, ModificationEleve.SuppressionClasse)
+// route qui permet de supprimer la classe d'un eleve (cad on retire l'invitation)
+router.post('/quitClass', verifyJWT, ModificationEleve.SuppressionClasse)
 
 // route pour changer le pseudo : seulement pour l'élève
-router.post('/changePseudo', ModificationEleve.ChangementPseudo)
+router.post('/changePseudo', verifyJWT, ModificationEleve.ChangementPseudo)
 // route qui permet d'accepter l'invitation d'une classe
-router.post('/acceptInvite', ModificationEleve.AcceptationInvitation)
+router.post('/acceptInvite', verifyJWT, ModificationEleve.AcceptationInvitation)
 
 // route qui permet de retourner la liste d'emails des eleves d'une classe
-router.get('/eleves', Classe.getAllStudents)
+router.get('/eleves', verifyJWT, Classe.getAllStudents)
 // route qui permet d'envoyer une invitation à un élève
-router.post('/inviteEleve', ModificationClasse.ajoutInvitation)
+router.post('/inviteEleve', verifyJWT, ModificationClasse.ajoutInvitation)
 // route permettant de supprimer un élève de la classe
-router.post('/deleteEleve', ModificationClasse.suppressionEleve)
+router.post('/deleteEleve', verifyJWT, ModificationClasse.suppressionEleve)
 
 // route pour sauvegarder l'avatar d'un élève
-router.post('/avatar', Image.saveAvatar)
+router.post('/avatar', verifyJWT, Image.saveAvatar)
 // route pour récupèrer l'avatar
-router.get('/avatar', Image.getAvatar)
+router.get('/avatar', verifyJWT, Image.getAvatar)
 // route pour sauvegarder l'image de profil d'un élève
-router.post('/saveImage', verifyImg.single("file"), Image.savePicture)
+router.post('/saveImage', verifyJWT, verifyImg.single("file"), Image.savePicture)
 // route pour récupèrer l'image de profil d'un élève
-router.get('/getImage', Image.getPicture)
+router.get('/getImage', verifyJWT, Image.getPicture)
 
 // route pour sauvegarder un document d'un élève
-router.post('/saveFile', verifyDoc.single("file"), AjoutDoc.saveCoursEleve)
+router.post('/saveFile', verifyJWT, verifyDoc.single("file"), AjoutDoc.saveCoursEleve)
 // route pour sauvegarder un document d'une classe
-router.post('/saveFileClass', verifyDoc.single("file"), AjoutDoc.saveCoursClasse)
+router.post('/saveFileClass', verifyJWT, verifyDoc.single("file"), AjoutDoc.saveCoursClasse)
 // route pour récupèrer un document d'un élève
-router.get('/getFile', Document.getCoursEleve)
+router.get('/getFile', verifyJWT, Document.getCoursEleve)
 // route pour récupèrer le nom de tous les cours qu'un élève possède dans une matière donnée
-router.get('/getCours', Document.getAllCoursEleve)
+router.get('/getCours', verifyJWT, Document.getAllCoursEleve)
 // route pour récupèrer le nom de toutes les matières qu'un élève possède
-router.get('/getMatieres', Document.getAllMatieresEleve)
+router.get('/getMatieres', verifyJWT, Document.getAllMatieresEleve)
 //PAS IMPLEMENTE : cours des classes
 // route pour accèder à un fichier précis de la classe, dans une matière donnée
-router.get('/getFileClass', Document.getCoursClasse)
+router.get('/getFileClass', verifyJWT, Document.getCoursClasse)
 // route pour récupérer le nom de tous les fichiers présents pour une matière
-router.get('/getCoursClass', Document.getAllCoursClasse)
+router.get('/getCoursClass', verifyJWT, Document.getAllCoursClasse)
 // route pour récupèrer le nom de toutes les matières qu'une classe a
-router.get('/getMatiereClass', Document.getAllMatieresClasse)
+router.get('/getMatiereClass', verifyJWT, Document.getAllMatieresClasse)
 
 // PAS IMPLEMENTE : ajout de matiere
 // route pour ajouter une matiere à l'élève
@@ -100,9 +103,9 @@ router.get('/getMatiereClass', Document.getAllMatieresClasse)
 // route pour supprimer une matiere à la classe
 //router.delete('matiereClasse', SuppressionDoc.deleteMatiereClasse)
 // route pour supprimer un cours à l'élève
-router.delete('/coursEleve', SuppressionDoc.deleteCoursEleve)
+router.delete('/coursEleve', verifyJWT, SuppressionDoc.deleteCoursEleve)
 // route pour supprimer un cours à la classe
-router.delete('/coursClasse', SuppressionDoc.deleteCoursClasse)
+router.delete('/coursClasse', verifyJWT, SuppressionDoc.deleteCoursClasse)
 
 /* PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
 // route pour renommer la matière d'une classe

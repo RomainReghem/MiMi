@@ -1,8 +1,8 @@
 const Eleve = require('../models/users').Eleve
 const Classe = require('../models/users').Classe
 
-
 const fs = require('fs');
+
 
 /**
  * Supprime le cours d'un élève avec le nom donné
@@ -11,7 +11,6 @@ const fs = require('fs');
  */
 const deleteCoursEleve = (req, res) => {
     console.log("\n*** Suppression de cours de l'eleve ***")
-    console.log(req.data)
     const email = req.body.mail;
     const cours = req.body.cours;
     const matiere = req.body.matiere;
@@ -21,6 +20,11 @@ const deleteCoursEleve = (req, res) => {
         // erreur 400
         return res.sendStatus(400)
     }
+
+    const role = req.role;
+    const emailToken = req.mail
+    // seul un eleve peut supprimer un fichier ici, celui à qui appartient les cours
+    if (role == "eleve" && emailToken == email) {
     Eleve.findOne({
         attributes: ['ideleve'],
         where: { courriel: email }
@@ -39,8 +43,17 @@ const deleteCoursEleve = (req, res) => {
             }
             return res.status(code)
 
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         });
+    } else {
+        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
+        return res.status(403).send("Tentative de suppression de cours d'un autre utilisateur")
+    }
 }
+
 
 /**
  * Supprime le cours d'une classe avec le nom donné
@@ -54,14 +67,21 @@ const deleteCoursClasse = (req, res) => {
     const cours = req.body.cours;
     const matiere = req.body.matiere;
 
+    const role = req.role;
+    const emailToken = req.mail
+    // seule une classe peut supprimer un fichier ici, celle à qui appartient les cours
+    if (role == "classe") {
     Classe.findOne({
-        attributes: ['idclasse'],
+        attributes: ['idclasse', 'courriel'],
         where: { idclasse: id }
     })
         .then(classe => {
             if (!classe) {
                 console.log("Utilisateur pas trouvé");
                 return res.status(404).send("classe inexistante");
+            }
+            if (emailToken != classe.courriel) {
+                return res.status(403).send("Tentative de suppression de cours d'un autre utilisateur")
             }
             let path = "./Classes/classe" + id + "/depot/" + matiere + "/" + cours;
 
@@ -71,7 +91,15 @@ const deleteCoursClasse = (req, res) => {
                 return res.status(code).send("suppression réussie")
             }
             return res.status(code)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         });
+    } else {
+        console.log('soit pas une classe, soit pas la bonne classe : accès interdit')
+        return res.status(403).send("Tentative de suppression de cours d'un autre utilisateur")
+    }
 }
 
 /**
@@ -89,6 +117,11 @@ const deleteMatiereEleve = (req, res) => {
         // erreur 400
         return res.sendStatus(400)
     }
+
+    const role = req.role;
+    const emailToken = req.mail
+    // seul un eleve peut supprimer un dossier ici, celui à qui appartient les cours
+    if (role == "eleve" && emailToken == email) {
     Eleve.findOne({
         attributes: ['ideleve'],
         where: { courriel: email }
@@ -102,8 +135,19 @@ const deleteMatiereEleve = (req, res) => {
             let path = "./Eleves/eleve" + num + "/depot/" + matiere;
 
             const code = deleteMatiere(path)
+            if(code==201){
+                return res.status(code).send("suppression réussie")
+            }
             return res.status(code)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         });
+    } else {
+        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
+        return res.status(403).send("Tentative de suppression de matiere d'un autre utilisateur")
+    }
 }
 
 /**
@@ -116,20 +160,38 @@ const deleteMatiereClasse = (req, res) => {
     const id = req.body.id;
     const matiere = req.body.matiere;
 
+    const role = req.role;
+    const emailToken = req.mail
+    // seule une classe peut supprimer un dossier ici, celle à qui appartient les cours
+    if (role == "classe") {
     Classe.findOne({
-        attributes: ['idclasse'],
+        attributes: ['idclasse', 'courriel'],
         where: { idclasse: id }
     })
         .then(classe => {
             if (!classe) {
                 //console.log("Utilisateur pas trouvé");
                 return res.status(404).send("classe inexistante");
+            } 
+            if (emailToken != classe.courriel) {
+                return res.status(403).send("Tentative de suppression de cours d'un autre utilisateur")
             }
             let path = "./Classes/classe" + id + "/depot/" + matiere;
 
             const code = deleteMatiere(path)
+            if(code==201){
+                return res.status(code).send("suppression réussie")
+            }
             return res.status(code)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.send(err).status(520)
         });
+    } else {
+        console.log('soit pas une classe, soit pas la bonne classe : accès interdit')
+        return res.status(403).send("Tentative de suppression de matiere d'un autre utilisateur")
+    }
 }
 
 /**

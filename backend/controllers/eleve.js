@@ -128,7 +128,7 @@ function getInvitation(emailEleve, cb) {
                     })
                     .catch(err => {
                         console.log(err)
-                        return res.send(err).status(520)
+                        return cb({erreur:err})
                     });
             } else {
                 return cb({ invitation: invitation })
@@ -136,7 +136,7 @@ function getInvitation(emailEleve, cb) {
         })
         .catch(err => {
             console.log(err)
-            return res.send(err).status(520)
+            return cb({erreur:err})
         });
 }
 

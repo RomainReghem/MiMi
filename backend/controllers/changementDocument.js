@@ -22,40 +22,48 @@ const renameCoursEleve = (req, res) => {
         return res.sendStatus(400)
     }
 
-    Eleve.findOne({
-        attributes:['ideleve'],
-        where: { courriel: email }
-    })
-        .then(eleve => {
-            if (!eleve) {
-                console.log("Utilisateur pas trouvé");
-                return res.status(404).send("Élève inexistant");
-            }
-            const num = eleve.ideleve;
-            let path = "./Eleves/eleve" + num + "/depot/" + matiere + "/";
-            try {
-                // on vérifie que l'ancien cours existe bien 
-                if (fs.existsSync(path + ancienCours)) {
-                    // s'il existe alors on peut le renommer
-                    // mais d'abord on vérifie 
-                    fs.renameSync(path + ancienCours, path + nouvCours);
-                    return res.status(201);
-                    // sinon le cours n'a pas été trouvé
-                } else {
-                    console.log("Cours inexistant");
-                    return res.status(404).send("Pas de cours portant le nom " + ancienCours + " trouvé.");
+    const role = req.role;
+    const emailToken = req.mail
+    // seul un eleve peut renommer un fichier ici, celui à qui appartient les cours
+    if (role == "eleve" && emailToken == email) {
+        Eleve.findOne({
+            attributes: ['ideleve'],
+            where: { courriel: email }
+        })
+            .then(eleve => {
+                if (!eleve) {
+                    console.log("Utilisateur pas trouvé");
+                    return res.status(404).send("Élève inexistant");
+                }
+                const num = eleve.ideleve;
+                let path = "./Eleves/eleve" + num + "/depot/" + matiere + "/";
+                try {
+                    // on vérifie que l'ancien cours existe bien 
+                    if (fs.existsSync(path + ancienCours)) {
+                        // s'il existe alors on peut le renommer
+                        // mais d'abord on vérifie 
+                        fs.renameSync(path + ancienCours, path + nouvCours);
+                        return res.status(201);
+                        // sinon le cours n'a pas été trouvé
+                    } else {
+                        console.log("Cours inexistant");
+                        return res.status(404).send("Pas de cours portant le nom " + ancienCours + " trouvé.");
+                    }
+
+                } catch (err) {
+                    console.error(err)
+                    return res.status(520).send("Erreur lors de la vérification des dossiers")
                 }
 
-            } catch (err) {
-                console.error(err)
-                return res.status(520).send("Erreur lors de la vérification des dossiers")
-            }
-
-        })
-        .catch(err => {
-            console.log(err)
-            return res.send(err).status(520)
-        });
+            })
+            .catch(err => {
+                console.log(err)
+                return res.send(err).status(520)
+            });
+    } else {
+        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
+        return res.status(403).send("Tentative de renommage de cours d'un autre utilisateur")
+    }
 }
 
 /**
@@ -76,98 +84,52 @@ const renameMatiereEleve = (req, res) => {
         return res.sendStatus(400)
     }
 
-    Eleve.findOne({
-        attributes:['ideleve'],
-        where: { courriel: email }
-    })
-        .then(eleve => {
-            if (!eleve) {
-                console.log("Utilisateur pas trouvé");
-                return res.status(404).send("Élève inexistant");
-            }
-            const num = eleve.ideleve;
-            let path = "./Eleves/eleve" + num + "/depot/";
-            /* try {
-                 // on vérifie que l'ancien cours existe bien 
-                 if (fs.existsSync(path + ancienneMatiere)) {
-                     // s'il existe alors on peut le renommer
-                     fs.renameSync(path + ancienneMatiere, path + nouvMatiere);
-                     console.log("renommage de la matière " + ancienneMatiere + " en " + nouvMatiere + " effectuee")
-                     return res.status(201);
-                     // sinon le cours n'a pas été trouvé
-                 } else {
-                     console.log("Cours inexistant");
-                     return res.status(404).send("Pas de matière portant le nom " + ancienneMatiere + " trouvée.");
-                 }
- 
-             } catch (err) {
-                 console.error(err)
-                 return res.status(520).send("Erreur lors de la vérification des dossiers")
-             }*/
-            renameDoc(path, ancienneMatiere, nouvMatiere, function (code) {
-                return res.status(code)
-            })
+    const role = req.role;
+    const emailToken = req.mail
+    // seul un eleve peut renommer un document ici, celui à qui appartient les cours
+    if (role == "eleve" && emailToken == email) {
+        Eleve.findOne({
+            attributes: ['ideleve'],
+            where: { courriel: email }
         })
-        .catch(err => {
-            console.log(err)
-            return res.send(err).status(520)
-        });
-}
-
-/**
- * Renomme une matière d'une classe avec le nouveau nom donné
- * @param {*} req la requête du client, doit contenir l'email de la classe, l'ancien nom de la matière et le nouveau nom.
- * @param {*} res la réponse du serveur
- */
-const renameMatiereClasse = (req, res) => {
-    console.log("\n*** Changement de nom de matière d'une classe ***")
-
-    const id = req.body.id;
-    const nouvMatiere = req.body.newmatiere;
-    const ancienneMatiere = req.body.oldmatiere;
-
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(400)
-    }
-
-    Classe.findOne({
-        attributes:['idclasse'],
-        where: { idclasse: id }
-    })
-        .then(classe => {
-            if (!classe) {
-                console.log("Utilisateur pas trouvé");
-                return res.status(404).send("Classe inexistante");
-            }
-            let path = "./Classes/classe" + id + "/depot/";
-            /* try {
-                 // on vérifie que l'ancien cours existe bien 
-                 if (fs.existsSync(path + ancienneMatiere)) {
-                     // s'il existe alors on peut le renommer
-                     fs.renameSync(path + ancienneMatiere, path + nouvMatiere);
-                     console.log("renommage de la matière " + ancienneMatiere + " en " + nouvMatiere + " effectuee")
-                     return res.status(201);
-                     // sinon le cours n'a pas été trouvé
-                 } else {
-                     console.log("Cours inexistant");
-                     return res.status(404).send("Pas de matière portant le nom " + ancienneMatiere + " trouvée.");
-                 }
- 
-             } catch (err) {
-                 console.error(err)
-                 return res.status(520).send("Erreur lors de la vérification des dossiers")
-             }*/
-            renameDoc(path, ancienneMatiere, nouvMatiere, function (code) {
-                return res.status(code)
+            .then(eleve => {
+                if (!eleve) {
+                    console.log("Utilisateur pas trouvé");
+                    return res.status(404).send("Élève inexistant");
+                }
+                const num = eleve.ideleve;
+                let path = "./Eleves/eleve" + num + "/depot/";
+                /* try {
+                     // on vérifie que l'ancien cours existe bien 
+                     if (fs.existsSync(path + ancienneMatiere)) {
+                         // s'il existe alors on peut le renommer
+                         fs.renameSync(path + ancienneMatiere, path + nouvMatiere);
+                         console.log("renommage de la matière " + ancienneMatiere + " en " + nouvMatiere + " effectuee")
+                         return res.status(201);
+                         // sinon le cours n'a pas été trouvé
+                     } else {
+                         console.log("Cours inexistant");
+                         return res.status(404).send("Pas de matière portant le nom " + ancienneMatiere + " trouvée.");
+                     }
+     
+                 } catch (err) {
+                     console.error(err)
+                     return res.status(520).send("Erreur lors de la vérification des dossiers")
+                 }*/
+                renameDoc(path, ancienneMatiere, nouvMatiere, function (code) {
+                    return res.status(code)
+                })
             })
-        })  
-        .catch(err => {
-            console.log(err)
-            return res.send(err).status(520)
-        });
+            .catch(err => {
+                console.log(err)
+                return res.send(err).status(520)
+            });
+    } else {
+        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
+        return res.status(403).send("Tentative de renommage de cours d'un autre utilisateur")
+    }
 }
+
 
 /**
  * Renomme une matière d'un élève avec le nouveau nom donné
@@ -182,26 +144,99 @@ const renameCoursClasse = (req, res) => {
     const ancienCours = req.body.oldcours;
     const matiere = req.body.matiere;
 
-    Classe.findOne({
-        attributes:['idclasse'],
-        where: { idclasse: id }
-    })
-        .then(classe => {
-            if (!classe) {
-                console.log("Utilisateur pas trouvé");
-                return res.status(404).send("Élève inexistant");
-            }
-            let path = "./Classe/classe" + id + "/depot/" + matiere + "/";
-
-            renameDoc(path, ancienCours, nouvCours, function (code) {
-                return res.status(code)
-            })
+    const role = req.role;
+    const emailToken = req.mail
+    // seule une classe peut renommer un dossier ici, celle à qui appartient les cours
+    if (role == "classe") {
+        Classe.findOne({
+            attributes: ['idclasse', 'courriel'],
+            where: { idclasse: id }
         })
-        .catch(err => {
-            console.log(err)
-            return res.send(err).status(520)
-        });
+            .then(classe => {
+                if (!classe) {
+                    console.log("Utilisateur pas trouvé");
+                    return res.status(404).send("Élève inexistant");
+                }
+                if (emailToken != classe.courriel) {
+                    return res.status(403).send("Tentative de renommage de cours d'un autre utilisateur")
+                }
+                let path = "./Classe/classe" + id + "/depot/" + matiere + "/";
+
+                renameDoc(path, ancienCours, nouvCours, function (code) {
+                    return res.status(code)
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                return res.send(err).status(520)
+            });
+    } else {
+        console.log('soit pas une classe, soit pas la bonne classe : accès interdit')
+        return res.status(403).send("Tentative de renommage de cours d'un autre utilisateur")
+    }
 }
+
+
+/**
+ * Renomme une matière d'une classe avec le nouveau nom donné
+ * @param {*} req la requête du client, doit contenir l'email de la classe, l'ancien nom de la matière et le nouveau nom.
+ * @param {*} res la réponse du serveur
+ */
+const renameMatiereClasse = (req, res) => {
+    console.log("\n*** Changement de nom de matière d'une classe ***")
+
+    const id = req.body.id;
+    const nouvMatiere = req.body.newmatiere;
+    const ancienneMatiere = req.body.oldmatiere;
+
+    const role = req.role;
+    const emailToken = req.mail
+    // seule une classe peut renommer un dossier ici, celle à qui appartient les cours
+    if (role == "classe") {
+        Classe.findOne({
+            attributes: ['idclasse', 'courriel'],
+            where: { idclasse: id }
+        })
+            .then(classe => {
+                if (!classe) {
+                    console.log("Utilisateur pas trouvé");
+                    return res.status(404).send("Classe inexistante");
+                }
+                if (emailToken != classe.courriel) {
+                    return res.status(403).send("Tentative de renommage de cours d'un autre utilisateur")
+                }
+                let path = "./Classes/classe" + id + "/depot/";
+                /* try {
+                     // on vérifie que l'ancien cours existe bien 
+                     if (fs.existsSync(path + ancienneMatiere)) {
+                         // s'il existe alors on peut le renommer
+                         fs.renameSync(path + ancienneMatiere, path + nouvMatiere);
+                         console.log("renommage de la matière " + ancienneMatiere + " en " + nouvMatiere + " effectuee")
+                         return res.status(201);
+                         // sinon le cours n'a pas été trouvé
+                     } else {
+                         console.log("Cours inexistant");
+                         return res.status(404).send("Pas de matière portant le nom " + ancienneMatiere + " trouvée.");
+                     }
+     
+                 } catch (err) {
+                     console.error(err)
+                     return res.status(520).send("Erreur lors de la vérification des dossiers")
+                 }*/
+                renameDoc(path, ancienneMatiere, nouvMatiere, function (code) {
+                    return res.status(code)
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                return res.send(err).status(520)
+            });
+    } else {
+        console.log('soit pas une classe, soit pas la bonne classe : accès interdit')
+        return res.status(403).send("Tentative de renommage de matiere d'un autre utilisateur")
+    }
+}
+
 
 /**
  * Fonction qui permet de renommer un document selon l'ancien et le nouveau nom donné.
@@ -230,6 +265,7 @@ function renameDoc(path, oldname, newname, callback) {
         return callback(520);
     }
 }
+
 
 module.exports = {
     renameCoursClasse,
