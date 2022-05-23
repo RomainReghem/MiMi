@@ -84,10 +84,8 @@ const Documents = () => {
 
     const deleteFile = async (f) => {
         try {
-            const response = await axios.delete(deleteFileURL, {
-                headers: { 'Content-Type': 'application/json' },
+            const response = await axiosPrivate.delete(deleteFileURL, {
                 data: { ...deleteParams, cours: f },
-                withCredentials: true
             });
             loadFiles()
             Notifs("Fichier supprimé !", "", "success")
