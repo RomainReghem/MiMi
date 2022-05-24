@@ -40,9 +40,9 @@ router.get('/refresh', refreshToken.refreshToken);
 //router.use(verifyJWT)
 
 // Pour changer le mot de passe 
-router.post('/changePwd', verifyJWT, Modification.ChangementMdp)
+//router.post('/changePwd', verifyJWT, Modification.ChangementMdp)
 // route pour changer le mail
-router.post('/changeMail', verifyJWT, Modification.ChangementMail)
+//router.post('/changeMail', verifyJWT, Modification.ChangementMail)
 
 // route qui permet de retourner un pseudo à partir du mail
 router.get('/pseudo', verifyJWT, Eleve.getUsernameStudent)
@@ -128,8 +128,8 @@ router.post('/changePwdClasse', ModificationClasse.changementMdpClasse)
 // route pour changer l'adresse mail de la classe
 router.post('/changeMailClasse', ModificationClasse.changementMailClasse)
 // route pour changer le mot de passe de l'élève
-router.post('/changePwdEleve', ModificationClasse.changementMdpClasse)
+router.post('/changePwdEleve', ModificationEleve.ChangementMdp)
 // route pour changer l'adresse mail de l'élève
-router.post('/changeMailEleve', ModificationClasse.changementMailClasse)
+router.post('/changeMailEleve', ModificationEleve.ChangementMail)
 
 module.exports = router;
