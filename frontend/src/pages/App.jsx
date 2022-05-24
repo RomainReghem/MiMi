@@ -24,6 +24,7 @@ import Tests from "./Tests"
 import Construction from "./Construction"
 import Settings from "./Settings";
 import Visio from "./Visio"
+import TicTacToe from "./TicTacToe";
 
 // Styles
 import '../styles/App.css'
@@ -64,7 +65,8 @@ export default function App() {
                 <Route path="/documents" element={<Documents />} />
                 <Route path="/visio" element={<Jitsi />} />
                 <Route path="/jeux" element={<Construction />} />
-                <Route path="/settings" element={<Settings/>}/>                
+                <Route path="/settings" element={<Settings/>}/>      
+                <Route path="/tictactoe" element={<TicTacToe/>}/>          
               </Route>
             </Route>
 
