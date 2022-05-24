@@ -3,6 +3,10 @@ const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
 const Modification = require('../controllers/modification.js')
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+let refreshTokens = require('./connexion').refreshTokens;
 
 
 /**

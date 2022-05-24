@@ -1,5 +1,14 @@
 const Modification = require('../controllers/modification.js')
 
+const Users = require('../models/users');
+const Eleve = Users.Eleve;
+const Classe = Users.Classe;
+
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+let refreshTokens = require('./connexion').refreshTokens;
+
 /**
  * Change la valeur d'invitation à en attente et l'id de classe à l'id de la classe dont on reçoit le mail
  * @param {*} req la requête du client

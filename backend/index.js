@@ -23,6 +23,7 @@ const db = mysql.createConnection({
    database: DB_DATABASE,
 })*/
 
+const http = require("http");
 
 const app = express();
 
@@ -47,7 +48,7 @@ app.use(express.json());
 
 app.use(session({
     // pour signer l'id du cookie
-    secret: 'T-4c3d-i*{pWF-Mb9-rK',
+    secret:process.env.SECRET,
     // ne force pas la sauvegarde de la session
     resave: false,
     // ne force pas la sauvegarde d'une session nouvelle mais non smodifiée  
@@ -58,6 +59,30 @@ app.use(cookieParser());
 
 app.use(router);
 
+const server = http.createServer(app);
+const io = require("socket.io")(server, { cors: { origin: "*" } });
+
+
+io.on("connection", (socket) => {
+  console.log("User Connected");
+
+  socket.on("joinRoom", (roomCode) => {
+    console.log(`A user joined the room ${roomCode}`);
+    socket.join(roomCode);
+  });
+
+  socket.on("play", ({ id, roomCode }) => {
+    console.log(`play at ${id} to ${roomCode}`);
+    socket.broadcast.to(roomCode).emit("updateGame", id);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User Disconnected");
+  });
+});
+server.listen(5000, () =>
+  console.log("server running => http://localhost:5000")
+);
 
 //db.sequelize.sync().then(() => {
 // adresse du serveur, pour faire des tests
