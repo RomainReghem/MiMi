@@ -59,7 +59,7 @@ app.use(cookieParser());
 
 app.use(router);
 
-const server = http.createServer(app);
+/*const server = http.createServer(app);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 
 
@@ -79,10 +79,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("User Disconnected");
   });
-});
-server.listen(5000, () =>
+});*/
+/*server.listen(5000, () =>
   console.log("server running => http://localhost:5000")
-);
+);*/
 
 //db.sequelize.sync().then(() => {
 // adresse du serveur, pour faire des tests
