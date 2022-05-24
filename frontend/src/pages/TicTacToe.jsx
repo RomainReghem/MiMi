@@ -28,6 +28,15 @@ const TicTacToe = () => {
         return () => socket.off("updateGame");
     });
 
+    useEffect(() => {
+        for(let i=0; i<=3; i+=3){
+            if(board[i] == "X" && board[i+1] == "X" && board[i+2] == "X"){
+                console.log("gagné ligne !")
+            }
+        }
+        
+    }, [board])
+
     const handleCellClick = (e) => {
         const id = e.currentTarget.id;
         if (canPlay && board[id] == "") {

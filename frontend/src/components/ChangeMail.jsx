@@ -4,7 +4,6 @@ import axios from '../api/axios';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Notifs from '../components/Notifs';
 
-const CHANGEMAIL_URL = '/changeMail';
 const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
 const LOGIN_URL = '/login';
@@ -15,6 +14,8 @@ const ChangeMail = () => {
     const { auth } = useAuth();
     const { setAuth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
+    const CHANGEMAIL_URL = auth?.role == "eleve" ? '/changeMailEleve' : "/changeMailClasse" ;
+
 
     
 

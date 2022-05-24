@@ -4,7 +4,6 @@ import axios from '../api/axios';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Notifs from '../components/Notifs';
 
-const CHANGEPWD_URL = '/changePwd';
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
 
@@ -12,6 +11,8 @@ const ChangePwd = () => {
 
     const { auth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
+    const CHANGEPWD_URL = auth?.role == "eleve" ? '/changePwdEleve' : "/changePwdClasse" ;
+
 
     const [mail, setMail] = useState(auth?.user);
 
