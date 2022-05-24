@@ -6,7 +6,7 @@ let refreshTokens = require('./connexion').refreshTokens;
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
  */
-const Deconnexion = (req, res) => {
+const Deconnexion = async(req, res) => {
     console.log("\n*** Déconnexion ***")
     const cookies = req.cookies;
     if (!cookies?.jwt) {
@@ -17,7 +17,7 @@ const Deconnexion = (req, res) => {
 
     const refreshToken = cookies.jwt;
     // retire de la liste des refresh token le refresh token
-    refreshTokens = refreshTokens.filter(
+    refreshTokens = await  refreshTokens.filter(
         (c) => c != refreshToken
     );
     console.log("Déconnexion effectuée !")

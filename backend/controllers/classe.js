@@ -24,10 +24,6 @@ const getAllStudents = (req, res) => {
             }
         }]
     }).then(eleves => {
-        for (e in eleves) {
-            console.log('élève ' + e.courriel)
-        }
-        // res.json({students:eleves})
         res.json({ eleves: eleves })
     })
         .catch(err => {

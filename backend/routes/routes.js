@@ -43,7 +43,6 @@ router.get('/refresh', refreshToken.refreshToken);
 router.post('/changePwd', verifyJWT, Modification.ChangementMdp)
 // route pour changer le mail
 router.post('/changeMail', verifyJWT, Modification.ChangementMail)
-//router.post('/changeMail', verifyJWT, Modification.ChangementMail)
 
 // route qui permet de retourner un pseudo à partir du mail
 router.get('/pseudo', verifyJWT, Eleve.getUsernameStudent)
@@ -123,5 +122,8 @@ router.put("coursEleve", ChangeDoc.renameMatiereClasse)*/
 // PAS IMPLEMENTE
 // route pour supprimer la classe
 // router.delete("/classe", Classe.deleteClass)
+/*Pas implemente
+router.put('/mdpEleve', ModificationClasse)
+router.put('/mailClasse', dg)*/
 
 module.exports = router;

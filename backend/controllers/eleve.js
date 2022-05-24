@@ -11,32 +11,41 @@ const { Classe } = require('../models/users');
  */
 const getUsernameStudent = (req, res) => {
     console.log("\n*** Récupération du pseudo ***")
-    const mail = req.query.mail
+    const email = req.query.mail
 
-    if (mail == undefined) {
-        console.log("pas de mail")
-        res.status(409).send("Pas de mail")
-    } else {
+    if (email == undefined) {
+        return res.status(404).send("Pas de mail")
+    }
+    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+        return res.status(400).send("Mail incorrect")
+    }
+
+    const role = req.role;
+    const emailToken = req.mail
+    // pas d'autre utilisateur que l'élève ne peut récupèrer son propre pseudo
+    if (role == "eleve" && emailToken == email) {
         Eleve.findOne({
             attributes: ['pseudo'],
             where: {
-                courriel: mail
+                courriel: email
             }
         }).then(eleve => {
             if (eleve) {
                 console.log('pseudo ' + eleve.pseudo)
-                res.json({ pseudo: eleve.pseudo })
-                //res.send(eleve.pseudo)
+                return res.json({ pseudo: eleve.pseudo })
             } else {
-                res.status(409).send("Aucun élève avec cette adresse")
+                return res.status(409).send("Aucun élève avec cette adresse")
             }
         })
             .catch(err => {
                 console.log(err)
                 return res.send(err).status(520)
             });
+    } else {
+        return res.send("Pas un élève / pas le bon élève").status(403)
     }
 }
+
 
 /**
  * Supprime l'élève en fonction de son mail.
@@ -58,44 +67,53 @@ const deleteStudent = async (req, res) => {
         console.log("forme mail incorrect")
         return res.status(407).send("Mail incorrect")
     }
-    // on cherche dans la bd l'eleve qui correspond au mail fourni
-    Eleve.findOne({
-        attributes: ['ideleve'],
-        where: { courriel: email }
-    })
-        .then(eleve => {
-            // si aucun élève n'a été trouvé
-            if (!eleve) {
-                return res.status(401).send("Pas d'élève trouvé avec cet adresse mail.");
-            }
-            // sinon on supprime l'élève
-            Eleve.destroy({
-                where: {
-                    ideleve: eleve.ideleve
+
+    const role = req.role;
+    const emailToken = req.mail
+    // pas d'autre utilisateur que l'élève ne peuvent se supprimer
+    if (role == "eleve" && emailToken == email) {
+        // on cherche dans la bd l'eleve qui correspond au mail fourni
+        Eleve.findOne({
+            attributes: ['ideleve'],
+            where: { courriel: email }
+        })
+            .then(eleve => {
+                // si aucun élève n'a été trouvé
+                if (!eleve) {
+                    return res.status(401).send("Pas d'élève trouvé avec cet adresse mail.");
                 }
-            }).then(result => {
-                // maintenant on doit supprimer les dossiers et les documents de l'élève
-                const num = eleve.ideleve;
-                const path = "./Eleves/eleve" + num
-                // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
-                fs.rmdir(path, { recursive: true }, (err) => {
-                    if (err) {
-                        console.log("erreur suppression dossiers : " + err)
-                        return res.status(500).send("Erreur lors de la suppression de documents.")
+                // sinon on supprime l'élève
+                Eleve.destroy({
+                    where: {
+                        ideleve: eleve.ideleve
                     }
-                    console.log("Suppression effectuée !")
-                    return res.send(result);
-                })
-            }).catch(err => {
+                }).then(result => {
+                    // maintenant on doit supprimer les dossiers et les documents de l'élève
+                    const num = eleve.ideleve;
+                    const path = "./Eleves/eleve" + num
+                    // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
+                    fs.rmdir(path, { recursive: true }, (err) => {
+                        if (err) {
+                            console.log("erreur suppression dossiers : " + err)
+                            return res.status(500).send("Erreur lors de la suppression de documents.")
+                        }
+                        console.log("Suppression effectuée !")
+                        return res.send(result);
+                    })
+                }).catch(err => {
+                    console.log(err)
+                    return res.send(err).status(520)
+                });
+            })
+            .catch(err => {
                 console.log(err)
                 return res.send(err).status(520)
             });
-        })
-        .catch(err => {
-            console.log(err)
-            return res.send(err).status(520)
-        });
+    } else {
+        return res.send("Pas un élève / pas le bon élève").status(403)
+    }
 }
+
 
 /**
  * Retourne l'invitation et l'id de la classe associée à l'invitation dans un format JSON
@@ -109,9 +127,10 @@ function getInvitation(emailEleve, cb) {
         return cb(407)
     }
 
-    Eleve.findOne({ 
-        attributes:['invitation','idclasse'],
-        where: { courriel: emailEleve } })
+    Eleve.findOne({
+        attributes: ['invitation', 'idclasse'],
+        where: { courriel: emailEleve }
+    })
         .then(eleve => {
             // si aucun élève n'a été trouvé
             if (!eleve) {
@@ -119,7 +138,7 @@ function getInvitation(emailEleve, cb) {
             }
             const invitation = eleve.invitation;
             if (invitation != "aucune") {
-                Classe.findOne({attributes:["idclasse"], where: { idclasse: eleve.idclasse } })
+                Classe.findOne({ attributes: ["idclasse"], where: { idclasse: eleve.idclasse } })
                     .then(classe => {
                         if (!classe) {
                             return cb(404);
@@ -128,7 +147,7 @@ function getInvitation(emailEleve, cb) {
                     })
                     .catch(err => {
                         console.log(err)
-                        return cb({erreur:err})
+                        return cb({ erreur: err })
                     });
             } else {
                 return cb({ invitation: invitation })
@@ -136,7 +155,7 @@ function getInvitation(emailEleve, cb) {
         })
         .catch(err => {
             console.log(err)
-            return cb({erreur:err})
+            return cb({ erreur: err })
         });
 }
 

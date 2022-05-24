@@ -3,7 +3,7 @@ const router = require('./routes/routes.js')
 
 const express = require('express');
 const fileupload = require("express-fileupload");
-//const session = require('express-session');
+const session = require('express-session');
 const cors = require("cors");
 const cookieParser = require("cookie-parser")
 //onst bodyParser = require("body-parser")
@@ -45,14 +45,14 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
 
-/*app.use(session({
+app.use(session({
     // pour signer l'id du cookie
     secret: 'T-4c3d-i*{pWF-Mb9-rK',
     // ne force pas la sauvegarde de la session
     resave: false,
     // ne force pas la sauvegarde d'une session nouvelle mais non smodifiée  
     saveUninitialized: false
-}));*/
+}));
 
 app.use(cookieParser());
 

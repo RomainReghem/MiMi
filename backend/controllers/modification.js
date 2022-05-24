@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 
 let refreshTokens = require('./connexion').refreshTokens;
 
+
 /**
  * Change dans la base de données le mot de passe de l'utilsateur donné.
  * 
@@ -15,25 +16,11 @@ let refreshTokens = require('./connexion').refreshTokens;
  */
 const ChangementMdp = (req, res) => {
     console.log("\n*** Changement de mot de passe ***")
-    let test = req.query.mail
     let email = req.body.mail;
     const mdp = req.body.pwd;
     const newMdp = req.body.newPwd;
 
-    /*if (email == "") {
-        console.log("MAIL VIDE")
-        const refreshTokenOld = req.cookies.jwt;
-
-        jwt.verify(
-            refreshTokenOld,
-            process.env.REFRESH_TOKEN_SECRET,
-            (err, decoded) => {
-                email = decoded.mail
-            }
-        )
-    }*/
-
-    console.log("mail " + email + " mdp " + mdp + " newMdp " + newMdp + " param " + test)
+    console.log("mail " + email + " mdp " + mdp + " newMdp " + newMdp)
     console.log("** Vérification mot de passe **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
@@ -59,21 +46,24 @@ const ChangementMdp = (req, res) => {
                             bcrypt.hash(newMdp, 10, (err, hash) => {
                                 if (err) {
                                     //erreur lors du hahage
-                                    res.sendStatus(300)
+                                    return res.sendStatus(300)
                                 }
                                 // on change le mdp
-                                const neweleve = Eleve.update(
-                                    {
-                                        motdepasse: hash,
-                                    },
-                                    {
-                                        where: { ideleve: eleve.ideleve },
+                                Eleve.update(
+                                    {motdepasse: hash},
+                                    {where: { ideleve: eleve.ideleve }}
+                                ).then(neweleve=>{
+                                    if(!neweleve){
+                                        return res.status(404).send("pas d'eleve changé")
                                     }
-                                );
-                                // si le mot de passe entré correspond bien au mot de passe dans la base de données
-                                res.send(neweleve)
+                                    // si le mot de passe entré correspond bien au mot de passe dans la base de données
+                                    res.send(neweleve)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    return res.send(err).status(520)
+                                });
                             });
-
                         } else {
                             console.log("Mauvais mot de passe ELEVE")
                             res.sendStatus(400)
@@ -114,6 +104,10 @@ const ChangementMdp = (req, res) => {
                                 }
                             });
                         })
+                        .catch(err => {
+                            console.log(err)
+                            return res.send(err).status(520)
+                        });
                 }
             });
     }
@@ -131,19 +125,6 @@ const ChangementMail = (req, res) => {
     const newEmail = req.body.newMail;
     const mdp = req.body.pwd;
     console.log("email " + email + " new " + newEmail + " mdp " + mdp)
-
-    /* if (email == "") {
-         console.log("MAIL VIDE")
-         const refreshTokenOld = req.cookies.jwt;
- 
-         jwt.verify(
-             refreshTokenOld,
-             process.env.REFRESH_TOKEN_SECRET,
-             (err, decoded) => {
-                 email = decoded.mail
-             }
-         )
-     }*/
 
     console.log("** Vérification mail **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
@@ -185,12 +166,8 @@ const ChangementMail = (req, res) => {
                                                     console.log("Bon mot de passe de l'élève")
                                                     // on change le mdp
                                                     Eleve.update(
-                                                        {
-                                                            courriel: newEmail,
-                                                        },
-                                                        {
-                                                            where: { ideleve: eleve.ideleve },
-                                                        }
+                                                        {courriel: newEmail},
+                                                        {where: { ideleve: eleve.ideleve }}
                                                     ).then(newEleve => {
                                                         if (newEleve) {
                                                             console.log("Changement de mail ok")
@@ -238,7 +215,7 @@ const ChangementMail = (req, res) => {
                                                                             res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                                                                             res.json({ accessToken: accessToken })
                                                                         } else {
-                                                                            res.sendStatus(403)
+                                                                            return res.sendStatus(403)
                                                                         }
 
                                                                     }
@@ -246,16 +223,16 @@ const ChangementMail = (req, res) => {
                                                             )
                                                             //res.sendStatus(201)
                                                         } else {
-                                                            res.status(600).send("non défini")
+                                                            return res.status(600).send("non défini")
                                                         }
 
                                                     }).catch(err => {
                                                         console.log(err)
-                                                        res.sendStatus(600)
+                                                        return res.sendStatus(600)
                                                     });
                                                 } else {
                                                     console.log("Mauvais mot de passe de l'eleve")
-                                                    res.sendStatus(400)
+                                                    return res.sendStatus(400)
                                                 }
                                             });
                                         }
