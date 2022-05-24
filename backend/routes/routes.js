@@ -124,12 +124,12 @@ router.put("coursEleve", ChangeDoc.renameMatiereClasse)*/
 // router.delete("/classe", Classe.deleteClass)
 
 // route pour changer le mot de passe de la classe
-router.post('/changePwdClasse', ModificationClasse.changementMdpClasse)
+router.post('/changePwdClasse',verifyJWT, ModificationClasse.changementMdpClasse)
 // route pour changer l'adresse mail de la classe
-router.post('/changeMailClasse', ModificationClasse.changementMailClasse)
+router.post('/changeMailClasse',verifyJWT, ModificationClasse.changementMailClasse)
 // route pour changer le mot de passe de l'élève
-router.post('/changePwdEleve', ModificationEleve.ChangementMdp)
+router.post('/changePwdEleve',verifyJWT, ModificationEleve.ChangementMdp)
 // route pour changer l'adresse mail de l'élève
-router.post('/changeMailEleve', ModificationEleve.ChangementMail)
+router.post('/changeMailEleve',verifyJWT, ModificationEleve.ChangementMail)
 
 module.exports = router;

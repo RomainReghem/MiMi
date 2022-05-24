@@ -7,6 +7,7 @@ const { getInvitation } = require('./eleve');
 const Modification = require('../controllers/modification.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { response } = require('express');
 
 let refreshTokens = require('./connexion').refreshTokens;
 
@@ -244,6 +245,7 @@ const ChangementMail = (req, res) => {
 
     const role = req.role;
     const emailToken = req.mail
+    console.log("emial "+email+ "token "+emailToken+"role"+role)
     // seul un élève peut changer son propre mail
     if (role == "eleve" && email == emailToken) {
         // on cherche un eleve qui a le mail donné
@@ -320,14 +322,15 @@ const ChangementMail = (req, res) => {
                                                                     // on insère dans la liste le nouveau refreshtoken
                                                                     refreshTokens.push(refreshToken);
 
-                                                                    getInvitation(eleve.courriel, function (reponse) {
+                                                                    getInvitation(newEmail, function (reponse) {
                                                                         if (reponse == 404 || reponse == 407) {
                                                                             return res.sendStatus(reponse)
                                                                         } else {
+                                                                            console.log("changement de mail ok")
                                                                             let json = reponse
                                                                             res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                                                                             json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
-                                                                            res.status(200).json(json)
+                                                                            return res.status(201).json(json)
                                                                         }
                                                                     })
                                                                 } else {
@@ -360,7 +363,7 @@ const ChangementMail = (req, res) => {
                     });
             });
     } else {
-        return res.status(403).send("Accès interdit : tentative de changement de mail de classe !")
+        return res.status(403).send("Accès interdit : tentative de changement de mail de l'eleve !")
     }
 }
 
