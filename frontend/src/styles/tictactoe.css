@@ -1,4 +1,4 @@
-tictactoe {
+.tictactoe {
     flex: 1;
     display: grid;
     place-content: center;
@@ -10,4 +10,12 @@ tictactoe {
     grid-template-rows: repeat(3, 1fr);
     background-color: var(--secondary-color);
     gap: 0.5rem;
+}
+
+.waitingRoom{
+    display: flex;
+    flex:1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }

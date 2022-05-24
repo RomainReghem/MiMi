@@ -55,6 +55,7 @@ export default function App() {
             <Route path="/choice" element={<Choice />} />
             <Route path="/tests" element={<Tests />} />
             <Route path="/success" element={<Success />} />
+                <Route path="/tictactoe" element={<TicTacToe/>}/>          
 
 
 
@@ -66,7 +67,6 @@ export default function App() {
                 <Route path="/visio" element={<Jitsi />} />
                 <Route path="/jeux" element={<Construction />} />
                 <Route path="/settings" element={<Settings/>}/>      
-                <Route path="/tictactoe" element={<TicTacToe/>}/>          
               </Route>
             </Route>
 
