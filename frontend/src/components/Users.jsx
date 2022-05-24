@@ -51,7 +51,7 @@ const Users = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("/inviteEleve", JSON.stringify({ classe:auth?.user, eleve:newEleve }),
+            await axiosPrivate.post("/inviteEleve", JSON.stringify({ classe:auth?.user, eleve:newEleve }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
             Notifs("Eleve invité", "", "success");
         }
@@ -70,7 +70,7 @@ const Users = () => {
 
     const deleteEleve = async (eleveToDelete) => {
         try {
-            await axios.post("/deleteEleve", JSON.stringify({ classe:auth?.user, eleve:eleveToDelete }),
+            await axiosPrivate.post("/deleteEleve", JSON.stringify({ classe:auth?.user, eleve:eleveToDelete }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
             Notifs("Eleve supprimé", "", "success");
         }
