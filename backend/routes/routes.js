@@ -122,8 +122,14 @@ router.put("coursEleve", ChangeDoc.renameMatiereClasse)*/
 // PAS IMPLEMENTE
 // route pour supprimer la classe
 // router.delete("/classe", Classe.deleteClass)
-/*Pas implemente
-router.put('/mdpEleve', ModificationClasse)
-router.put('/mailClasse', dg)*/
+
+// route pour changer le mot de passe de la classe
+router.post('/changePwdClasse', ModificationClasse.changementMdpClasse)
+// route pour changer l'adresse mail de la classe
+router.post('/changeMailClasse', ModificationClasse.changementMailClasse)
+// route pour changer le mot de passe de l'élève
+router.post('/changePwdEleve', ModificationClasse.changementMdpClasse)
+// route pour changer l'adresse mail de l'élève
+router.post('/changeMailEleve', ModificationClasse.changementMailClasse)
 
 module.exports = router;

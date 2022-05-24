@@ -2,12 +2,13 @@ const Users = require('../models/users');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
+const { getInvitation } = require('./eleve');
+
 const Modification = require('../controllers/modification.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 let refreshTokens = require('./connexion').refreshTokens;
-
 
 /**
  * Change le pseudo de l'élève dans la base de données.
@@ -176,7 +177,7 @@ const ChangementMdp = (req, res) => {
     // seul une classe peut changer son propre mot de passe
     if (role == "eleve" && email == emailToken) {
         // on cherche un eleve qui a le mail donné
-        Eleve.findOne({attributes:['ideleve', 'motdepasse'], where: { courriel: email } })
+        Eleve.findOne({ attributes: ['ideleve', 'motdepasse'], where: { courriel: email } })
             .then(eleve => {
                 if (!eleve) {
                     return res.status(404).send("Aucun compte correspondant à cet adresse.")
@@ -246,21 +247,21 @@ const ChangementMail = (req, res) => {
     // seul un élève peut changer son propre mail
     if (role == "eleve" && email == emailToken) {
         // on cherche un eleve qui a le mail donné
-        Eleve.findOne({attributes:['ideleve', 'motdepasse'],  where: { courriel: email } })
+        Eleve.findOne({ attributes: ['ideleve', 'motdepasse'], where: { courriel: email } })
             .then(eleve => {
                 // un eleve est bien associé à l'ancien mail
                 if (!eleve) {
                     return res.status(404).send("Aucun compte correspondant à cet adresse.")
                 }
                 // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
-                Eleve.findOne({attributes:['ideleve'], where: { courriel: newEmail } })
+                Eleve.findOne({ attributes: ['ideleve'], where: { courriel: newEmail } })
                     .then(eleve2 => {
                         if (eleve2) {
                             console.log("Mail pas unique");
                             return res.sendStatus(409)
                         }
                         // console.log("mail unique pour eleves");
-                        Classe.findOne({attributes:['idclasse'], where: { courriel: newEmail } })
+                        Classe.findOne({ attributes: ['idclasse'], where: { courriel: newEmail } })
                             .then(classe => {
                                 if (classe) {
                                     console.log("Mail existant pour la classe");
@@ -318,8 +319,17 @@ const ChangementMail = (req, res) => {
                                                                     )
                                                                     // on insère dans la liste le nouveau refreshtoken
                                                                     refreshTokens.push(refreshToken);
-                                                                    res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                                    res.json({ accessToken: accessToken })
+
+                                                                    getInvitation(eleve.courriel, function (reponse) {
+                                                                        if (reponse == 404 || reponse == 407) {
+                                                                            return res.sendStatus(reponse)
+                                                                        } else {
+                                                                            let json = reponse
+                                                                            res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                                            json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
+                                                                            res.status(200).json(json)
+                                                                        }
+                                                                    })
                                                                 } else {
                                                                     return res.sendStatus(403)
                                                                 }
@@ -327,7 +337,6 @@ const ChangementMail = (req, res) => {
                                                             }
                                                         }
                                                     )
-                                                    //res.sendStatus(201)
                                                 } else {
                                                     return res.status(600).send("non défini")
                                                 }
@@ -356,4 +365,4 @@ const ChangementMail = (req, res) => {
 }
 
 
-module.exports = { ChangementPseudo, SuppressionClasse, AcceptationInvitation }
+module.exports = { ChangementPseudo, SuppressionClasse, AcceptationInvitation, ChangementMail, ChangementMdp }

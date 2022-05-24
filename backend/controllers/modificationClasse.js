@@ -162,26 +162,25 @@ const changementMailClasse = (req, res) => {
     // seul une classe peut changer son propre mail
     if (role == "classe" && email == emailToken) {
         // on cherche si il existe une classe correspondante à l'aide de l'ancien mail
-        Classe.findOne({ where: { courriel: email } })
+        Classe.findOne({attributes: ['idclasse', 'motdepasse'], where: { courriel: email } })
             .then(classe => {
                 // s'il n'y aucune classe  qui a été trouvée alors aucun compte ne correspond à ce mail
                 if (!classe) {
                     return res.status(404).send("Aucun compte correspondant à cet adresse.")
                 }
                 // On vérifie que dans la table classe aucune classe ne possède déjà la nouvelle adresse mail
-                Classe.findOne({ attributes:['idclasse'],where: { courriel: newEmail } })
+                Classe.findOne({ attributes: ['idclasse'], where: { courriel: newEmail } })
                     .then(classe2 => {
                         if (classe2) {
                             console.log("Mail existant pour la classe");
                             return res.status(409).send('Adresse déjà utilisée par un compte classe')
                         }
                         // on vérifie que l'adresse mail n'est aussi pas déjà prise par un élève
-                        Eleve.findOne({attributes:['ideleve'], where: { courriel: newEmail } })
+                        Eleve.findOne({ attributes: ['ideleve'], where: { courriel: newEmail } })
                             .then(async eleve => {
                                 // si on trouve un eleve, c'est qu'il est enregistré avec le nouveau mail
                                 if (eleve) {
                                     console.log("Mail existant pour un eleve");
-                                    // res.sendStatus(411)
                                     return res.status(411).send('Adresse déjà utilisée par un élève')
                                 }
                                 // comparaion du mdp avec celui connu
@@ -238,7 +237,7 @@ const changementMailClasse = (req, res) => {
                                                                 // on insère dans la liste le nouveau refreshtoken
                                                                 refreshTokens.push(refreshToken);
                                                                 res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                                res.json({ accessToken: accessToken })
+                                                                res.json({ role: "classe", accessToken: accessToken, idclasse:classe.idclasse })
                                                             } else {
                                                                 return res.sendStatus(403)
                                                             }
@@ -265,4 +264,4 @@ const changementMailClasse = (req, res) => {
 }
 
 
-module.exports = { ajoutInvitation, suppressionEleve }
+module.exports = { ajoutInvitation, suppressionEleve, changementMailClasse, changementMdpClasse }

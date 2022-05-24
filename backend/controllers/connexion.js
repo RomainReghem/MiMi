@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken")
 
 const Users = require('../models/users');
 const { getInvitation } = require('./eleve');
-const { response } = require('express');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
