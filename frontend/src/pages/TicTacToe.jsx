@@ -12,7 +12,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { faCircle } from "@fortawesome/free-regular-svg-icons"
+import { faCircle } from "@fortawesome/free-regular-svg-icons";
+import {faDiceThree} from "@fortawesome/free-solid-svg-icons";
 
 const socket = io.connect("http://localhost:5000");
 
@@ -119,7 +120,7 @@ const TicTacToe = () => {
                         <Cell handleCellClick={handleCellClick} id={"8"} text={UIboard[8]} />
                     </section>
                     {canPlay ? (<Button style={{ marginTop: "0.5rem" }} variant="contained" color="success">
-                        A ton tour de jouer !
+                        <FontAwesomeIcon className="dice" icon={faDiceThree} style={{ marginRight: "0.5rem" }}/> A ton tour de jouer !
                     </Button>) : (<Button style={{ marginTop: "0.5rem" }} variant="outlined" color="error">
                         <CircularProgress style={{ marginRight: "0.5rem" }} size={10} color="error" />
                         Tour de l'adversaire...
