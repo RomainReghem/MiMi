@@ -56,7 +56,6 @@ io.on("connection", (socket) => {
 
     // Lines victory conditions
     for (let i = 0; i <= 6; i += 3) {
-      console.log(i)
       if (board[i] == "X" && board[i + 1] == "X" && board[i + 2] == "X") {
         io.in(roomCode).emit("victory", rooms.get(roomCode).player1);
         io.in(roomCode).socketsLeave(roomCode);
@@ -67,7 +66,6 @@ io.on("connection", (socket) => {
 
       }
     }
-
     // Column victory conditions
     for (let i = 0; i <= 3; i += 1) {
       if (board[i] == "X" && board[i + 3] == "X" && board[i + 6] == "X") {
@@ -80,7 +78,6 @@ io.on("connection", (socket) => {
 
       }
     }
-
     // Diagonals victory conditions
     if ((board[0] == "X" && board[4] == "X" && board[8] == "X") || (board[2] == "X" && board[4] == "X" && board[6] == "X")) {
       io.in(roomCode).emit("victory", rooms.get(roomCode).player1);
@@ -90,6 +87,13 @@ io.on("connection", (socket) => {
       io.in(roomCode).emit("victory", rooms.get(roomCode).player2);
       io.in(roomCode).socketsLeave(roomCode);
     }
+
+    // If no more spaces to play on the board, then stops the game. They both lose (victory without a winner parameter)
+    if(!board.includes("")){
+      io.in(roomCode).emit("victory");
+      io.in(roomCode).socketsLeave(roomCode);
+    }
+
   }
 
   socket.on("disconnect", () => {
