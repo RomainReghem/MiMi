@@ -53,7 +53,8 @@ const ChangeMail = () => {
             const response = await axiosPrivate.post(CHANGEMAIL_URL,
                 JSON.stringify({ mail, newMail, pwd }),
                 {
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials:true
                 }
             );            
             setMail(newMail);

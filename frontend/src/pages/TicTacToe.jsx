@@ -136,7 +136,7 @@ const TicTacToe = () => {
                                 <Button variant="outlined" color="error">Quitter</Button>
                             </Link>
                         </DialogActions>
-                    </Dialog> : console.log("partie en cours")}
+                    </Dialog> : <></>}
                 </div>
 
 

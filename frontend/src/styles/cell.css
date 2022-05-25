@@ -7,6 +7,7 @@
   font-size: 4rem;
   display: grid;
   place-content: center;
+  transition: transform 200ms;
   /*border: 5px solid #026773;*/
 
 }
