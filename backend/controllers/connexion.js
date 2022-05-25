@@ -8,10 +8,9 @@ const Users = require('../models/users');
 const { getInvitation } = require('./eleve');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
+const Refresh = Users.RefreshToken;
 
 require('dotenv').config()
-
-let refreshTokens = [];
 
 /**
  * Permet de valider ou non la connexion d'un utilisateur (élève ou classe.)
@@ -30,7 +29,7 @@ const Connexion = (req, res) => {
         res.sendStatus(402)
     }
     Eleve.findOne({
-        attributes:['motdepasse', 'courriel'],
+        attributes: ['motdepasse', 'courriel'],
         where:
             { courriel: pseudo }
     })
@@ -51,19 +50,26 @@ const Connexion = (req, res) => {
                             process.env.REFRESH_TOKEN_SECRET,
                             { expiresIn: '1d' }
                         )
-                        refreshTokens.push(refreshToken);
-                        //console.log("refresh token connexion " + refreshToken)
-                        console.log("** Connexion de l'élève effectuée **")
-                        getInvitation(eleve.courriel, function (reponse) {
-                            if (reponse == 404 || reponse == 407) {
-                                return res.sendStatus(reponse)
-                            } else {
-                                let json = reponse
-                                res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
-                                res.status(200).json(json)
-                            }
+                        Refresh.create({
+                            token: refreshToken
+                        }).then(token => {
+                            //console.log("refresh token connexion " + refreshToken)
+                            console.log("** Connexion de l'élève effectuée **")
+                            getInvitation(eleve.courriel, function (reponse) {
+                                if (reponse == 404 || reponse == 407) {
+                                    return res.sendStatus(reponse)
+                                } else {
+                                    let json = reponse
+                                    res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                    json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
+                                    res.status(200).json(json)
+                                }
+                            })
                         })
+                            .catch(err => {
+                                console.log(err);
+                                res.sendStatus(520)
+                            })
                     } else {
                         console.log("Mauvais mot de passe ELEVE")
                         // sinon, si ce n'est pas le bon mdp mais le bon pseudo
@@ -72,7 +78,9 @@ const Connexion = (req, res) => {
                 });
             } else if (pseudo.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) {
                 Classe.findOne({
-                    where: { courriel: pseudo } })
+                    attributes: ['courriel', 'motdepasse', 'idclasse'],
+                    where: { courriel: pseudo }
+                })
                     .then(classe => {
                         if (classe) {
                             bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {
@@ -94,14 +102,19 @@ const Connexion = (req, res) => {
                                         process.env.REFRESH_TOKEN_SECRET,
                                         { expiresIn: '1d' }
                                     )
-                                    refreshTokens.push(refreshToken);
                                     //console.log("refresh token connexion " + refreshToken)
-
-                                    res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                    res.status(201).json({ role: "classe", accessToken: accessToken, idclasse:classe.idclasse })
-                                    console.log("CONNEXION de la classe OK")
-                                    // si le mot de passe entré correspond bien au mot de passe dans la base de données
-                                    //res.send(classe)
+                                    Refresh.create({
+                                        token: refreshToken
+                                    }).then(() => {
+                                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                        res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
+                                        console.log("CONNEXION de la classe OK")
+                                        // si le mot de passe entré correspond bien au mot de passe dans la base de données
+                                        //res.send(classe)
+                                    }).catch(err => {
+                                            console.log(err);
+                                            res.sendStatus(520)
+                                        })
                                 } else {
                                     console.log("Mauvais mot de passe CLASSE")
                                     // si ce n'est pas le bon mdp mais le bon pseudo
@@ -123,10 +136,10 @@ const Connexion = (req, res) => {
             }
         })
         .catch(err => {
-           // console.log(err);
-           console.log("Erreur : délai d'attente dépassé")
+            // console.log(err);
+            console.log("Erreur : délai d'attente dépassé")
             res.sendStatus(504)
         })
 }
 
-module.exports = { refreshTokens, Connexion };
+module.exports = { Connexion };
