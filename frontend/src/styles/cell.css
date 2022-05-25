@@ -1,16 +1,19 @@
 .cell {
     height: 150px;
     width: 150px;
-    background: var(--primary-color);
-    color: var(--secondary-color);
+    background: #F2E3D5;
+    color: #026773;
     font-size: 4rem;
     display: grid;
     place-content: center;
-    border: 1px solid black;
-  }
+    border: 5px solid #026773;
+
+}
   
   .cell:hover {
     cursor: pointer;
+    transform: scale(1.01);
+    transition:transform 300ms;
   }
   
   @media (max-width: 700px) {

@@ -9,7 +9,7 @@
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     background-color: var(--secondary-color);
-    gap: 0.5rem;
+    gap:0.5rem;
 }
 
 .waitingRoom{
