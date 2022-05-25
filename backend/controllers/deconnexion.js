@@ -1,4 +1,4 @@
-let refreshTokens = require('./connexion').refreshTokens;
+const Refresh = require('../models/users').RefreshToken;
 
 /**
  * Permet de déconnecter un utilisateur en supprimant ses tokens.
@@ -16,14 +16,19 @@ const Deconnexion = async(req, res) => {
     }
 
     const refreshToken = cookies.jwt;
-    // retire de la liste des refresh token le refresh token
-    refreshTokens = await  refreshTokens.filter(
-        (c) => c != refreshToken
-    );
-    console.log("Déconnexion effectuée !")
-    // On vide le cache des cookies
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
-    res.sendStatus(204);
+   
+    // supprime de la db le refreshtoken 
+    Refresh.destroy({where:{token:refreshToken}})
+    .then(()=>{
+        console.log("Déconnexion effectuée !")
+        // On vide le cache des cookies
+        res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+        res.sendStatus(204);
+    }).catch(err=>{
+        console.log("erreur lors de la deconnexion")
+        return res.send(err).status(520)
+    })
+  
 }
 
 module.exports = Deconnexion

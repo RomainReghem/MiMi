@@ -63,14 +63,40 @@ const Score = db.define('score',
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
-    }
+    }//,
+   /* jeu : {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    score:{
+        type: Sequelize.STRING,
+        allowNull: true,
+    },
+    ideleve:{
+        type: Sequelize.INTEGER,
+        references: 'classe', 
+        referencesKey:'idclasse'
+    }*/
 }, {timestamps: false, freezeTableName: true, tableName:'score'})
+
+const RefreshToken = db.define('refreshToken', {
+    idtoken: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true,
+    },
+    token: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    }
+}, {timestamps: false, freezeTableName: true, tableName:'refreshToken'});
 
 //relations
 // un eleve a une classe, une classe a un ou plusieurs élèves
 Classe.hasMany(Eleve,{foreignKey: 'idclasse'})
 Eleve.belongsTo(Classe,{foreignKey:'idclasse'})
-// Eleve.hasOne(Score,{as:'score'})
-//Score.belongsTo(Eleve, {as:"eleves"})
+// Eleve.hasMany(Score,{foreignKey:'ideleve'})
+//Score.belongsTo(Eleve,{foreignKey:'ideleve'})
 
-module.exports= {Eleve, Classe};
+module.exports= {Eleve, Classe, RefreshToken};

@@ -75,14 +75,14 @@ const InscriptionEleve = (req, res) => {
         }
 
         // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
-        Eleve.findOne({ where: { courriel: email } })
-            .then(eleve => {
-                if (eleve) {
+        Eleve.findOne({attributes:['ideleve'], where: { courriel: email } })
+            .then(searchEleve => {
+                if (searchEleve) {
                     console.log("Mail pas unique");
                     return res.sendStatus(409)
                 } else {
                     console.log("mail unique pour eleves");
-                    Classe.findOne({ where: { courriel: email } })
+                    Classe.findOne({attributes:['idclasse'], where: { courriel: email } })
                         .then(classe => {
                             if (classe) {
                                 console.log("Mail existant pour la classe");
@@ -90,7 +90,7 @@ const InscriptionEleve = (req, res) => {
                             } else {
                                 console.log("inscription ok")
                                 console.log("mdp" + hash)
-                                const neweleve = Eleve.create(({
+                                Eleve.create(({
                                     pseudo: pseudo,
                                     courriel: email,
                                     motdepasse: hash,
@@ -149,8 +149,7 @@ const InscriptionEleve = (req, res) => {
                                         console.log("erreur inscription eleve : " + err)
                                     })
                             }
-                        }
-                        )
+                        })
                         .catch(err => {
                             console.log(err)
                             return res.send(err).status(520)
@@ -180,8 +179,6 @@ const InscriptionClasse = (req, res) => {
     const email = req.body.mail;
     const mdp = req.body.pwd;
 
-    //console.log(email + mdp)
-
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
         return res.sendStatus(406)
@@ -198,13 +195,13 @@ const InscriptionClasse = (req, res) => {
     // La base de données a déjà des contraintes mais il faut éviter d'insérer et de causer une erreur SQL
 
     // On vérifie que dans la table classe aucun classe ne possède déjà cet email
-    Classe.findOne({ where: { courriel: email } })
-        .then(classe => {
-            if (classe) {
+    Classe.findOne({attributes:['idclasse'], where: { courriel: email } })
+        .then(searchClass => {
+            if (searchClass) {
                 console.log("Mail existant pour la classe");
                 return res.sendStatus(409)
             } else {
-                Eleve.findOne({ where: { courriel: email } })
+                Eleve.findOne({attributes:['ideleve'], where: { courriel: email } })
                     .then(eleve => {
                         if (eleve) {
                             console.log("Mail existant pour un eleve");

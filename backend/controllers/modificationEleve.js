@@ -1,15 +1,13 @@
 const Users = require('../models/users');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
+const Refresh = Users.RefreshToken;
 
 const { getInvitation } = require('./eleve');
 
 const Modification = require('../controllers/modification.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { response } = require('express');
-
-let refreshTokens = require('./connexion').refreshTokens;
 
 /**
  * Change le pseudo de l'élève dans la base de données.
@@ -245,7 +243,7 @@ const ChangementMail = (req, res) => {
 
     const role = req.role;
     const emailToken = req.mail
-    console.log("emial "+email+ "token "+emailToken+"role"+role)
+    console.log("emial " + email + "token " + emailToken + "role" + role)
     // seul un élève peut changer son propre mail
     if (role == "eleve" && email == emailToken) {
         // on cherche un eleve qui a le mail donné
@@ -273,76 +271,127 @@ const ChangementMail = (req, res) => {
                                     bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                                         if (estValide) {
                                             console.log("Bon mot de passe de l'élève")
-                                            // on change le mdp
+                                            /*
+                                                                                        // Comme on a changé l'adresse mail, on doit aussi changer les tokens
+                                                                                        const cookies = req.cookies;
+                                                                                        //console.log("refresh cookies" + cookies.jwt);
+                                                                                        if (!cookies?.jwt) {
+                                                                                            console.log("accès refusé")
+                                                                                            // 401 : authentification raté
+                                                                                            return res.status(401).send("Accès refusé : authentification requise")
+                                                                                        }
+                                                                                        const refreshTokenOld = cookies.jwt;
+                                                                                        if (!refreshTokens.includes(refreshTokenOld)) {
+                                                                                            //token invalide 
+                                                                                            for (r in refreshTokens){
+                                                                                                console.log("--- "+r)
+                                                                                            }
+                                                                                            console.log('token actuel : '+refreshTokenOld)
+                                                                                            console.log("token introuvable")
+                                                                                            return res.status(403).send("Accès interdit : autorisation nécessaire")
+                                                                                        }
+                                                                                        // on retire l'ancien refreshtoken de la liste
+                                                                                        refreshTokens = refreshTokens.filter((c) => c != refreshTokenOld)
+                                                                                        // on crée de nouveaux token 
+                                                                                        console.log("*** Recréation des cookies pour l'élève ***")
+                                                                                        // cookie 
+                                                                                        const accessToken = jwt.sign(
+                                                                                            { "UserInfo": { "mail": newEmail, "role": "eleve" } },
+                                                                                            process.env.ACCESS_TOKEN_SECRET,
+                                                                                            { expiresIn: '10m' }
+                                                                                        );
+                                                                                        const refreshToken = jwt.sign(
+                                                                                            { "mail": newEmail, "role": "eleve" },
+                                                                                            process.env.REFRESH_TOKEN_SECRET,
+                                                                                            { expiresIn: '1d' }
+                                                                                        )
+                                                                                        // on insère dans la liste le nouveau refreshtoken
+                                                                                        refreshTokens.push(refreshToken);
+                                            
+                                                                                        // on change le mail
+                                                                                        Eleve.update(
+                                                                                            { courriel: newEmail },
+                                                                                            { where: { ideleve: eleve.ideleve } }
+                                                                                        ).then(newEleve => {
+                                                                                            if (newEleve) {
+                                                                                                console.log("Changement de mail ok")
+                                            
+                                                                                                getInvitation(newEmail, function (reponse) {
+                                                                                                    if (reponse == 404 || reponse == 407) {
+                                                                                                        return res.sendStatus(reponse)
+                                                                                                    } else {
+                                                                                                        console.log("changement de mail ok")
+                                                                                                        let json = reponse
+                                                                                                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                                                                        json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
+                                                                                                        return res.status(201).json(json)
+                                                                                                    }
+                                                                                                })
+                                            
+                                                                                            } else {
+                                                                                                return res.status(600).send("non défini")
+                                                                                            }*/
                                             Eleve.update(
                                                 { courriel: newEmail },
                                                 { where: { ideleve: eleve.ideleve } }
                                             ).then(newEleve => {
-                                                if (newEleve) {
-                                                    console.log("Changement de mail ok")
-                                                    // Comme on a changé l'adresse mail, on doit aussi changer les tokens
-                                                    const cookies = req.cookies;
-                                                    //console.log("refresh cookies" + cookies.jwt);
-                                                    if (!cookies?.jwt) {
-                                                        console.log("accès refusé")
-                                                        // 401 : authentification raté
-                                                        return res.status(401).send("Accès refusé : authentification requise")
-                                                    }
-                                                    const refreshTokenOld = cookies.jwt;
-                                                    if (!refreshTokens.includes(refreshTokenOld)) {
-                                                        //token invalide 
-                                                        return res.status(403).send("Accès interdit : autorisation nécessaire")
-                                                    }
-                                                    jwt.verify(
-                                                        refreshTokenOld,
-                                                        process.env.REFRESH_TOKEN_SECRET,
-                                                        (err, decoded) => {
-                                                            if (err) {
-                                                                //refreshTokens = refreshTokens.filter((c) => c != refreshToken)
-                                                                console.log(err);
-                                                                // accès interdit
-                                                                return res.sendStatus(403);
-                                                            } else {
-                                                                if (decoded.mail == email) {
-                                                                    // on retire l'ancien refreshtoken de la liste
-                                                                    refreshTokens = refreshTokens.filter((c) => c != refreshTokenOld)
-                                                                    // on crée de nouveaux token 
-                                                                    console.log("*** Recréation des cookies pour l'élève ***")
-                                                                    // cookie 
-                                                                    const accessToken = jwt.sign(
-                                                                        { "UserInfo": { "mail": newEmail, "role": "eleve" } },
-                                                                        process.env.ACCESS_TOKEN_SECRET,
-                                                                        { expiresIn: '10m' }
-                                                                    );
-                                                                    const refreshToken = jwt.sign(
-                                                                        { "mail": newEmail, "role": "eleve" },
-                                                                        process.env.REFRESH_TOKEN_SECRET,
-                                                                        { expiresIn: '1d' }
-                                                                    )
-                                                                    // on insère dans la liste le nouveau refreshtoken
-                                                                    refreshTokens.push(refreshToken);
-
-                                                                    getInvitation(newEmail, function (reponse) {
-                                                                        if (reponse == 404 || reponse == 407) {
-                                                                            return res.sendStatus(reponse)
-                                                                        } else {
-                                                                            console.log("changement de mail ok")
-                                                                            let json = reponse
-                                                                            res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                                            json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
-                                                                            return res.status(201).json(json)
-                                                                        }
-                                                                    })
-                                                                } else {
-                                                                    return res.sendStatus(403)
-                                                                }
-
-                                                            }
-                                                        }
-                                                    )
-                                                } else {
+                                                if (!newEleve) {
                                                     return res.status(600).send("non défini")
                                                 }
+                                                console.log("Changement de mail ok")
+                                                // Comme on a changé l'adresse mail, on doit aussi changer les tokens
+                                                const cookies = req.cookies;
+                                                //console.log("refresh cookies" + cookies.jwt);
+                                                if (!cookies?.jwt) {
+                                                    console.log("accès refusé")
+                                                    // 401 : authentification raté
+                                                    return res.status(401).send("Accès refusé : authentification requise")
+                                                }
+                                                const refreshTokenOld = cookies.jwt;
+                                        
+                                                //refreshTokens = refreshTokens.filter((c) => c != refreshTokenOld)
+                                                Refresh.findOne({attributes:['idtoken'], where: { token: refreshTokenOld } })
+                                                    .then(token => {
+                                                        if (!token) {
+                                                            console.log("pas de token trouvé : accès interdit")
+                                                            return res.status(403)
+                                                        }
+                                                        // on crée de nouveaux token 
+                                                        console.log("*** Recréation des cookies pour l'élève ***")
+                                                        // cookie 
+                                                        const accessToken = jwt.sign(
+                                                            { "UserInfo": { "mail": newEmail, "role": "eleve" } },
+                                                            process.env.ACCESS_TOKEN_SECRET,
+                                                            { expiresIn: '10m' }
+                                                        );
+                                                        const refreshToken = jwt.sign(
+                                                            { "mail": newEmail, "role": "eleve" },
+                                                            process.env.REFRESH_TOKEN_SECRET,
+                                                            { expiresIn: '1d' }
+                                                        )
+                                                        // on insère dans la liste le nouveau refreshtoken
+                                                        // refreshTokens.push(refreshToken);
+                                                        Refresh.update({ token: refreshToken }, { where: { idtoken: token.idtoken } })
+                                                            .then(() => {
+                                                                getInvitation(newEmail, function (reponse) {
+                                                                    if (reponse == 404 || reponse == 407) {
+                                                                        return res.sendStatus(reponse)
+                                                                    } else {
+                                                                        console.log("changement de mail ok")
+                                                                        let json = reponse
+                                                                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                                        json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
+                                                                        return res.status(201).json(json)
+                                                                    }
+                                                                })
+                                                            }).catch(err => {
+                                                                console.log(err)
+                                                                return res.sendStatus(600)
+                                                            });
+                                                    }).catch(err => {
+                                                        console.log(err)
+                                                        return res.sendStatus(600)
+                                                    });
 
                                             }).catch(err => {
                                                 console.log(err)

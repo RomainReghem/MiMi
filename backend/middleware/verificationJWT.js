@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const verifyJWT = (req, res, next) => {
     console.log("\n*** Vérification du token (accessToken) ***")
-   /* console.log(req.accessToken+" cookie "+req.cookie+" autre tesr"+req.header.auth)*/
+    /* console.log(req.accessToken+" cookie "+req.cookie+" autre tesr"+req.header.auth)*/
     const authHeader = req.headers.authorization || req.headers.Authorization;
     // si l'utilisateur n'est pas autorisé
     if (!authHeader) {
@@ -26,10 +26,10 @@ const verifyJWT = (req, res, next) => {
             console.log("decoded mail " + decoded.UserInfo.mail)
             console.log("decoded role " + decoded.UserInfo.role)
 
-           req.mail = decoded.UserInfo.mail;
-        req.role = decoded.UserInfo.role;
-            
-            if(req.role!="eleve" && req.role !="classe"){
+            req.mail = decoded.UserInfo.mail;
+            req.role = decoded.UserInfo.role;
+
+            if (req.role != "eleve" && req.role != "classe") {
                 console.log("role pas bon")
                 return res.status(409)
             }
