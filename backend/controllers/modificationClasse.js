@@ -196,55 +196,70 @@ const changementMailClasse = (req, res) => {
                                 bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {
                                     if (estValide) {
                                         console.log("Bon mot de passe de la classe")
+                                        // console.log("\n*** Recréation des tokens ***")
+                                        const cookies = req.cookies;
+                                        //console.log("refresh cookies" + cookies.jwt);
+                                        if (!cookies?.jwt) {
+                                            console.log("accès refusé")
+                                            // 401 : authentification raté
+                                            return res.status(401).send("Accès refusé : authentification requise")
+                                        }
+                                        console.log("** Recréation des cookies pour la classe **")
+
+                                        const accessToken = jwt.sign(
+                                            { "UserInfo": { "mail": newEmail, "role": "classe" } },
+                                            process.env.ACCESS_TOKEN_SECRET,
+                                            { expiresIn: '10m' }
+                                        );
+                                        const refreshToken = jwt.sign(
+                                            { "mail": newEmail, "role": "classe" },
+                                            process.env.REFRESH_TOKEN_SECRET,
+                                            { expiresIn: '1d' }
+                                        )
                                         // on change le mail
                                         // si le mot de passe entré correspond bien au mot de passe dans la base de données
                                         Classe.update(
-                                            { courriel: newEmail },
+                                            {
+                                                courriel: newEmail,
+                                                token: refreshToken
+                                            },
                                             { where: { idclasse: classe.idclasse } }
                                         ).then(newclasse => {
                                             if (newclasse) {
                                                 console.log("update ok")
-                                                // console.log("\n*** Recréation des tokens ***")
-                                                const cookies = req.cookies;
-                                                //console.log("refresh cookies" + cookies.jwt);
-                                                if (!cookies?.jwt) {
-                                                    console.log("accès refusé")
-                                                    // 401 : authentification raté
-                                                    return res.status(401).send("Accès refusé : authentification requise")
-                                                }
-                                                const refreshTokenOld = cookies.jwt;
 
+                                                res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
                                                 // on crée de nouveaux token 
-                                                console.log("** Recréation des cookies pour la classe **")
-                                                Refresh.findOne({ attributes: ['idtoken'], where: { token: refreshTokenOld } })
-                                                    .then(token => {
-                                                        if (!token) {
-                                                            console.log("pas de token trouvé : accès interdit")
-                                                            return res.status(403)
-                                                        }
-                                                        // cookie 
-                                                        const accessToken = jwt.sign(
-                                                            { "UserInfo": { "mail": newEmail, "role": "classe" } },
-                                                            process.env.ACCESS_TOKEN_SECRET,
-                                                            { expiresIn: '10m' }
-                                                        );
-                                                        const refreshToken = jwt.sign(
-                                                            { "mail": newEmail, "role": "classe" },
-                                                            process.env.REFRESH_TOKEN_SECRET,
-                                                            { expiresIn: '1d' }
-                                                        )
-                                                        // on insère dans la liste le nouveau refreshtoken
-                                                        Refresh.update({ token: refreshToken }, { where: { idtoken: token.idtoken } })
-                                                            .then(() => {
-                                                                res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                                return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
-                                                            }).catch(err => {
-                                                                console.log("erreur update token")
-                                                                return res.status(500).send("erreur update token " + err);
-                                                            });
-                                                    }).catch(err => {
-                                                        return res.status(500).send("Erreur " + err);
-                                                    });
+                                                /* Refresh.findOne({ attributes: ['idtoken'], where: { token: refreshTokenOld } })
+                                                     .then(token => {
+                                                         if (!token) {
+                                                             console.log("pas de token trouvé : accès interdit")
+                                                             return res.status(403)
+                                                         }
+                                                         // cookie 
+                                                         const accessToken = jwt.sign(
+                                                             { "UserInfo": { "mail": newEmail, "role": "classe" } },
+                                                             process.env.ACCESS_TOKEN_SECRET,
+                                                             { expiresIn: '10m' }
+                                                         );
+                                                         const refreshToken = jwt.sign(
+                                                             { "mail": newEmail, "role": "classe" },
+                                                             process.env.REFRESH_TOKEN_SECRET,
+                                                             { expiresIn: '1d' }
+                                                         )
+                                                         // on insère dans la liste le nouveau refreshtoken
+                                                         Refresh.update({ token: refreshToken }, { where: { idtoken: token.idtoken } })
+                                                             .then(() => {
+                                                                 res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                                 return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
+                                                             }).catch(err => {
+                                                                 console.log("erreur update token")
+                                                                 return res.status(500).send("erreur update token " + err);
+                                                             });
+                                                     }).catch(err => {
+                                                         return res.status(500).send("Erreur " + err);
+                                                     });*/
                                             } else {
                                                 return res.status(500).send("non défini")
                                             }

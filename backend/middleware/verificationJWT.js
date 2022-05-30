@@ -9,18 +9,19 @@ const verifyJWT = (req, res, next) => {
     // si l'utilisateur n'est pas autorisé
     if (!authHeader) {
         console.log("pas de header")
-        return res.sendStatus(600)
+        return res.sendStatus(401)
     }
-    //console.log("authHeader : " + authHeader)
+    console.log("authHeader : " + authHeader)
     // le token est en deuxième position
     const token = authHeader.split(' ')[1]
+    console.log("token : "+token)
     // vérification du token
     jwt.verify(
         token,
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
             if (err) {
-                console.log("token pas bon")
+                console.log("token pas bon : "+err)
                 return res.sendStatus(403)
             }
             console.log("decoded mail " + decoded.UserInfo.mail)
@@ -31,7 +32,7 @@ const verifyJWT = (req, res, next) => {
 
             if (req.role != "eleve" && req.role != "classe") {
                 console.log("role pas bon")
-                return res.status(409)
+                return res.status(403)
             }
             console.log("token ok")
             // passe au back, ce qui vient après

@@ -15,6 +15,7 @@ const Eleve = db.define('eleve', {
     courriel: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique:true
     },
     prenom: {
         type: Sequelize.STRING,
@@ -36,6 +37,11 @@ const Eleve = db.define('eleve', {
         type: Sequelize.INTEGER,
         references: 'classe', 
         referencesKey:'idclasse'
+    },
+    token: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        unique:true
     }
 }, {timestamps: false, freezeTableName: true, tableName:'eleve'});
 
@@ -49,10 +55,16 @@ const Classe = db.define('classe', {
     courriel: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique:true
     },
     motdepasse: {
         type: Sequelize.STRING,
         allowNull: false,
+    },
+    token: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        unique:true
     }
 }, {timestamps: false, freezeTableName: true, tableName:'classe'});
 

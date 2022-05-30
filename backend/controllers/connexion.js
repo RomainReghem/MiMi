@@ -49,10 +49,14 @@ const Connexion = (req, res) => {
                             { "mail": eleve.courriel, "role": "eleve" },
                             process.env.REFRESH_TOKEN_SECRET,
                             { expiresIn: '1d' }
-                        )
-                        Refresh.create({
+                        )   /* Refresh.create({
                             token: refreshToken
-                        }).then(token => {
+                        })*/
+                        Eleve.update(
+                            {token:refreshToken},
+                            { where:{courriel:eleve.courriel}}
+                            )
+                        .then(token => {
                             //console.log("refresh token connexion " + refreshToken)
                             console.log("** Connexion de l'élève effectuée **")
                             getInvitation(eleve.courriel, function (reponse) {
@@ -71,7 +75,7 @@ const Connexion = (req, res) => {
                                 res.sendStatus(520)
                             })
                     } else {
-                        console.log("Mauvais mot de passe ELEVE")
+                        console.log("Mauvais mot de passe ELEVE"+err)
                         // sinon, si ce n'est pas le bon mdp mais le bon pseudo
                         res.sendStatus(400)
                     }
@@ -88,12 +92,10 @@ const Connexion = (req, res) => {
                                     console.log("Création des cookies pour la classe")
                                     // cookie 
                                     const accessToken = jwt.sign(
-                                        {
-                                            "UserInfo": {
+                                        {"UserInfo": {
                                                 "mail": classe.courriel,
                                                 "role": "classe"
-                                            }
-                                        },
+                                            }},
                                         process.env.ACCESS_TOKEN_SECRET,
                                         { expiresIn: '10m' }
                                     );
@@ -101,11 +103,12 @@ const Connexion = (req, res) => {
                                         { "mail": classe.courriel, "role": "classe" },
                                         process.env.REFRESH_TOKEN_SECRET,
                                         { expiresIn: '1d' }
-                                    )
-                                    //console.log("refresh token connexion " + refreshToken)
-                                    Refresh.create({
+                                    );
+                                   /* Refresh.create({
                                         token: refreshToken
-                                    }).then(() => {
+                                    })*/
+                                    Classe.update({token:refreshToken}, {where:{idclasse:classe.idclasse}})
+                                    .then(() => {
                                         res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                                         res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
                                         console.log("CONNEXION de la classe OK")
