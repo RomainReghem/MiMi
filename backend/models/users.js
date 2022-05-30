@@ -8,14 +8,14 @@ const Eleve = db.define('eleve', {
         allowNull: false,
         primaryKey: true,
     },
-    pseudo :{
-        type:Sequelize.STRING,
-        allowNull:false
+    pseudo: {
+        type: Sequelize.STRING,
+        allowNull: false
     },
     courriel: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique:true
+        unique: true
     },
     prenom: {
         type: Sequelize.STRING,
@@ -35,15 +35,14 @@ const Eleve = db.define('eleve', {
     },
     idclasse: {
         type: Sequelize.INTEGER,
-        references: 'classe', 
-        referencesKey:'idclasse'
+        references: 'classe',
+        referencesKey: 'idclasse'
     },
     token: {
         type: Sequelize.STRING,
-        allowNull: true,
-        unique:true
+        allowNull: true
     }
-}, {timestamps: false, freezeTableName: true, tableName:'eleve'});
+}, { timestamps: false, freezeTableName: true, tableName: 'eleve' });
 
 const Classe = db.define('classe', {
     idclasse: {
@@ -55,7 +54,7 @@ const Classe = db.define('classe', {
     courriel: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique:true
+        unique: true
     },
     motdepasse: {
         type: Sequelize.STRING,
@@ -63,33 +62,32 @@ const Classe = db.define('classe', {
     },
     token: {
         type: Sequelize.STRING,
-        allowNull: true,
-        unique:true
+        allowNull: true
     }
-}, {timestamps: false, freezeTableName: true, tableName:'classe'});
+}, { timestamps: false, freezeTableName: true, tableName: 'classe' });
 
 const Score = db.define('score',
-{
-    idscore : {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true,
-    }//,
-   /* jeu : {
-        type: Sequelize.STRING,
-        allowNull: false,
-    },
-    score:{
-        type: Sequelize.STRING,
-        allowNull: true,
-    },
-    ideleve:{
-        type: Sequelize.INTEGER,
-        references: 'classe', 
-        referencesKey:'idclasse'
-    }*/
-}, {timestamps: false, freezeTableName: true, tableName:'score'})
+    {
+        idscore: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            allowNull: false,
+            primaryKey: true,
+        }//,
+        /* jeu : {
+             type: Sequelize.STRING,
+             allowNull: false,
+         },
+         score:{
+             type: Sequelize.STRING,
+             allowNull: true,
+         },
+         ideleve:{
+             type: Sequelize.INTEGER,
+             references: 'classe', 
+             referencesKey:'idclasse'
+         }*/
+    }, { timestamps: false, freezeTableName: true, tableName: 'score' })
 
 const RefreshToken = db.define('refreshToken', {
     idtoken: {
@@ -102,13 +100,13 @@ const RefreshToken = db.define('refreshToken', {
         type: Sequelize.STRING,
         allowNull: false,
     }
-}, {timestamps: false, freezeTableName: true, tableName:'refreshToken'});
+}, { timestamps: false, freezeTableName: true, tableName: 'refreshToken' });
 
 //relations
 // un eleve a une classe, une classe a un ou plusieurs élèves
-Classe.hasMany(Eleve,{foreignKey: 'idclasse'})
-Eleve.belongsTo(Classe,{foreignKey:'idclasse'})
+Classe.hasMany(Eleve, { foreignKey: 'idclasse' })
+Eleve.belongsTo(Classe, { foreignKey: 'idclasse' })
 // Eleve.hasMany(Score,{foreignKey:'ideleve'})
 //Score.belongsTo(Eleve,{foreignKey:'ideleve'})
 
-module.exports= {Eleve, Classe, RefreshToken};
+module.exports = { Eleve, Classe, RefreshToken };

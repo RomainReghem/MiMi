@@ -71,7 +71,7 @@ const Connexion = (req, res) => {
                             })
                         })
                             .catch(err => {
-                                console.log(err);
+                                console.log("Erreur lors de l'ajout de Token"+err);
                                 res.sendStatus(520)
                             })
                     } else {
