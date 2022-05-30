@@ -1,5 +1,0 @@
-- changer le token dans :
-    -refreshtoken ok
-    -connexion ok
-    -modifctionelebe ->modifmail ok
-    -modificationclasse -> modifmail
