@@ -182,6 +182,7 @@
     border: none;
     box-shadow: 2px 2px #012E40;
     margin-bottom: 1rem;
+    transition: box-shadow 300ms, transform 300ms;
 }
 
 .pictureLabel {
@@ -197,6 +198,11 @@
     box-shadow: 3px 3px #012E40;
     transition-duration: 300ms;
     transition-property: box-shadow;
+}
+
+.pictureSendButton:hover{
+    box-shadow: 3px 3px #012E40;
+    transition: box-shadow 300ms;
 }
 
 .pictureSendButton:focus {

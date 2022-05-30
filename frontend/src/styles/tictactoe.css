@@ -2,6 +2,7 @@
     flex: 1;
     display: grid;
     place-content: center;
+    background-color: #E4F2E7;
 }
 
 .tictactoe-section {
@@ -18,4 +19,34 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.dice{
+    animation-name: dice-anim;
+    animation-duration: 5s;
+    animation-delay: 0;
+    animation-iteration-count: infinite;
+  animation-direction: forward;
+}
+
+@keyframes dice-anim{
+        0% {
+            transform: rotate(0deg);
+        }
+    
+        25% {
+            transform: rotate(90deg);
+        }
+    
+        50% {
+            transform: rotate(180deg);
+        }
+
+        75% {
+            transform: rotate(270deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
 }

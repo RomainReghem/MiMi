@@ -6,7 +6,12 @@ const io = require("socket.io")(server, { cors: { origin: "*" } });
 const rooms = io.sockets.adapter.rooms
 
 io.on("connection", (socket) => {
+
   socket.on("joinRoom", (roomCode) => {
+    if (socket.rooms.has(roomCode)) {
+      socket.leave(roomCode);
+    }
+
     const clients = io.sockets.adapter.rooms.get(roomCode);
     const numClients = clients ? clients.size : 0;
 
@@ -89,7 +94,7 @@ io.on("connection", (socket) => {
     }
 
     // If no more spaces to play on the board, then stops the game. They both lose (victory without a winner parameter)
-    if(!board.includes("")){
+    if (!board.includes("")) {
       io.in(roomCode).emit("victory");
       io.in(roomCode).socketsLeave(roomCode);
     }
@@ -97,7 +102,7 @@ io.on("connection", (socket) => {
   }
 
   socket.on("disconnect", () => {
-    //io.in(roomCode).emit("disconnect");
+    io.in(socket.rooms).socketsLeave(socket.rooms);
     console.log("User Disconnected");
   });
 });

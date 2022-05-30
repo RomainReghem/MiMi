@@ -23,8 +23,8 @@ import Success from "./Success"
 import Tests from "./Tests"
 import Construction from "./Construction"
 import Settings from "./Settings";
-import Visio from "./Visio"
 import TicTacToe from "./TicTacToe";
+import Jeux from "./Jeux"
 
 // Styles
 import '../styles/App.css'
@@ -34,6 +34,7 @@ import 'react-notifications-component/dist/theme.css'
 import '../styles/identity.css'
 import '../styles/settings.css'
 import '../styles/users.css'
+import '../styles/jeux.css'
 
 
 
@@ -55,9 +56,6 @@ export default function App() {
             <Route path="/choice" element={<Choice />} />
             <Route path="/tests" element={<Tests />} />
             <Route path="/success" element={<Success />} />
-                <Route path="/tictactoe" element={<TicTacToe/>}/>          
-
-
 
             {/* Routes qui nécessitent d'être connecté*/}
             <Route element={<PersistLogin />}>
@@ -65,7 +63,8 @@ export default function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/documents" element={<Documents />} />
                 <Route path="/visio" element={<Jitsi />} />
-                <Route path="/jeux" element={<Construction />} />
+                <Route path="/jeux" element={<Jeux />} />
+                <Route path="/tictactoe" element={<TicTacToe/>}/>
                 <Route path="/settings" element={<Settings/>}/>      
               </Route>
             </Route>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { Link } from "react-router-dom";
 import * as React from 'react';
 import Cell from "../components/Cell";
@@ -12,15 +12,18 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { faCircle } from "@fortawesome/free-regular-svg-icons"
+import { faCircle } from "@fortawesome/free-regular-svg-icons";
+import {faDiceThree} from "@fortawesome/free-solid-svg-icons";
 
-const socket = io.connect("http://localhost:5000")
+const socket = io.connect("http://localhost:5000");
+
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const TicTacToe = () => {
+
     const [roomCode, setRoomCode] = useState("53");
     const [roomJoined, setRoomJoined] = useState(false);
     const [waitingText, setWaitingText] = useState("");
@@ -32,9 +35,9 @@ const TicTacToe = () => {
     const [canPlay, setCanPlay] = useState(true);
 
     useEffect(() => {
-        console.log(roomCode);
         if (roomCode && !roomJoined) {
             socket.emit("joinRoom", roomCode);
+            console.log("joining room...");
         }
     }, [roomCode]);
 
@@ -63,8 +66,8 @@ const TicTacToe = () => {
             // Making a new array to have nicer UI than just letters "X" and "O"
             let newUIboard = [];
             updatedBoard.forEach((cell) => {
-                cell == "X" ? newUIboard.push(<FontAwesomeIcon icon={faXmark}/>)
-                : cell == "O" ? newUIboard.push(<FontAwesomeIcon icon={faCircle}/>)
+                cell == "X" ? newUIboard.push(<FontAwesomeIcon className="cellX" icon={faXmark}/>)
+                : cell == "O" ? newUIboard.push(<FontAwesomeIcon className="cellO" icon={faCircle}/>)
                 : newUIboard.push("")
             })
             setUIboard(newUIboard)
@@ -81,10 +84,6 @@ const TicTacToe = () => {
             setRoomJoined(false);
 
         });
-
-        socket.on("disconnect", () => {
-            console.log("Quelqu'un a quitté la partie")
-        })
     })
 
     const handleCellClick = (e) => {
@@ -121,7 +120,7 @@ const TicTacToe = () => {
                         <Cell handleCellClick={handleCellClick} id={"8"} text={UIboard[8]} />
                     </section>
                     {canPlay ? (<Button style={{ marginTop: "0.5rem" }} variant="contained" color="success">
-                        A ton tour de jouer !
+                        <FontAwesomeIcon className="dice" icon={faDiceThree} style={{ marginRight: "0.5rem" }}/> A ton tour de jouer !
                     </Button>) : (<Button style={{ marginTop: "0.5rem" }} variant="outlined" color="error">
                         <CircularProgress style={{ marginRight: "0.5rem" }} size={10} color="error" />
                         Tour de l'adversaire...
@@ -138,7 +137,7 @@ const TicTacToe = () => {
                                 <Button variant="outlined" color="error">Quitter</Button>
                             </Link>
                         </DialogActions>
-                    </Dialog> : console.log("partie en cours")}
+                    </Dialog> : <></>}
                 </div>
 
 

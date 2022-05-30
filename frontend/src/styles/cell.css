@@ -1,24 +1,37 @@
 .cell {
-    height: 150px;
-    width: 150px;
-    background: #F2E3D5;
-    color: #026773;
-    font-size: 4rem;
-    display: grid;
-    place-content: center;
-    border: 5px solid #026773;
+  height: 150px;
+  width: 150px;
+  background: #026773;
+  box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  color: #F2E3D5;
+  font-size: 4rem;
+  display: grid;
+  place-content: center;
+  transition: transform 200ms;
+  /*border: 5px solid #026773;*/
 
 }
-  
-  .cell:hover {
-    cursor: pointer;
-    transform: scale(1.01);
-    transition:transform 300ms;
+
+.cell:hover {
+  cursor: pointer;
+  transform: scale(1.01);
+  transition: transform 300ms;
+}
+
+.cell:hover .cellX{
+  transform: rotate(90deg);
+  transition: transform 300ms ease-out;
+}
+
+.cell:hover .cellO{
+  transform: rotateY(180deg);
+  transition: transform 300ms ease-out;
+}
+
+
+@media (max-width: 700px) {
+  .cell {
+    height: 100px;
+    width: 100px;
   }
-  
-  @media (max-width: 700px) {
-    .cell {
-      height: 100px;
-      width: 100px;
-    }
-  }
+}
