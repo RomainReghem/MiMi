@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import useAuth from "../hooks/useAuth";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useAuth from "../../hooks/useAuth";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faCheck, faPaperPlane, faDoorOpen, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Avatar from 'react-nice-avatar';
 import Invitations from "./Invitations";
-import useGetImage from "../hooks/useGetImage";
-import useGetAvatar from "../hooks/useGetAvatar";
+import useGetImage from "../../hooks/useGetImage";
+import useGetAvatar from "../../hooks/useGetAvatar";
 import { useToast, InputGroup ,Tooltip, FormLabel, IconButton, Input, InputRightElement, Text, Button, Heading, Stack, Image, InputRightAddon, Divider, Center } from "@chakra-ui/react";
 
 const CHANGEPSEUDO_URL = '/changePseudo';

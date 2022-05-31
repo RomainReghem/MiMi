@@ -7,14 +7,14 @@ import {
     ChevronDownIcon,
     ChevronRightIcon,
 } from '@chakra-ui/icons';
-import { faGear } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import Avatar from 'react-nice-avatar'
-import useLogout from "../hooks/useLogout";
+import useLogout from "../../hooks/useLogout";
 import { ColorModeSwitcher } from './ColorModeSwitcher';
-import useAuth from '../hooks/useAuth';
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import useGetImage from '../hooks/useGetImage';
-import useGetAvatar from '../hooks/useGetAvatar';
+import useAuth from '../../hooks/useAuth';
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useGetImage from '../../hooks/useGetImage';
+import useGetAvatar from '../../hooks/useGetAvatar';
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -58,7 +58,7 @@ export default function Nav() {
                 bg={useColorModeValue('white', 'gray.900')}
                 color={useColorModeValue('gray.600', 'white')}
                 minH={'60px'}
-                py={{ base: 2 }}
+                py={{ base: 1 }}
                 px={{ base: 4 }}
                 borderBottom={1}
                 borderStyle={'solid'}
@@ -77,15 +77,14 @@ export default function Nav() {
                         aria-label={'Toggle Navigation'}
                     />
                 </Flex>
-                <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-                    <Text
+                <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }} align={'center'}>
+                    <Badge
                         textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-                        fontFamily={'heading'}
-                        color={useColorModeValue('gray.800', 'white')}>
-                        MiMi
-                    </Text>
+                        colorScheme='gray'>
+                        {auth?.role == "eleve" ? pseudo : "classe #" + auth?.idclasse}
+                    </Badge>
 
-                    <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
+                    <Flex display={{ base: 'none', md: 'flex' }} ml={5}>
                         <DesktopNav />
                     </Flex>
                 </Flex>
@@ -94,8 +93,8 @@ export default function Nav() {
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
                     direction={'row'}
-                    spacing={6}>
-                        { !auth?.user ? <>
+                    spacing={3}>
+                        { !auth?.user && <>
                     <Link textDecoration={'none'} as={ReactRouterLink} to="/choice">
                         <Button
                             display={{ base: 'none', md: 'inline-flex' }}
@@ -112,11 +111,12 @@ export default function Nav() {
                             colorScheme={'blue'}>
                             Se connecter
                         </Button>
-                    </Link></> : <Center><Badge colorScheme={'teal'}>Bienvenue, {pseudo}</Badge></Center>}
+                    </Link></> }
                     {auth?.user && <Link as={ReactRouterLink} to="/settings"><IconButton colorScheme={'teal'} icon={<FontAwesomeIcon icon={faGear}/>}></IconButton></Link>}
                     <ColorModeSwitcher />
-                    {auth?.user && <><Center><Divider height={'1rem'} orientation='vertical'/></Center>
-                    <Button onClick={signOut} colorScheme={'red'}>Déconnexion</Button></>}
+                    {auth?.user && <><Center><Divider height={'2rem'} orientation='vertical'/></Center>
+                    <Button display={{ base: 'none', md: 'inline-flex' }} onClick={signOut} colorScheme={'red'}>Déconnexion</Button>
+                    <IconButton display={{ base: 'inline-flex', md: 'none' }} onClick={signOut} colorScheme={'red'} icon={<FontAwesomeIcon icon={faPowerOff}/>}></IconButton></>}
                 </Stack>
             </Flex>
 

@@ -1,4 +1,4 @@
-import "../styles/cell.css";
+import "../../styles/cell.css";
 
 const Cell = ({ handleCellClick, id, text }) => {
   return (

@@ -1,15 +1,15 @@
 import { useEffect, useState, useLayoutEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as React from 'react';
-import Cell from "../components/Cell";
-import "../styles/tictactoe.css";
+import Cell from "./Cell";
+import "../../styles/tictactoe.css";
 import io from "socket.io-client"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
 import { faDiceThree } from "@fortawesome/free-solid-svg-icons";
-import { axiosPrivate } from "../api/axios";
-import useAuth from '../hooks/useAuth'
+import { axiosPrivate } from "../../api/axios";
+import useAuth from '../../hooks/useAuth'
 import { CircularProgress, Button, AlertDialogFooter, AlertDialogCloseButton, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent } from "@chakra-ui/react";
 
 

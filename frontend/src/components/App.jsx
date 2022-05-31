@@ -7,17 +7,17 @@ import { ChakraProvider, theme, } from '@chakra-ui/react';
 import Layout from "./Layout"
 import Home from "./Home"
 
-import Login from "./Login"
-import Choice from "./Choice"
-import RegisterStudent from "./RegisterStudent"
-import RegisterClass from "./RegisterClass"
-import Profile from "./Profile"
-import PersistLogin from "./PersistLogin"
+import Login from "./Login/Login"
+import Choice from "./Login/Choice"
+import RegisterStudent from "./Login/RegisterStudent"
+import RegisterClass from "./Login/RegisterClass"
+import Profile from "./Profile/Profile"
+import PersistLogin from "./Login/PersistLogin"
 import RequireAuth from "./RequireAuth"
-import Documents from "./Documents"
+import Documents from "./Documents/Documents"
 import Jitsi from "../components/jitsi";
-import TicTacToe from "./TicTacToe";
-import Jeux from "./Jeux"
+import TicTacToe from "./Games/TicTacToe";
+import Jeux from "./Games/Jeux"
 
 
 import '../styles/tictactoe.css'

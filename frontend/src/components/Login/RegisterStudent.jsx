@@ -3,7 +3,7 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {createSearchParams, useNavigate } from 'react-router-dom'
 import {useState, useEffect } from 'react';
-import axios from '../api/axios'
+import axios from '../../api/axios'
 
 export default function RegisterStudent() {
     const [showPassword, setShowPassword] = useState(false);

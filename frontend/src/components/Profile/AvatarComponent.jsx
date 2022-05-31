@@ -2,8 +2,8 @@ import Avatar, { genConfig } from 'react-nice-avatar'
 import { Heading, useToast } from '@chakra-ui/react';
 import { useState, useEffect } from 'react'
 import randomColor from "randomcolor";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useAuth from "../../hooks/useAuth";
 import { AiOutlineBgColors } from 'react-icons/ai';
 import { FaTshirt, FaGlasses, FaHatCowboy } from 'react-icons/fa';
 import { GiNoseSide, GiLips} from 'react-icons/gi';

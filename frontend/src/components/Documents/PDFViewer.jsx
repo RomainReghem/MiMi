@@ -1,7 +1,7 @@
-import axios from '../api/axios';
-import useAuth from '../hooks/useAuth';
+import axios from '../../api/axios';
+import useAuth from '../../hooks/useAuth';
 import { Document, Page, pdfjs } from 'react-pdf/dist/esm/entry.webpack'
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useEffect, useState } from "react"
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
