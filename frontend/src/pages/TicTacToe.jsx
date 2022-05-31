@@ -85,7 +85,13 @@ const TicTacToe = () => {
         });
 
         socket.on("victory", (player) => {
-            socket.id == player ? winner = true : winner = false
+            if (socket.id == player) {
+                winner = true
+                setWin(true)
+            } else {
+                winner = false
+                setWin(false)
+            }
             setGameEnded(true);
             setRoomJoined(false);
             postScore();
