@@ -1,19 +1,17 @@
 import PDFSender from "../components/PDFSender"
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import Tooltip from "@mui/material/Tooltip"
-import IconButton from "@mui/material/IconButton"
-import Button from "@mui/material/Button"
-import Notifs from "../components/Notifs"
+import { useToast, Tooltip, Text, Button, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue } from "@chakra-ui/react";
 import PDFViewer from "../components/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faXmark } from "@fortawesome/free-solid-svg-icons";
-import axios from "../api/axios";
 import useAuth from "../hooks/useAuth";
 import { useState, useEffect } from "react";
+
 
 const Documents = () => {
     // Hooks
     const { auth } = useAuth();
+    const toast = useToast();
     const axiosPrivate = useAxiosPrivate();
 
 
@@ -89,7 +87,7 @@ const Documents = () => {
                 data: { ...deleteParams, cours: f },
             });
             loadFiles()
-            Notifs("Fichier supprimé !", "", "success")
+            toast({ title: "Fichier supprimé", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
 
         }
         catch (err) {
@@ -98,29 +96,32 @@ const Documents = () => {
     }
 
     return (
-        <div className="fileMain">
-            <section className="fileManager">
-                <div className="fileManagerMenu">
-                    <Tooltip title="Refresh" placement="right">
-                        <Button onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></Button>
-                    </Tooltip>
-                    <h4 onClick={() => { setMenuSelection(myFiles); setSelectedUI("my") }} style={selectedUI == "my" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}>Mes documents partagés</h4>
-                    <h4 onClick={() => { setMenuSelection(sharedFiles); setSelectedUI("shared") }} style={selectedUI == "shared" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}>Partagés avec moi</h4>
-                </div>
-                <div className="fileList">
+        <Center flexGrow={1}>
+        <Wrap spacing={10} p={5} justify={'center'} align={'center'}>
+            <Stack spacing={4} w={useBreakpointValue({base:"xs", md:"md"})}>
+                <Heading fontSize={'2xl'}>Gestion des documents</Heading>
+                <Stack w={'100%'} direction={'row'}>
+                <Tooltip bg={'blue.500'} label="Charger les fichiers" fontSize='md' placement="top">
+                    <Button onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></Button>
+                </Tooltip>
+                <Button colorScheme={'blue'} onClick={() => { setMenuSelection(myFiles); setSelectedUI("my") }} style={selectedUI == "my" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Mes documents partagés</Text></Button>
+                <Button colorScheme={'blue'} onClick={() => { setMenuSelection(sharedFiles); setSelectedUI("shared") }} style={selectedUI == "shared" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Partagés avec moi</Text></Button>
+                </Stack>
+                <Stack w={'100%'} h={'xs'} overflowY="auto" p={1}>
                     {Array.from(Array(menuSelection?.length), (e, i) => {
-                        return <div key={i} onClick={() => setFile(menuSelection[i])} className="file">{menuSelection[i]}
-                            {selectedUI == "my" ? <IconButton size="small" style={{ color: "white", borderRadius: 0, padding: "0.5rem, 0.5rem" }} onClick={(e) => { deleteFile(menuSelection[i]); e.stopPropagation() }}><FontAwesomeIcon icon={faXmark} /></IconButton> : <></>}</div>
+                        return <Stack key={i} direction={'row'} w={'100%'}><Button w={'100%'} justifyContent={'flex-start'} onClick={() => setFile(menuSelection[i])}><Text noOfLines={1}>{menuSelection[i]}</Text></Button>
+                            {selectedUI == "my" ? <IconButton colorScheme={'red'} onClick={(e) => { deleteFile(menuSelection[i]); e.stopPropagation() }}><FontAwesomeIcon icon={faXmark} /></IconButton> : <></>}</Stack>
                     })}
-                </div>
-                <div className="fileUploadFormContainer">
-                    <PDFSender reload={loadFiles} />
-                </div>
-            </section>
+                </Stack>
+                <Stack w={'100%'}>
+                <PDFSender reload={loadFiles} />
+                </Stack>
+            </Stack>
             <section className="fileViewer">
                 <PDFViewer clickedFile={file} selected={selectedUI} />
             </section>
-        </div>
+        </Wrap>
+        </Center>
 
     )
 }

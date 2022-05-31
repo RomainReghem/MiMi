@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
+import { useToast } from "@chakra-ui/react";
 import useAuth from "../hooks/useAuth";
-import axios from "../api/axios";
-import Tooltip from "@mui/material/Tooltip";
-import Notifs from "./Notifs";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
+//import Popup from 'reactjs-popup';
+//import 'reactjs-popup/dist/index.css';
 
 const Users = () => {
+    const toast = useToast();
     const [users, setUsers] = useState();
     const [usersUpdated, setUsersUpdated] = useState();
     const { auth } = useAuth();
@@ -53,17 +52,19 @@ const Users = () => {
         try {
             await axiosPrivate.post("/inviteEleve", JSON.stringify({ classe:auth?.user, eleve:newEleve }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
-            Notifs("Eleve invité", "", "success");
+                toast({title: "Elève invité", description: "", status: "Success", duration: 5000, isClosable: true, position:"top"})
+
         }
         catch (err) {
             if (!err?.response) {
-                Notifs("Erreur", "Pas de réponse du serveur", "danger");
+                toast({title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 5000, isClosable: true, position:"top"})
             } else if (err.response?.status === 404) {
-                Notifs("Erreur", "Eleve introuvable, vérifiez l'adresse mail", "danger");
+                toast({title: "Erreur", description: "Elève introuvable", status: "error", duration: 5000, isClosable: true, position:"top"})
             } else if (err.response?.status === 403) {
-                Notifs("Erreur", "L'élève est déjà dans une classe ou a déjà une invitation en attente", "danger");
+                toast({title: "Erreur", description: "L'élève est déjà dans une classe ou a déjà une invitation en attente", status: "error", duration: 5000, isClosable: true, position:"top"})
             } else {
-                Notifs("Erreur", "Erreur", "danger");
+                toast({title: "Erreur", description: "Erreur", status: "error", duration: 5000, isClosable: true, position:"top"})
+
             }
         }
     }
@@ -72,14 +73,14 @@ const Users = () => {
         try {
             await axiosPrivate.post("/deleteEleve", JSON.stringify({ classe:auth?.user, eleve:eleveToDelete }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
-            Notifs("Eleve supprimé", "", "success");
+                toast({title: "Elève supprimé", description: "", status: "Success", duration: 5000, isClosable: true, position:"top"})
         }
         catch (err) {
             if (!err?.response) {
-                Notifs("Erreur", "Pas de réponse du serveur", "danger");
+                toast({title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 5000, isClosable: true, position:"top"})
             }            
             else {
-                Notifs("Erreur", "Erreur", "danger");
+                toast({title: "Erreur", description: "Erreur", status: "error", duration: 5000, isClosable: true, position:"top"})
             }
         }
 
@@ -105,13 +106,13 @@ const Users = () => {
                 ? (
                     <div className="usersList">
                         {users.map((user, i) => <div key={i}>{user?.courriel}
-                            <Popup trigger={<button><FontAwesomeIcon icon={faXmark} /></button>} modal>
+                            {/* <Popup trigger={<button><FontAwesomeIcon icon={faXmark} /></button>} modal>
                                 {close => (<div className="popupMsg">
                                     <h2>Supprimer cet élève ?</h2>
                                     <p>Il n'aura plus accès aux documents partagés</p>
                                     <div><button onClick={() => {deleteEleve(user?.courriel);close();setUsersUpdated(!usersUpdated)}}>Oui</button><button onClick={close}>Non</button></div>
                                 </div>)}
-                            </Popup>
+                            </Popup> */}
                         </div>)}
 
                     </div>

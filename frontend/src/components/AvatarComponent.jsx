@@ -1,43 +1,39 @@
 import Avatar, { genConfig } from 'react-nice-avatar'
-import Notifs from '../components/Notifs';
+import { Heading, useToast } from '@chakra-ui/react';
 import { useState, useEffect } from 'react'
-import axios from '../api/axios';
 import randomColor from "randomcolor";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
-import { GiPerspectiveDiceSixFacesRandom } from 'react-icons/gi';
 import { AiOutlineBgColors } from 'react-icons/ai';
-import { RiSave3Fill } from 'react-icons/ri';
-import { FaTshirt } from 'react-icons/fa';
-import { FaHatCowboy } from 'react-icons/fa';
-import { FaGlasses } from 'react-icons/fa';
-import { GiNoseSide } from 'react-icons/gi';
-import { GiLips } from 'react-icons/gi';
-import { GiAngryEyes } from 'react-icons/gi';
+import { FaTshirt, FaGlasses, FaHatCowboy } from 'react-icons/fa';
+import { GiNoseSide, GiLips} from 'react-icons/gi';
 import { BiFace } from 'react-icons/bi';
+import { Stack, Text, IconButton, Button, Tooltip } from "@chakra-ui/react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 
 
 const AvatarComponent = () => {
-
+    const toast = useToast();
     const { auth } = useAuth();
     const { setAuth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
-    
+
     const [config, setConfig] = useState(JSON.parse(localStorage.getItem("avatar")));
 
     let mail = auth?.user;
 
     useEffect(() => {
-        getAvatar()        
-    },[])
+        getAvatar()
+    }, [])
 
     const getAvatar = async (e) => {
         try {
-            const response = await axiosPrivate.get("/avatar",{params: { mail: auth?.user }});
+            const response = await axiosPrivate.get("/avatar", { params: { mail: auth?.user } });
             setConfig(JSON.parse(response.data.avatar));
         } catch (err) { console.log("Erreur du chargement de l'avatar"); }
     }
-    
+
 
     const shirts = ["hoody", "short", "polo"]
     const glasses = ["none", "round", "square"]
@@ -81,23 +77,20 @@ const AvatarComponent = () => {
         localStorage.setItem("avatar", JSON.stringify(config))
         setAuth({
             ...auth,
-            somethingchanged: (0 + Math.random() * (10000 - 0))      
+            somethingchanged: (0 + Math.random() * (10000 - 0))
         });
 
-        
+
     }
 
     const SaveDB = async (e) => {
         try {
-            const response = await axiosPrivate.post("/avatar", JSON.stringify({ mail, avatar:config }),
+            const response = await axiosPrivate.post("/avatar", JSON.stringify({ mail, avatar: config }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            
-            Notifs("Avatar sauvegardé !", "Rechargez la page s'il ne s'affiche pas correctement", "Success")
-            
-
+            toast({ title: "Avatar sauvegardé !", description: "Rechargez la page s'il ne s'affiche pas correctement", status: "success", duration: 5000, isClosable: true, position: "top" })
         } catch (err) { console.log("couldnt save avatar"); }
     }
 
@@ -106,36 +99,36 @@ const AvatarComponent = () => {
 
     return (
         <>
-            <section className="profileGraphics">
-                
-                <div className="profileAvatar">
-                    <Avatar 
-                        {...config}
-                        style={{ width: '15rem', height: '15rem', minWidth: '250px', minHeight: '250px',marginBottom: "20px" }}
-                    />
-                    <div className="controls">
-                        <div className="controls-firstRow">
-                            <button className="controls-btn" onClick={changeBg}><AiOutlineBgColors size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, glassesStyle: glasses[(glasses.findIndex((e) => e === config.glassesStyle) + 1) % glasses.length] })}><FaGlasses size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, shirtStyle: shirts[(shirts.findIndex((e) => e === config.shirtStyle) + 1) % shirts.length], shirtColor: randomColor() })}><FaTshirt size={iconSize} /></button>
-                            <button className="controls-btn" onClick={changeHat}><FaHatCowboy size={iconSize} /></button>
-                        </div>
+            <Stack spacing={2}>
+                <Heading fontSize={'2xl'} >Créateur d'avatar</Heading>
+                <Avatar
+                    {...config}
+                    style={{ width: '15rem', height: '15rem', minWidth: '250px', minHeight: '250px'}}
+                />
+                <Stack spacing={3} direction={'row'} w={'100%'} justify='center'>
+                    <IconButton colorScheme={'blue'} size={'lg'} onClick={changeBg} icon={<AiOutlineBgColors/>}></IconButton>
+                    <IconButton colorScheme={'blue'} size={'lg'} onClick={() => setConfig({ ...config, glassesStyle: glasses[(glasses.findIndex((e) => e === config.glassesStyle) + 1) % glasses.length] })} icon={<FaGlasses/>}></IconButton>
+                    <IconButton colorScheme={'blue'} size={'lg'} onClick={() => setConfig({ ...config, shirtStyle: shirts[(shirts.findIndex((e) => e === config.shirtStyle) + 1) % shirts.length], shirtColor: randomColor() })} icon={<FaTshirt/>}></IconButton>
+                    <IconButton colorScheme={'blue'} size={'lg'} onClick={changeHat} icon={<FaHatCowboy/>}></IconButton>
+                </Stack>
 
-                        <div className="controls-secondRow">
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, faceColor: faces[(faces.findIndex((e) => e === config.faceColor) + 1) % faces.length] })}><BiFace size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, mouthStyle: mouths[(mouths.findIndex((e) => e === config.mouthStyle) + 1) % mouths.length] })}><GiLips size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, eyeStyle: eyes[(eyes.findIndex((e) => e === config.eyeStyle) + 1) % eyes.length] })}><GiAngryEyes size={iconSize} /></button>
-                            <button className="controls-btn" onClick={() => setConfig({ ...config, noseStyle: noses[(noses.findIndex((e) => e === config.noseStyle) + 1) % noses.length] })}><GiNoseSide size={iconSize} /></button>
+                <Stack spacing={3} direction={'row'} w={'100%'} justify='center'>
+                    <IconButton colorScheme={'blue'} size={'lg'} onClick={() => setConfig({ ...config, faceColor: faces[(faces.findIndex((e) => e === config.faceColor) + 1) % faces.length] })} icon={<BiFace/>}></IconButton>
+                    <IconButton colorScheme={'blue'} size={'lg'} onClick={() => setConfig({ ...config, mouthStyle: mouths[(mouths.findIndex((e) => e === config.mouthStyle) + 1) % mouths.length] })} icon={<GiLips/>}></IconButton>
+                    <IconButton colorScheme={'blue'} size={'lg'} onClick={() => setConfig({ ...config, eyeStyle: eyes[(eyes.findIndex((e) => e === config.eyeStyle) + 1) % eyes.length] })} icon={<FontAwesomeIcon icon={faEye}/>}></IconButton>
+                    <IconButton colorScheme={'blue'} size={'lg'} onClick={() => setConfig({ ...config, noseStyle: noses[(noses.findIndex((e) => e === config.noseStyle) + 1) % noses.length] })} icon={<GiNoseSide/>}></IconButton>
 
-                        </div>
-                        <div className="controls-thirdRow">
-                            <button className="controls-btn" onClick={RandomC}><GiPerspectiveDiceSixFacesRandom size={iconSize} /> Aléatoire</button>
-                            <button className="controls-btn" onClick={() => { Save(); SaveDB();}}><RiSave3Fill size={iconSize} /> Sauvegarder</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                </Stack>
+                <Stack direction={'row'} justify='center'>
+                    <Tooltip label='Générer un avatar aléatoire' fontSize='md' placement="bottom">
+                    <Button onClick={RandomC}>Aléatoire</Button>
+                    </Tooltip>
+                    <Tooltip label="Sauvegarder l'avatar" fontSize='md' placement="bottom">
+                    <Button onClick={() => { Save(); SaveDB(); }}>Sauvegarder</Button>
+                    </Tooltip>
+                </Stack>
 
+            </Stack>
         </>
     )
 }

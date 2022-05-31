@@ -1,57 +1,23 @@
-.fileMain {
-    display: flex;
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: auto;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-    width: 100%;
-}
-
 @media screen and (max-width: 71rem) {
-    .fileMain {
-        flex-direction: column;
-    }
-
-    .fileManager {
-        margin-top: 3rem;
-        margin-bottom: 3rem;
-    }
 
     .fileViewer {
         margin-bottom: 3rem;
     }
 }
 
-@media screen and (max-width: 40rem) {
+@media screen and (min-width:40rem) {
     .fileManager {
-        width: 18rem;
-    }
-}
-
-@media screen and (min-width:40rem){
-    .fileManager{
-        width:25rem;
+        width: 25rem;
     }
 
 }
 
 
 @media screen and (min-width:71rem) {
-    .fileViewer {        
+    .fileViewer {
         min-width: 612px;
-        height:34rem;
+        height: 34rem;
     }
-}
-
-.fileManager {
-    display: flex;
-    border:1px solid#012E40;
-    padding: 0.3rem;
-    flex-direction: column;
-    margin-left: 1rem;
-    margin-right: 1rem;
 }
 
 .fileViewer {
@@ -65,98 +31,6 @@
     .fileViewer {
         max-width: 90%;
     }
-}
-
-
-
-.fileUploadFormContainer {
-    margin-top: 0.3rem;
-    display: flex;
-    width: 100%;
-    
-}
-
-.fileForm {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.fileInput {
-    display: none;
-}
-
-.fileLabel:hover,
-.fileSendButton:hover {
-    background-color: #024959;
-
-    transition-duration: 500ms;
-    transition-property: background-color;
-}
-
-.fileLabel p,
-.fileSendButton p {
-    display: inline;
-    margin-left: 0.5rem;
-}
-
-.fileSendButton,
-.fileLabel {
-    color: #F2E3D5;
-    display: block;
-    background-color: #012E40;
-    font-family: Abril Fatface;
-    font-size: 0.9rem;
-    padding: 0.8rem 0rem;
-    cursor: pointer;
-    border: none;
-}
-
-.fileLabel {
-    width: 11rem;
-    margin-right: 0.3rem;
-    text-align: center;
-}
-
-.fileSendButton {
-    width: 7rem;
-}
-
-.file {
-    display: flex;
-    justify-content: space-between;
-    background-color: #3CA6A6;
-    border: 1px solid #3CA6A6;
-    text-decoration: none;
-    padding: 0.8rem 1rem;
-    margin-bottom: 0.3rem;
-    cursor: pointer;
-    word-break:break-all ;
-    box-shadow: 2px 2px #026773;
-}
-
-.file:hover {
-    border: 1px solid black;
-
-}
-
-.file:active {
-    box-shadow: 0.5px 0.5px #026773;
-}
-
-.deleteFile{
-    background-color: #3CA6A6;
-    padding: 0.5rem, 0.5rem;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-.fileList {
-    max-width: 100%;
-    max-height: 30rem;
-    min-height: 10rem;
-    overflow-y: auto;
 }
 
 /* width */
@@ -187,26 +61,4 @@
 
 .react-pdf__message {
     display: none;
-}
-
-.fileRefresh:hover{
-    cursor: pointer;
-}
-
-.fileRefresh{
-    color:black;
-}
-
-.fileManagerMenu{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    width:100%;
-    flex-direction: row;
-    cursor: pointer;
-}
-
-.fileManagerMenu h4{
-    font-family: Abril Fatface;
-    font-size:small;
 }

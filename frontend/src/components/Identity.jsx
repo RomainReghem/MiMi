@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import useAuth from "../hooks/useAuth";
-import axios from '../api/axios';
-import Notifs from '../components/Notifs';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faCheck, faPaperPlane, faDoorOpen, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -9,13 +7,14 @@ import Avatar from 'react-nice-avatar';
 import Invitations from "./Invitations";
 import useGetImage from "../hooks/useGetImage";
 import useGetAvatar from "../hooks/useGetAvatar";
+import { useToast, InputGroup ,Tooltip, FormLabel, IconButton, Input, InputRightElement, Text, Button, Heading, Stack, Image, InputRightAddon, Divider, Center } from "@chakra-ui/react";
 
 const CHANGEPSEUDO_URL = '/changePseudo';
 const PSEUDO_REGEX = /^[A-z0-9-_]{3,24}$/;
 
 
 const Identity = () => {
-
+    const toast = useToast();
     const { auth, setAuth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
 
@@ -83,7 +82,7 @@ const Identity = () => {
         e.preventDefault();
         setMail(auth?.user);
         if (!PSEUDO_REGEX.test(newPseudo)) {
-            Notifs('Erreur', 'Le pseudo doit comporter entre 4 et 24 caractères alphanumériques ', 'Danger');
+            toast({ title: "Erreur", description: "Le pseudo doit comporter entre 4 et 24 caractères alphanumériques", status: "error", duration: 5000, isClosable: true, position: "top" })
             return;
         }
         try {
@@ -95,7 +94,7 @@ const Identity = () => {
                     withCredentials: true
                 }
             );
-            Notifs('Pseudo modifié', 'Votre nouveau pseudo est : ' + newPseudo, 'Success');
+            toast({ title: "Pseudo modifié", description: "Votre nouveau pseudo est : " + newPseudo, status: "success", duration: 5000, isClosable: true, position: "top" })
             setAuth({
                 ...auth,
                 somethingchanged: (0 + Math.random() * (10000 - 0))
@@ -103,14 +102,14 @@ const Identity = () => {
 
         } catch (err) {
             if (!err?.response) {
-                Notifs('Erreur', 'Pas de réponse du serveur', 'Danger')
+                toast({ title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 5000, isClosable: true, position: "top" })
             } else if (err.response?.status === 407 || err.response?.status === 401) {
-                Notifs('Erreur', "Problème d'authentification, reconnectez-vous", 'Danger')
+                toast({ title: "Erreur", description: "Problème d'authentification, reconnectez-vous", status: "error", duration: 5000, isClosable: true, position: "top" })
             }
             else if (err.response?.status === 405) {
-                Notifs('Erreur', 'Pseudo incorrect', 'Danger')
+                toast({ title: "Erreur", description: "Pseudo incorrect", status: "error", duration: 5000, isClosable: true, position: "top" })
             } else {
-                Notifs('Erreur', 'Veuillez réessayer', 'Danger')
+                toast({ title: "Erreur", description: "Veuillez rééssayer", status: "error", duration: 5000, isClosable: true, position: "top" })
             }
             return;
         }
@@ -126,12 +125,12 @@ const Identity = () => {
         // PNG / JPEG only
         console.log(img)
         if (img.data.type != "image/png" && img.data.type != "image/jpeg" && img.data.type != "image/jpg") {
-            Notifs("Erreur type de fichier", "Les seules images acceptées sont les PNG et JPEG", "warning")
+            toast({ title: "Erreur type de fichier", description: "Les seules images acceptées sont les PNG et JPEG", status: "error", duration: 5000, isClosable: true, position: "top" })
             return;
         }
         // Fichiers < 10 Mo
         if (img.data.size > 10_000_000) {
-            Notifs("Erreur taille de fichier", "L'image séléctionnée doit faire moins de 10Mo", "warning")
+            toast({ title: "Erreur taille de fichier", description: "L'image séléctionnée doit faire moins de 10Mo", status: "error", duration: 5000, isClosable: true, position: "top" })
             return;
         }
         setSelectedPicture(img);
@@ -139,7 +138,6 @@ const Identity = () => {
 
     // Submit de l'image
     const pictureSubmit = async () => {
-
         try {
             let formData = new FormData()
             formData.append('file', selectedPicture.data);
@@ -149,7 +147,7 @@ const Identity = () => {
                 {
                     headers: { "Content-Type": "image/*" },
                 });
-            Notifs("Image de profil sauvegardée !", "", "success")
+            toast({ title: "Image de profil sauvegardée", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
             setPictureWaitingToBeSent(false);
             setAuth({
                 ...auth,
@@ -157,43 +155,53 @@ const Identity = () => {
             });
             console.log(response)
         } catch (error) {
-            console.log(error)
+            toast({ title: "Erreur", description: "Vérifiez le fichier", status: "error", duration: 5000, isClosable: true, position: "top" })
+
         }
     }
 
     return (
-        <div className="identity">
-            <h3>Préférences</h3>
+        <>
+            <Stack spacing={4} w={'xs'}>
+                <Heading fontSize={'2xl'}>Préférences</Heading>
+                <InputGroup>
+                    <Input placeholder='Nouveau pseudo' _focus={{ outline: 'none' }} onChange={(e) => setNewPseudo(e.target.value)} />
+                    <InputRightElement>
+                        <IconButton colorScheme={"green"} borderRadius={'0px 5px 5px 0px'} _focus={{ outline: 'none' }} onClick={handleSubmit} icon={<FontAwesomeIcon icon={faCheck}/>}>
+                        </IconButton>
+                    </InputRightElement>
+                </InputGroup>
 
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    id="newPseudo"
-                    autoComplete="off"
-                    onChange={(e) => setNewPseudo(e.target.value)}
-                    required
-                    placeholder="Nouveau pseudo"
-                />
-                <button className="pseudoSubmit" onClick={(e) => e.currentTarget.blur()}><FontAwesomeIcon className="pseudoSubmitIcon" icon={faCheck} /></button>
-            </form>
+                <Divider />
 
-            <div className="importProfilePic">
-                <input type="file" id="picture" className="pictureInput" onChange={handlePictureSelect} />
-                <label htmlFor="picture" className="pictureLabel"><FontAwesomeIcon icon={faUpload} /><p>{selectedPicture?.data && pictureWaitingToBeSent ? (selectedPicture?.data.name).substring(0, 10) + "..." : "Importer une image"}</p></label>
-                <button className="pictureSendButton" onClick={(e) => { pictureSubmit(e); e.currentTarget.blur() }}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></button>
-            </div>
-            <div className="preferences">
-                <div>
-                    <img className="previewImage" src={picture}></img>
-                    <button onClick={(e) => { setAuth({ ...auth, preference: "image" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("image")) }} className="chooseImage">Choisir l'image</button>
-                </div>
-                <div>
-                    <Avatar className="previewAvatar"  {...avatar} />
-                    <button onClick={(e) => { setAuth({ ...auth, preference: "avatar" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar")) }} className="chooseAvatar">Choisir l'avatar</button>
-                </div>
-            </div>
-            <Invitations />
-        </div>
+                <Stack direction={'row'} justify={'space-between'}>
+                    <Stack align={'center'}>
+                        <Image boxSize={'8.5rem'} objectFit={'cover'} src={picture}></Image>
+                        <Button onClick={(e) => { setAuth({ ...auth, preference: "image" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("image")) }}>Choisir l'image</Button>
+                    </Stack>
+                    <Stack align={'center'}>
+                        <Avatar style={{ width: '8.5rem', height: '8.5rem' }}  {...avatar} />
+                        <Button onClick={(e) => { setAuth({ ...auth, preference: "avatar" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar")) }}>Choisir l'avatar</Button>
+                    </Stack>
+                </Stack>
+
+                <Stack w={'100%'} spacing={0} direction={'row'}>
+                    <Input type="file" display={'none'} id="picture" onChange={handlePictureSelect} />
+                        <FormLabel w={'90%'} htmlFor="picture" border={'0.5px solid'} borderRight={'none'} cursor={'pointer'} borderRadius={'3px 0px 0px 3px'}>
+                            <Center h={'100%'}>                         
+                                <FontAwesomeIcon icon={faUpload} />
+                                <Text display={'inline'} fontFamily={'body'} ml={2}>{selectedPicture?.data && pictureWaitingToBeSent ? (selectedPicture?.data.name).substring(0, 10) + "..." : "Importer une image"}</Text>
+                            </Center>
+                        </FormLabel>
+                        <Tooltip bg={'green.400'} label="Valider l'image" fontSize='md' placement="top">
+                    <IconButton borderRadius={'0px 3px 3px 0px'} colorScheme={"green"} onClick={(e) => { pictureSubmit(e); e.currentTarget.blur() }}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></IconButton>
+                    </Tooltip>
+                </Stack>
+
+                <Divider />
+                <Invitations />
+            </Stack>
+        </>
     );
 }
 export default Identity;

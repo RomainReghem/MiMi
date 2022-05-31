@@ -1,12 +1,12 @@
 import { useState } from "react";
-import axios from "../api/axios";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import Notifs from "./Notifs"
+import { useToast,Stack, Center, FormControl, FormLabel, Input, Button, Text } from "@chakra-ui/react";
 
 const PDFSender = (props) => {
+    const toast = useToast()
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileWaitingToBeSent, setFileWaitingToBeSent] = useState(false);
     const axiosPrivate = useAxiosPrivate();
@@ -18,12 +18,12 @@ const PDFSender = (props) => {
         const formData = new FormData();
         // PDF only
         if (selectedFile.type != "application/pdf") {
-            Notifs("Erreur type de fichier", "Les seuls fichier acceptés sont les PDF", "warning")
+            toast({ title: "Erreur de type de fichier", description: "Les seuls fichier acceptés sont les PDF", status: "error", duration: 3000, isClosable: true, position: "top" })
             return;
         }
         // Fichiers < 10 Mo
         if (selectedFile.size > 10_000_000) {
-            Notifs("Erreur taille de fichier", "Le fichier séléctionné doit faire moins de 10Mo", "warning")
+            toast({ title: "Erreur de taille de fichier", description: "Le fichier séléctionné doit faire moins de 10Mo", status: "error", duration: 3000, isClosable: true, position: "top" })
             return;
         }
         formData.append("file", selectedFile);
@@ -36,7 +36,7 @@ const PDFSender = (props) => {
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
-            Notifs("Fichier ajouté !", "", "success")
+            toast({ title: "Fichier sauvegardé", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
 
             // Pour l'UI on remet fileWaitingToBeSent à false
             setFileWaitingToBeSent(false);
@@ -55,19 +55,18 @@ const PDFSender = (props) => {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="fileForm">
-            <input type="file" id="file" className="fileInput" onChange={handleFileSelect} />
-            <label htmlFor="file" className="fileLabel">
-                <FontAwesomeIcon icon={faUpload} />
-                {/* Si un fichier est en attente, on joue les animations d'UI, et on change la valeur du label*/}
-                <p>{fileWaitingToBeSent ? (selectedFile?.name).substring(0, 10) + "..." : "Choisir un fichier"}</p>
-            </label>
-            <button className="fileSendButton" disabled={fileWaitingToBeSent ? false : true}>
-                <FontAwesomeIcon icon={faPaperPlane} bounce={fileWaitingToBeSent ? true : false} />
-                <p>Envoyer</p>
-            </button>
-
-        </form>
+            <Stack direction={"row"} spacing={'none'}>
+            <Input type="file" display={'none'} id="file" onChange={handleFileSelect} />
+            <FormLabel w={'75%'} p={1} htmlFor="file" border={'1px solid'} borderRight={'none'} cursor={'pointer'} borderRadius={'3px 0px 0px 3px'}>
+                <Center h={'100%'}>
+                    <FontAwesomeIcon icon={faUpload}/>
+                    <Text display={'inline'} ml={2} noOfLines={1}>{fileWaitingToBeSent ? selectedFile?.name : "Choisir un fichier"}</Text>
+                </Center>
+            </FormLabel>
+            <Button w={'25%'} borderRadius={'0px 3px 3px 0px'} onClick={handleSubmit} colorScheme={'green'} disabled={fileWaitingToBeSent ? false : true} leftIcon={<FontAwesomeIcon icon={faPaperPlane} bounce={fileWaitingToBeSent ? true : false} />}>
+                <Text>Envoyer</Text>
+            </Button>
+            </Stack>
     )
 };
 
