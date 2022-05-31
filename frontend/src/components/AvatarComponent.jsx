@@ -22,7 +22,8 @@ const AvatarComponent = () => {
     const { auth } = useAuth();
     const { setAuth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
-
+    
+    const [config, setConfig] = useState(JSON.parse(localStorage.getItem("avatar")));
 
     let mail = auth?.user;
 
@@ -37,7 +38,6 @@ const AvatarComponent = () => {
         } catch (err) { console.log("Erreur du chargement de l'avatar"); }
     }
     
-    const [config, setConfig] = useState(JSON.parse(localStorage.getItem("avatar")));
 
     const shirts = ["hoody", "short", "polo"]
     const glasses = ["none", "round", "square"]

@@ -2,6 +2,7 @@ import PDFSender from "../components/PDFSender"
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Tooltip from "@mui/material/Tooltip"
 import IconButton from "@mui/material/IconButton"
+import Button from "@mui/material/Button"
 import Notifs from "../components/Notifs"
 import PDFViewer from "../components/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -101,7 +102,7 @@ const Documents = () => {
             <section className="fileManager">
                 <div className="fileManagerMenu">
                     <Tooltip title="Refresh" placement="right">
-                        <IconButton size="small" onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></IconButton>
+                        <Button onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></Button>
                     </Tooltip>
                     <h4 onClick={() => { setMenuSelection(myFiles); setSelectedUI("my") }} style={selectedUI == "my" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}>Mes documents partagés</h4>
                     <h4 onClick={() => { setMenuSelection(sharedFiles); setSelectedUI("shared") }} style={selectedUI == "shared" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}>Partagés avec moi</h4>

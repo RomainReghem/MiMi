@@ -14,6 +14,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
 import {faDiceThree} from "@fortawesome/free-solid-svg-icons";
+import { axiosPrivate } from "../api/axios";
+import useAuth from '../hooks/useAuth'
 
 const socket = io.connect("http://localhost:5000");
 
@@ -23,6 +25,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const TicTacToe = () => {
+    const { auth } = useAuth();
 
     const [roomCode, setRoomCode] = useState("53");
     const [roomJoined, setRoomJoined] = useState(false);
@@ -33,12 +36,14 @@ const TicTacToe = () => {
     const [board, setBoard] = useState(["", "", "", "", "", "", "", "", ""]);
     const [UIboard, setUIboard] = useState([])
     const [canPlay, setCanPlay] = useState(true);
+    const [score, setScore] = useState([0,0])
 
     useEffect(() => {
         if (roomCode && !roomJoined) {
             socket.emit("joinRoom", roomCode);
             console.log("joining room...");
         }
+        getScore();
     }, [roomCode]);
 
     useEffect(() => {
@@ -82,9 +87,22 @@ const TicTacToe = () => {
             socket.id == player ? setWin(true) : setWin(false)
             setGameEnded(true);
             setRoomJoined(false);
+            getScore();
 
         });
     })
+
+    const getScore = async () => {
+        try {
+            const response = await axiosPrivate.get("/score",
+                {
+                    params: { mail: auth?.user, win:win }
+                });
+            setScore(response.data.scores)
+            console.log(response.data)
+            console.log(score)
+        } catch (err) { console.log("Erreur du chargement du score"); }
+    }
 
     const handleCellClick = (e) => {
         const id = e.currentTarget.id;
@@ -125,6 +143,7 @@ const TicTacToe = () => {
                         <CircularProgress style={{ marginRight: "0.5rem" }} size={10} color="error" />
                         Tour de l'adversaire...
                     </Button>)}
+                    <p>Score : élève : {score[0]}, classe : {score[1]}</p>
 
                     {gameEnded ? <Dialog
                         open={gameEnded}

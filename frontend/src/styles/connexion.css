@@ -74,7 +74,7 @@
 }
 
 .formContainer button:focus{    
-    box-shadow: 2px 2px #ffc3ae;
+    box-shadow: 2px 2px #ffc3ae !important;
 }
 
 
