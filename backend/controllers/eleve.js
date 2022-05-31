@@ -1,4 +1,6 @@
 const Eleve = require('../models/users').Eleve
+const Score = require('../models/users').Score
+
 // pour l'accès aux documents
 const fs = require('fs');
 const { Classe } = require('../models/users');
@@ -50,6 +52,7 @@ const getUsernameStudent = (req, res) => {
 /**
  * Supprime l'élève en fonction de son mail.
  * Supprime aussi tous ses documents.
+ * Supprime aussi ses scores aux jeux
  * 
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
@@ -82,25 +85,37 @@ const deleteStudent = async (req, res) => {
                 if (!eleve) {
                     return res.status(401).send("Pas d'élève trouvé avec cet adresse mail.");
                 }
-                // sinon on supprime l'élève
-                Eleve.destroy({
+                // on supprime d'abord tous les scores de l'élève pour respecter les contraintes de clé étrangère
+                Score.destroy({
                     where: {
                         ideleve: eleve.ideleve
                     }
-                }).then(result => {
-                    // maintenant on doit supprimer les dossiers et les documents de l'élève
-                    const num = eleve.ideleve;
-                    const path = "./Eleves/eleve" + num
-                    // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
-                    fs.rmdir(path, { recursive: true }, (err) => {
-                        if (err) {
-                            console.log("erreur suppression dossiers : " + err)
-                            return res.status(500).send("Erreur lors de la suppression de documents.")
+                })
+                .then(() => {
+                    // sinon on supprime l'élève
+                    Eleve.destroy({
+                        where: {
+                            ideleve: eleve.ideleve
                         }
-                        console.log("Suppression effectuée !")
-                        return res.send(result);
-                    })
-                }).catch(err => {
+                    }).then(result => {
+                        // maintenant on doit supprimer les dossiers et les documents de l'élève
+                        const num = eleve.ideleve;
+                        const path = "./Eleves/eleve" + num
+                        // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
+                        fs.rmdir(path, { recursive: true }, (err) => {
+                            if (err) {
+                                console.log("erreur suppression dossiers : " + err)
+                                return res.status(500).send("Erreur lors de la suppression de documents.")
+                            }
+                            console.log("Suppression effectuée !")
+                            return res.send(result);
+                        })
+                    }).catch(err => {
+                        console.log(err)
+                        return res.send(err).status(520)
+                    });
+                })
+                .catch(err => {
                     console.log(err)
                     return res.send(err).status(520)
                 });

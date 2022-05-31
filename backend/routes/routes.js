@@ -14,12 +14,13 @@ const SuppressionDoc = require('../controllers/suppressionDocument.js')
 const AjoutDoc = require('../controllers/ajoutDocument.js')
 const Document = require('../controllers/recuperationDocument.js')
 const ChangeDoc = require('../controllers/changementDocument.js')
-
 // controlleurs spécifiques en fonction du type d'utilisateur
 const Eleve = require('../controllers/eleve.js')
 const ModificationEleve = require('../controllers/modificationEleve.js')
 const Classe = require('../controllers/classe.js')
 const ModificationClasse = require('../controllers/modificationClasse.js')
+// controlleur pour le score
+const Score = require('../controllers/score.js')
 
 // LIBRAIRIES
 const express = require('express')
@@ -38,11 +39,6 @@ router.get('/refresh', refreshToken.refreshToken);
 
 // pour toutes les routes qui ont besoin d'une authentification : on fait appel au middleware qui vérifie la validité du token
 //router.use(verifyJWT)
-
-// Pour changer le mot de passe 
-//router.post('/changePwd', verifyJWT, Modification.ChangementMdp)
-// route pour changer le mail
-//router.post('/changeMail', verifyJWT, Modification.ChangementMail)
 
 // route qui permet de retourner un pseudo à partir du mail
 router.get('/pseudo', verifyJWT, Eleve.getUsernameStudent)
@@ -131,5 +127,12 @@ router.post('/changeMailClasse',verifyJWT, ModificationClasse.changementMailClas
 router.post('/changePwdEleve',verifyJWT, ModificationEleve.ChangementMdp)
 // route pour changer l'adresse mail de l'élève
 router.post('/changeMailEleve',verifyJWT, ModificationEleve.ChangementMail)
+
+// score de jeu
+// route pour récupérer un score de jeu (appel à chaque fin de partie)
+router.get('/score', verifyJWT, Score.putScoreTicTacToe)
+// route pour changer le score d'un jeu
+//router.delete('/score', verifyJWT, Score.resetScore)
+
 
 module.exports = router;

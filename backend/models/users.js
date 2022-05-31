@@ -72,41 +72,51 @@ const Score = db.define('score',
             type: Sequelize.INTEGER,
             autoIncrement: true,
             allowNull: false,
-            primaryKey: true,
-        }//,
-        /* jeu : {
-             type: Sequelize.STRING,
-             allowNull: false,
-         },
-         score:{
-             type: Sequelize.STRING,
-             allowNull: true,
-         },
-         ideleve:{
-             type: Sequelize.INTEGER,
-             references: 'classe', 
-             referencesKey:'idclasse'
-         }*/
+            primaryKey: true
+        },
+        jeu: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        scoreclasse: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            defaultValue: 0
+        },
+        scoreeleves: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            defaultValue: 0
+        },
+        victoireclasse: {
+            type: Sequelize.INTEGER.UNSIGNED,
+            allowNull: false,
+            defaultValue: 0
+        },
+        victoireeleves: {
+            type: Sequelize.INTEGER.UNSIGNED,
+            allowNull: false,
+            defaultValue: 0
+        },
+        nbpartie: {
+            type: Sequelize.INTEGER.UNSIGNED,
+            allowNull: false,
+            defaultValue: 0
+        },
+        idclasse: {
+            type: Sequelize.INTEGER,
+            references: 'classe',
+            referencesKey: 'idclasse',
+            allowNull: false
+        }
     }, { timestamps: false, freezeTableName: true, tableName: 'score' })
-
-const RefreshToken = db.define('refreshToken', {
-    idtoken: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true,
-    },
-    token: {
-        type: Sequelize.STRING,
-        allowNull: false,
-    }
-}, { timestamps: false, freezeTableName: true, tableName: 'refreshToken' });
 
 //relations
 // un eleve a une classe, une classe a un ou plusieurs élèves
 Classe.hasMany(Eleve, { foreignKey: 'idclasse' })
 Eleve.belongsTo(Classe, { foreignKey: 'idclasse' })
-// Eleve.hasMany(Score,{foreignKey:'ideleve'})
-//Score.belongsTo(Eleve,{foreignKey:'ideleve'})
+// une classe a un score pour chaque jeu auquel il a joué
+Classe.hasMany(Score, { foreignKey: 'idclasse' })
+Score.belongsTo(Classe,{foreignKey:'idclasse'})
 
-module.exports = { Eleve, Classe, RefreshToken };
+module.exports = { Eleve, Classe, Score };

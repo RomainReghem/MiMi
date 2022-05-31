@@ -312,51 +312,6 @@ const ChangementMail = (req, res) => {
                                                         return res.status(201).json(json)
                                                     }
                                                 })
-
-                                                //refreshTokens = refreshTokens.filter((c) => c != refreshTokenOld)
-                                                /* Refresh.findOne({attributes:['idtoken'], where: { token: refreshTokenOld } })
-                                                     .then(token => {
-                                                         if (!token) {
-                                                             console.log("pas de token trouvé : accès interdit")
-                                                             return res.status(403)
-                                                         }
-                                                         // on crée de nouveaux token 
-                                                         console.log("*** Recréation des cookies pour l'élève ***")
-                                                         // cookie 
-                                                         const accessToken = jwt.sign(
-                                                             { "UserInfo": { "mail": newEmail, "role": "eleve" } },
-                                                             process.env.ACCESS_TOKEN_SECRET,
-                                                             { expiresIn: '10m' }
-                                                         );
-                                                         const refreshToken = jwt.sign(
-                                                             { "mail": newEmail, "role": "eleve" },
-                                                             process.env.REFRESH_TOKEN_SECRET,
-                                                             { expiresIn: '1d' }
-                                                         )
-                                                         // on insère dans la liste le nouveau refreshtoken
-                                                         // refreshTokens.push(refreshToken);
-                                                         Refresh.update({ token: refreshToken }, { where: { idtoken: token.idtoken } })
-                                                             .then(() => {
-                                                                 getInvitation(newEmail, function (reponse) {
-                                                                     if (reponse == 404 || reponse == 407) {
-                                                                         return res.sendStatus(reponse)
-                                                                     } else {
-                                                                         console.log("changement de mail ok")
-                                                                         let json = reponse
-                                                                         res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                                         json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
-                                                                         return res.status(201).json(json)
-                                                                     }
-                                                                 })
-                                                             }).catch(err => {
-                                                                 console.log(err)
-                                                                 return res.sendStatus(600)
-                                                             });
-                                                     }).catch(err => {
-                                                         console.log(err)
-                                                         return res.sendStatus(600)
-                                                     });*/
-
                                             }).catch(err => {
                                                 console.log(err)
                                                 return res.sendStatus(600)
