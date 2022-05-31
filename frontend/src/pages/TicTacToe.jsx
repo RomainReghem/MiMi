@@ -113,7 +113,11 @@ const TicTacToe = () => {
 
     const getScore = async () => {
         try {
-            const response = await axiosPrivate.get("/score");
+            const response = await axiosPrivate.get("/score",
+                {
+                    params: { mail: auth?.user }
+                }
+            );
             setScore(response.data.scores)
             console.log(response.data)
             console.log(score)
