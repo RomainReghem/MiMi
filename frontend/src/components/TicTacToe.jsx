@@ -1,31 +1,24 @@
-import { useEffect, useState, useLayoutEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState, useLayoutEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import * as React from 'react';
 import Cell from "../components/Cell";
 import "../styles/tictactoe.css";
-import CircularProgress from '@mui/material/CircularProgress';
 import io from "socket.io-client"
-import Button from "@mui/material/Button";
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogTitle from '@mui/material/DialogTitle';
-import Slide from '@mui/material/Slide';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
 import { faDiceThree } from "@fortawesome/free-solid-svg-icons";
 import { axiosPrivate } from "../api/axios";
 import useAuth from '../hooks/useAuth'
+import { CircularProgress, Button, AlertDialogFooter, AlertDialogCloseButton, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent } from "@chakra-ui/react";
+
 
 const socket = io.connect("http://localhost:5000");
 
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-});
-
 const TicTacToe = () => {
     const { auth } = useAuth();
+    const navigate = useNavigate();
+    const cancelRef = useRef();
 
     const [roomCode, setRoomCode] = useState("53");
     const [roomJoined, setRoomJoined] = useState(false);
@@ -157,32 +150,36 @@ const TicTacToe = () => {
                         <Cell handleCellClick={handleCellClick} id={"7"} text={UIboard[7]} />
                         <Cell handleCellClick={handleCellClick} id={"8"} text={UIboard[8]} />
                     </section>
-                    {canPlay ? (<Button style={{ marginTop: "0.5rem" }} variant="contained" color="success">
-                        <FontAwesomeIcon className="dice" icon={faDiceThree} style={{ marginRight: "0.5rem" }} /> A ton tour de jouer !
-                    </Button>) : (<Button style={{ marginTop: "0.5rem" }} variant="outlined" color="error">
+                    {canPlay ? (<Button style={{ marginTop: "0.5rem" }} variant="contained" colorScheme="green" leftIcon={<FontAwesomeIcon className="dice" icon={faDiceThree} />}>
+                        A ton tour de jouer !
+                    </Button>) : (<Button style={{ marginTop: "0.5rem" }} variant="outlined" colorScheme="red">
                         <CircularProgress style={{ marginRight: "0.5rem" }} size={10} color="error" />
                         Tour de l'adversaire...
                     </Button>)}
                     <p>Score : élève : {score[0]}, classe : {score[1]}</p>
 
-                    {gameEnded ? <Dialog
-                        open={gameEnded}
-                        TransitionComponent={Transition}
-                        keepMounted>
-                        <center><DialogTitle>{win ? "Gagné !" : "Perdu :("}</DialogTitle></center>
-                        <DialogActions>
-                            <Button onClick={handleReplay} variant="outlined" color="success">Rejouer</Button>
-                            <Link to="/jeux" style={{ textDecoration: 'none', marginLeft: "0.3rem" }} >
-                                <Button variant="outlined" color="error">Quitter</Button>
-                            </Link>
-                        </DialogActions>
-                    </Dialog> : <></>}
+                    {gameEnded ? <AlertDialog motionPreset='slideInBottom' leastDestructiveRef={cancelRef} isOpen={gameEnded} isCentered>
+                            <AlertDialogOverlay />
+                            <AlertDialogContent>
+                                <AlertDialogHeader>{win ? "Gagné !" : "Perdu :("}</AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <Button ref={cancelRef} onClick={handleReplay}>
+                                        Rejouer
+                                    </Button>
+                                    <Button  onClick={() => {navigate("/games")}} colorScheme='red' ml={3}>
+                                        Quitter
+                                    </Button>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog> : <></>}
                 </div>
+
+
 
 
             ) :
                 (<div className="waitingRoom">
-                    {roomJoined ? <CircularProgress /> : <></>}
+                    {roomJoined ? <CircularProgress isIndeterminate color='green.300' /> : <></>}
                     <p>{waitingText}</p>
                 </div>)
             }

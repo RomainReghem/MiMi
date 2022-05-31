@@ -1,21 +1,21 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "./styles/index.css";
-import App from "./pages/App";
+import React from 'react';
+import "./index.css"
+import * as ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import App from './components/App';
 import { AuthProvider } from "./context/AuthProvider";
 
-const rootElement = document.getElementById("root");
-const root = ReactDOM.createRoot(rootElement);
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
 
 root.render(
-    <div className="container">
-      <Router>
-        <AuthProvider>
-          <Routes>
-            <Route path="/*" element={<App />}/>
-          </Routes>          
-        </AuthProvider>
-      </Router>
-    </div>
+  <>
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/*" element={<App />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
+  </>
 );
