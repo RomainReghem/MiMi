@@ -13,7 +13,7 @@ import Slide from '@mui/material/Slide';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
-import {faDiceThree} from "@fortawesome/free-solid-svg-icons";
+import { faDiceThree } from "@fortawesome/free-solid-svg-icons";
 import { axiosPrivate } from "../api/axios";
 import useAuth from '../hooks/useAuth'
 
@@ -36,7 +36,8 @@ const TicTacToe = () => {
     const [board, setBoard] = useState(["", "", "", "", "", "", "", "", ""]);
     const [UIboard, setUIboard] = useState([])
     const [canPlay, setCanPlay] = useState(true);
-    const [score, setScore] = useState([0,0])
+    const [score, setScore] = useState([0, 0])
+    let winner = false;
 
     useEffect(() => {
         if (roomCode && !roomJoined) {
@@ -71,9 +72,9 @@ const TicTacToe = () => {
             // Making a new array to have nicer UI than just letters "X" and "O"
             let newUIboard = [];
             updatedBoard.forEach((cell) => {
-                cell == "X" ? newUIboard.push(<FontAwesomeIcon className="cellX" icon={faXmark}/>)
-                : cell == "O" ? newUIboard.push(<FontAwesomeIcon className="cellO" icon={faCircle}/>)
-                : newUIboard.push("")
+                cell == "X" ? newUIboard.push(<FontAwesomeIcon className="cellX" icon={faXmark} />)
+                    : cell == "O" ? newUIboard.push(<FontAwesomeIcon className="cellO" icon={faCircle} />)
+                        : newUIboard.push("")
             })
             setUIboard(newUIboard)
 
@@ -84,20 +85,29 @@ const TicTacToe = () => {
         });
 
         socket.on("victory", (player) => {
-            socket.id == player ? setWin(true) : setWin(false)
+            socket.id == player ? winner = true : winner = false
             setGameEnded(true);
             setRoomJoined(false);
-            getScore();
+            postScore();
 
         });
     })
 
+    const postScore = async () => {
+        try {
+            await axiosPrivate.post("/score", JSON.stringify({ mail: auth?.user, win: winner }),
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                });
+            getScore();
+        }
+        catch (err) { console.log(err) }
+    }
+
     const getScore = async () => {
         try {
-            const response = await axiosPrivate.get("/score",
-                {
-                    params: { mail: auth?.user, win:win }
-                });
+            const response = await axiosPrivate.get("/score");
             setScore(response.data.scores)
             console.log(response.data)
             console.log(score)
@@ -138,7 +148,7 @@ const TicTacToe = () => {
                         <Cell handleCellClick={handleCellClick} id={"8"} text={UIboard[8]} />
                     </section>
                     {canPlay ? (<Button style={{ marginTop: "0.5rem" }} variant="contained" color="success">
-                        <FontAwesomeIcon className="dice" icon={faDiceThree} style={{ marginRight: "0.5rem" }}/> A ton tour de jouer !
+                        <FontAwesomeIcon className="dice" icon={faDiceThree} style={{ marginRight: "0.5rem" }} /> A ton tour de jouer !
                     </Button>) : (<Button style={{ marginTop: "0.5rem" }} variant="outlined" color="error">
                         <CircularProgress style={{ marginRight: "0.5rem" }} size={10} color="error" />
                         Tour de l'adversaire...
@@ -152,7 +162,7 @@ const TicTacToe = () => {
                         <center><DialogTitle>{win ? "Gagné !" : "Perdu :("}</DialogTitle></center>
                         <DialogActions>
                             <Button onClick={handleReplay} variant="outlined" color="success">Rejouer</Button>
-                            <Link to="/jeux" style={{textDecoration: 'none', marginLeft:"0.3rem"}} >
+                            <Link to="/jeux" style={{ textDecoration: 'none', marginLeft: "0.3rem" }} >
                                 <Button variant="outlined" color="error">Quitter</Button>
                             </Link>
                         </DialogActions>
