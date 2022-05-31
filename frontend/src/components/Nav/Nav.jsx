@@ -81,7 +81,7 @@ export default function Nav() {
                     <Badge
                         textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
                         colorScheme='gray'>
-                        {auth?.role == "eleve" ? pseudo : "classe #" + auth?.idclasse}
+                        {auth?.role == "eleve" ? pseudo : auth?.role == "classe" ? "classe #" + auth?.idclasse : <></>}
                     </Badge>
 
                     <Flex display={{ base: 'none', md: 'flex' }} ml={5}>

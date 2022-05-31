@@ -19,6 +19,8 @@ import Jitsi from "../components/jitsi";
 import TicTacToe from "./Games/TicTacToe";
 import Jeux from "./Games/Jeux"
 
+import Settings from "../Settings/Settings";
+
 
 import '../styles/tictactoe.css'
 import '../styles/documents.css'
@@ -43,6 +45,7 @@ export default function App() {
                 <Route path="/video" element={<Jitsi />} />
                 <Route path="/games" element={<Jeux />} />
                 <Route path="/tictactoe" element={<TicTacToe/>}/> 
+                <Route path="/settings" element={<Settings/>}/>
               </Route>
             </Route>
           </Route>

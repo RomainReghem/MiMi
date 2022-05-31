@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useToast, Tooltip, Heading, Text, Stack, Center, Button, Badge, IconButton, Input, Divider, InputRightElement, InputGroup } from "@chakra-ui/react";
+import { useToast, Tooltip, Heading, Text, Stack, Center, Button, Badge, IconButton, Input, Divider, InputRightElement, InputGroup, Popover, PopoverHeader, PopoverContent, PopoverBody, PopoverTrigger } from "@chakra-ui/react";
 import useAuth from "../../hooks/useAuth";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -110,14 +110,17 @@ const Users = () => {
                     {users?.length
                         ? <>
                             {users.map((user, i) => <Stack key={i} align={'center'} justify={'flex-start'} direction={'row'}>
-                                <Tooltip bg={'red.400'} label="Supprimer l'élève" fontSize='md' placement="top">
-                                    <IconButton mr={2} size={'sm'} colorScheme={'red'} onClick={() => { deleteEleve(user?.courriel); setUsersUpdated(!usersUpdated) }} icon={<FontAwesomeIcon icon={faXmark} />}></IconButton>
-                                </Tooltip>
+                                <Popover placement="left">
+                                    <PopoverTrigger>
+                                        <IconButton _focus={{outline:'none'}} mr={2} size={'sm'} colorScheme={'red'} icon={<FontAwesomeIcon icon={faXmark} />}></IconButton>
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                        <PopoverBody><Stack><Text>Vous êtes sur le point de supprimer cet élève</Text><Button colorScheme={'red'} onClick={() => { deleteEleve(user?.courriel); setUsersUpdated(!usersUpdated) }}>Supprimer</Button></Stack></PopoverBody>
+                                    </PopoverContent>
+                                </Popover>
                                 <Text fontSize={'lg'}>{user?.courriel}</Text>
                             </Stack>)}
                         </>
-
-
                         : <p>Invitez un élève pour le voir apparaître ici lorsqu'il acceptera</p>
                     }
                 </Stack>
