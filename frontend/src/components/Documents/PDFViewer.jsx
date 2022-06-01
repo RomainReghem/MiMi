@@ -18,19 +18,19 @@ const PDFViewer = (props) => {
 
     if (auth?.role == "classe" && props.selected == "my") {
         url = "/getFileClass"
-        parameters = { id: auth?.idclasse, cours: "maths", name:props.clickedFile}
+        parameters = { id: auth?.idclasse, name:props.clickedFile}
 
     } else if (auth?.role == "classe" && props.selected == "shared") {
         url = "/getFile"
-        parameters = { mail:localStorage.getItem("mailEleve"), cours: "maths", name:props.clickedFile}
+        parameters = { mail:localStorage.getItem("mailEleve"), name:props.clickedFile}
 
     } else if (auth?.role == "eleve" && props.selected == "my") {
         url = "/getFile"
-        parameters = { mail: auth?.user, cours: "maths", name:props.clickedFile}
+        parameters = { mail: auth?.user, name:props.clickedFile}
 
     } else if (auth?.role == "eleve" && props.selected == "shared") {
         url = "/getFileClass"
-        parameters = { id: auth?.idclasse, cours: "maths", name:props.clickedFile}
+        parameters = { id: auth?.idclasse, name:props.clickedFile}
     }
 
 

@@ -28,7 +28,6 @@ const PDFSender = (props) => {
         }
         formData.append("file", selectedFile);
         formData.append("filename", selectedFile.name);
-        formData.append("cours", "maths");
         formData.append("mail", auth?.user)
         console.log(selectedFile.name);
         try {

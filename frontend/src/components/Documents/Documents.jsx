@@ -1,9 +1,9 @@
 import PDFSender from "../Documents/PDFSender"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useToast, Tooltip, Text, Button, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue } from "@chakra-ui/react";
+import { useToast, Tooltip, Text, Button, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls } from "@chakra-ui/react";
 import PDFViewer from "../Documents/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRotate, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faRotate, faXmark, faPencil, faEye } from "@fortawesome/free-solid-svg-icons";
 import useAuth from "../../hooks/useAuth";
 import { useState, useEffect } from "react";
 
@@ -13,7 +13,6 @@ const Documents = () => {
     const { auth } = useAuth();
     const toast = useToast();
     const axiosPrivate = useAxiosPrivate();
-
 
     // Tableau de tous les noms des fichiers 
     const [myFiles, setMyFiles] = useState([]);
@@ -29,20 +28,26 @@ const Documents = () => {
 
     let myFilesURL = (auth?.role == "classe" ? "/getCoursClass" : "/getCours");
     let sharedFilesURL = (auth?.role == "classe" ? "/getCours" : "/getCoursClass");
-    let myFilesParams = (auth?.role == "classe" ? { id: auth?.idclasse, cours: "maths" } : { mail: auth?.user, cours: "maths" })
-    let sharedFilesParams = (auth?.role == "classe" ? { mail: localStorage.getItem("mailEleve"), cours: "maths" } : { id: auth?.idclasse, cours: "maths" })
+    let myFilesParams = (auth?.role == "classe" ? { id: auth?.idclasse } : { mail: auth?.user })
+    let sharedFilesParams = (auth?.role == "classe" ? { mail: localStorage.getItem("mailEleve")} : { id: auth?.idclasse })
+    
     let deleteParams;
     let deleteFileURL;
+    let editFileURL;
+    let editFileParams;
 
     if (auth?.role == "classe") {
         deleteFileURL = "/coursClasse";
-        deleteParams = { id: auth?.idclasse, matiere: "maths" }
+        editFileURL = "/editFileClasse"
+        editFileParams = { id: auth?.idclasse }
+        deleteParams = { id: auth?.idclasse }
 
     } else if (auth?.role == "eleve") {
         deleteFileURL = "/coursEleve";
-        deleteParams = { mail: auth?.user, matiere: "maths" }
+        editFileURL = "/editFileEleve"
+        editFileParams = { mail: auth?.user }
+        deleteParams = { mail: auth?.user }
     }
-
 
     useEffect(() => {
         loadFiles()
@@ -95,32 +100,55 @@ const Documents = () => {
         }
     }
 
+    const editFileName = async (newName, currentName) => {
+        try {
+            console.log(newName, currentName)
+            await axiosPrivate.post(editFileURL, JSON.stringify({...editFileParams, newName, currentName }),
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                });
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
     return (
         <Center flexGrow={1}>
-        <Wrap spacing={10} p={5} justify={'center'} align={'center'}>
-            <Stack spacing={4} w={useBreakpointValue({base:"xs", md:"md"})}>
-                <Heading fontSize={'2xl'}>Gestion des documents</Heading>
-                <Stack w={'100%'} direction={'row'}>
-                <Tooltip bg={'blue.500'} label="Charger les fichiers" fontSize='md' placement="top">
-                    <Button onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></Button>
-                </Tooltip>
-                <Button colorScheme={'blue'} onClick={() => { setMenuSelection(myFiles); setSelectedUI("my") }} style={selectedUI == "my" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Mes documents partagés</Text></Button>
-                <Button colorScheme={'blue'} onClick={() => { setMenuSelection(sharedFiles); setSelectedUI("shared") }} style={selectedUI == "shared" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Partagés avec moi</Text></Button>
+            <Wrap spacing={10} p={5} justify={'center'} align={'center'}>
+                <Stack spacing={4} w={useBreakpointValue({ base: "xs", md: "md" })}>
+                    <Heading fontSize={'2xl'}>Gestion des documents</Heading>
+                    <Stack w={'100%'} direction={'row'}>
+                        <Tooltip bg={'blue.500'} label="Charger les fichiers" fontSize='md' placement="top">
+                            <Button onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></Button>
+                        </Tooltip>
+                        <Button colorScheme={'blue'} onClick={() => { setMenuSelection(myFiles); setSelectedUI("my") }} style={selectedUI == "my" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Mes documents partagés</Text></Button>
+                        <Button colorScheme={'blue'} onClick={() => { setMenuSelection(sharedFiles); setSelectedUI("shared") }} style={selectedUI == "shared" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Partagés avec moi</Text></Button>
+                    </Stack>
+                    <Stack w={'100%'} h={'xs'} overflowY="auto" p={1}>
+                        {Array.from(Array(menuSelection?.length), (e, i) => {
+                            return <Stack key={i} direction={'row'} w={'100%'}>
+                                <Button w={'100%'} justifyContent={'flex-start'}>
+                                    <Editable defaultValue={menuSelection[i]} noOfLines={1} onSubmit={(e) => { editFileName(e, menuSelection[i]) }}>
+                                        <EditablePreview />
+                                        <EditableInput />
+                                    </Editable>
+                                </Button>
+                                {selectedUI == "my" ? <>
+                                    <IconButton colorScheme={'gray'} onClick={() => setFile(menuSelection[i])} icon={<FontAwesomeIcon icon={faEye} />}></IconButton>
+                                    <IconButton colorScheme={'red'} onClick={(e) => { deleteFile(menuSelection[i]) }} icon={<FontAwesomeIcon icon={faXmark} />}></IconButton>
+                                </> : <></>}</Stack>
+                        })}
+                    </Stack>
+                    <Stack w={'100%'}>
+                        <PDFSender reload={loadFiles} />
+                    </Stack>
                 </Stack>
-                <Stack w={'100%'} h={'xs'} overflowY="auto" p={1}>
-                    {Array.from(Array(menuSelection?.length), (e, i) => {
-                        return <Stack key={i} direction={'row'} w={'100%'}><Button w={'100%'} justifyContent={'flex-start'} onClick={() => setFile(menuSelection[i])}><Text noOfLines={1}>{menuSelection[i]}</Text></Button>
-                            {selectedUI == "my" ? <IconButton colorScheme={'red'} onClick={(e) => { deleteFile(menuSelection[i]); e.stopPropagation() }}><FontAwesomeIcon icon={faXmark} /></IconButton> : <></>}</Stack>
-                    })}
-                </Stack>
-                <Stack w={'100%'}>
-                <PDFSender reload={loadFiles} />
-                </Stack>
-            </Stack>
-            <section className="fileViewer">
-                <PDFViewer clickedFile={file} selected={selectedUI} />
-            </section>
-        </Wrap>
+                <section className="fileViewer">
+                    <PDFViewer clickedFile={file} selected={selectedUI} />
+                </section>
+            </Wrap>
         </Center>
 
     )

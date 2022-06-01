@@ -97,8 +97,8 @@ io.on("connection", (socket) => {
     if (!board.includes("")) {
       io.in(roomCode).emit("victory");
       io.in(roomCode).socketsLeave(roomCode);
+      return;
     }
-
   }
 
   socket.on("disconnect", () => {

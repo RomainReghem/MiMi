@@ -10,7 +10,7 @@ import { faCircle } from "@fortawesome/free-regular-svg-icons";
 import { faDiceThree } from "@fortawesome/free-solid-svg-icons";
 import { axiosPrivate } from "../../api/axios";
 import useAuth from '../../hooks/useAuth'
-import { CircularProgress, Button, AlertDialogFooter, AlertDialogCloseButton, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent } from "@chakra-ui/react";
+import { CircularProgress, Center, Button, Text, Stack, AlertDialogFooter, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent, Wrap, Grid, Divider, Heading, Badge, StackDivider, Box } from "@chakra-ui/react";
 
 
 const socket = io.connect("http://localhost:5000");
@@ -37,7 +37,6 @@ const TicTacToe = () => {
             socket.emit("joinRoom", roomCode);
             console.log("joining room...");
         }
-        getScore();
     }, [roomCode]);
 
     useEffect(() => {
@@ -87,8 +86,6 @@ const TicTacToe = () => {
             }
             setGameEnded(true);
             setRoomJoined(false);
-            postScore();
-
         });
     })
 
@@ -99,20 +96,19 @@ const TicTacToe = () => {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            getScore();
         }
         catch (err) { console.log(err) }
     }
 
     const getScore = async () => {
         try {
+            console.log("mail envoyé au serveur : " +  auth?.user)
             const response = await axiosPrivate.get("/score",
                 {
                     params: { mail: auth?.user }
                 }
             );
             setScore(response.data.scores)
-            console.log(response.data)
             console.log(score)
         } catch (err) { console.log("Erreur du chargement du score"); }
     }
@@ -135,49 +131,61 @@ const TicTacToe = () => {
 
     return (
         <>
-            {showBoard ? (
-                <div className="tictactoe">
-                    <section className="tictactoe-section">
-                        <Cell handleCellClick={handleCellClick} id={"0"} text={UIboard[0]} />
-                        <Cell handleCellClick={handleCellClick} id={"1"} text={UIboard[1]} />
-                        <Cell handleCellClick={handleCellClick} id={"2"} text={UIboard[2]} />
+            {showBoard ? <>
+                <Center flexGrow={1}>
+                    <Wrap spacing={10} justify={'center'} p={5}>
+                        <Grid templateRows='repeat(3, 1fr)' templateColumns='repeat(3, 1fr)' gap={2}>
+                            <Cell handleCellClick={handleCellClick} id={"0"} text={UIboard[0]} />
+                            <Cell handleCellClick={handleCellClick} id={"1"} text={UIboard[1]} />
+                            <Cell handleCellClick={handleCellClick} id={"2"} text={UIboard[2]} />
 
-                        <Cell handleCellClick={handleCellClick} id={"3"} text={UIboard[3]} />
-                        <Cell handleCellClick={handleCellClick} id={"4"} text={UIboard[4]} />
-                        <Cell handleCellClick={handleCellClick} id={"5"} text={UIboard[5]} />
+                            <Cell handleCellClick={handleCellClick} id={"3"} text={UIboard[3]} />
+                            <Cell handleCellClick={handleCellClick} id={"4"} text={UIboard[4]} />
+                            <Cell handleCellClick={handleCellClick} id={"5"} text={UIboard[5]} />
 
-                        <Cell handleCellClick={handleCellClick} id={"6"} text={UIboard[6]} />
-                        <Cell handleCellClick={handleCellClick} id={"7"} text={UIboard[7]} />
-                        <Cell handleCellClick={handleCellClick} id={"8"} text={UIboard[8]} />
-                    </section>
-                    {canPlay ? (<Button style={{ marginTop: "0.5rem" }} variant="contained" colorScheme="green" leftIcon={<FontAwesomeIcon className="dice" icon={faDiceThree} />}>
-                        A ton tour de jouer !
-                    </Button>) : (<Button style={{ marginTop: "0.5rem" }} variant="outlined" colorScheme="red">
-                        <CircularProgress style={{ marginRight: "0.5rem" }} size={10} color="error" />
-                        Tour de l'adversaire...
-                    </Button>)}
-                    <p>Score : élève : {score[0]}, classe : {score[1]}</p>
+                            <Cell handleCellClick={handleCellClick} id={"6"} text={UIboard[6]} />
+                            <Cell handleCellClick={handleCellClick} id={"7"} text={UIboard[7]} />
+                            <Cell handleCellClick={handleCellClick} id={"8"} text={UIboard[8]} />
+                        </Grid >
+
+                        <Stack direction={'column'} w={'md'} spacing={10} >
+                            <Heading alignSelf={'center'} fontSize={'2xl'}>Scores</Heading>
+                            <Stack direction={'row'} justify={'space-evenly'}>
+                                <Stack align={'center'} >
+                                    <Badge fontSize={'md'} align={'center'} w={'10ch'} colorScheme='green'>ELEVE</Badge>
+                                    <Text fontSize={'xl'} fontFamily={'mono'}>{score[0]}</Text>
+                                </Stack>
+                                <Divider orientation="vertical" h={'3rem'} />
+                                <Stack align={'center'}>
+                                    <Badge fontSize={'md'} w={'10ch'} align={'center'} colorScheme='red'>CLASSE</Badge>
+                                    <Text fontSize={'xl'} fontFamily={'mono'}>{score[1]}</Text>
+                                </Stack>
+                            </Stack>
+                            {canPlay ? (<Button alignSelf={'center'} _focus={{ outline: 'none' }} bg='green.200' _hover={{ bg: 'green.300' }} variant={'outline'} leftIcon={<FontAwesomeIcon className="dice" icon={faDiceThree} />}>
+                                A ton tour de jouer !
+                            </Button>) : (<Button alignSelf={'center'} _focus={{ outline: 'none' }} w='xs' colorScheme="red" leftIcon={<CircularProgress size={'1.5rem'} isIndeterminate color='red.300' />}>
+                                Au tour de l'adversaire...
+                            </Button>)}
+                        </Stack>
+                    </Wrap>
 
                     {gameEnded ? <AlertDialog motionPreset='slideInBottom' leastDestructiveRef={cancelRef} isOpen={gameEnded} isCentered>
-                            <AlertDialogOverlay />
-                            <AlertDialogContent>
-                                <AlertDialogHeader>{win ? "Gagné !" : "Perdu :("}</AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <Button ref={cancelRef} onClick={handleReplay}>
-                                        Rejouer
-                                    </Button>
-                                    <Button  onClick={() => {navigate("/games")}} colorScheme='red' ml={3}>
-                                        Quitter
-                                    </Button>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog> : <></>}
-                </div>
+                        <AlertDialogOverlay />
+                        <AlertDialogContent>
+                            <AlertDialogHeader>{win ? "Gagné !" : "Perdu :("}</AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <Button ref={cancelRef} onClick={handleReplay}>
+                                    Rejouer
+                                </Button>
+                                <Button onClick={() => { navigate("/games") }} colorScheme='red' ml={3}>
+                                    Quitter
+                                </Button>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog> : <></>}
+                </Center>
 
-
-
-
-            ) :
+            </> :
                 (<div className="waitingRoom">
                     {roomJoined ? <CircularProgress isIndeterminate color='green.300' /> : <></>}
                     <p>{waitingText}</p>
