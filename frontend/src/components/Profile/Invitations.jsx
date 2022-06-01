@@ -1,6 +1,6 @@
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { faCheck, faXmark, faDoorOpen } from "@fortawesome/free-solid-svg-icons";
 import { useToast, Stack, Text, IconButton, Tooltip, useColorModeValue } from "@chakra-ui/react";
 

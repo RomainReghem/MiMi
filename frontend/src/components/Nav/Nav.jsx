@@ -1,4 +1,5 @@
-import {Box,Flex,Text,IconButton,Button,Stack,Heading, Collapse,Icon,Link,Popover,PopoverTrigger,PopoverContent,useColorModeValue,useBreakpointValue,useDisclosure,Center, Badge, Tooltip, Divider,
+import {
+    Box, Flex, Text, IconButton, Button, Stack, Heading, Collapse, Icon, Link, Popover, PopoverTrigger, PopoverContent, useColorModeValue, useBreakpointValue, useDisclosure, Center, Badge, Tooltip, Divider, Image,
 } from '@chakra-ui/react';
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 import {
@@ -7,14 +8,14 @@ import {
     ChevronDownIcon,
     ChevronRightIcon,
 } from '@chakra-ui/icons';
-import { faGear } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import Avatar from 'react-nice-avatar'
-import useLogout from "../hooks/useLogout";
+import useLogout from "../../hooks/useLogout";
 import { ColorModeSwitcher } from './ColorModeSwitcher';
-import useAuth from '../hooks/useAuth';
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import useGetImage from '../hooks/useGetImage';
-import useGetAvatar from '../hooks/useGetAvatar';
+import useAuth from '../../hooks/useAuth';
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useGetImage from '../../hooks/useGetImage';
+import useGetAvatar from '../../hooks/useGetAvatar';
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -28,6 +29,27 @@ export default function Nav() {
     const getImage = useGetImage();
     const getAvatar = useGetAvatar();
     const [pseudo, setPseudo] = useState("Profil");
+
+    let avatar_base = {
+        bgColor: "#E0DDFF",
+        earSize: "small",
+        eyeBrowStyle: "up",
+        eyeStyle: "oval",
+        faceColor: "#AC6651",
+        glassesStyle: "none",
+        hairColor: "#000",
+        hairStyle: "thick",
+        hatColor: "#000",
+        hatStyle: "none",
+        mouthStyle: "laugh",
+        noseStyle: "round",
+        shirtColor: "#6BD9E9",
+        shirtStyle: "polo",
+        shape: "square"
+    };
+
+    const [avatar, setAvatar] = useState(JSON.parse(localStorage.getItem("avatar")) || avatar_base);
+    const [imageURL, setImageURL] = useState("https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg");
 
     const signOut = async () => {
         await logout();
@@ -52,13 +74,45 @@ export default function Nav() {
             getPseudo()
     }, [auth?.user, auth?.somethingchanged])
 
+    useEffect(() => {
+        async function image() {
+            let data = await getImage()
+            let binary = '';
+            let bytes = new Uint8Array(data);
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            setImageURL("data:image/png;base64," + window.btoa(binary))
+        }
+        image();
+    }, [auth?.user, auth?.somethingchanged])
+
+
+
+    // On ne récupère l'avatar que s'il y a eu un changement, ou une connexion. Pour ne pas spammer les requetes
+    useEffect(() => {
+        async function avatar() {
+            if (auth?.user != undefined) {
+                let a = await getAvatar();
+                setAvatar(a);
+            }
+        }
+        avatar();
+        avatar();
+    }, [auth?.user, auth?.somethingchanged])
+
+    useEffect(() => {
+        if (auth?.user != undefined)
+            getPseudo()
+    }, [auth?.user, auth?.somethingchanged])
+
     return (
         <Box>
             <Flex
                 bg={useColorModeValue('white', 'gray.900')}
                 color={useColorModeValue('gray.600', 'white')}
                 minH={'60px'}
-                py={{ base: 2 }}
+                py={{ base: 1 }}
                 px={{ base: 4 }}
                 borderBottom={1}
                 borderStyle={'solid'}
@@ -77,15 +131,21 @@ export default function Nav() {
                         aria-label={'Toggle Navigation'}
                     />
                 </Flex>
-                <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-                    <Text
-                        textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-                        fontFamily={'heading'}
-                        color={useColorModeValue('gray.800', 'white')}>
-                        MiMi
-                    </Text>
+                <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }} align={'center'}>
+                    {auth?.user ?
+                        <Box boxSize={'2rem'} mr={2}>{auth?.preference === "avatar" ?
+                            (<Avatar style={{ width: '2rem', height: '2rem' }} {...avatar} />) :
+                            (
+                                <Image maxH={'100%'} width={'100%'} objectFit={'cover'} src={imageURL}></Image>
+                            )}</Box> : <></>}
+                        <Badge
+                            textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
+                            colorScheme='gray'>
+                            {auth?.role == "eleve" ? pseudo : auth?.role == "classe" ? "classe #" + auth?.idclasse : <></>}
+                        </Badge>
+                    
 
-                    <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
+                    <Flex display={{ base: 'none', md: 'flex' }} ml={5}>
                         <DesktopNav />
                     </Flex>
                 </Flex>
@@ -94,29 +154,30 @@ export default function Nav() {
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
                     direction={'row'}
-                    spacing={6}>
-                        { !auth?.user ? <>
-                    <Link textDecoration={'none'} as={ReactRouterLink} to="/choice">
-                        <Button
-                            display={{ base: 'none', md: 'inline-flex' }}
-                            variant={'unstyled'}
-                            fontSize={'sm'}
-                            fontWeight={400}>
-                            S'inscrire
-                        </Button>
-                    </Link>
-                    <Link textDecoration={'none'} as={ReactRouterLink} to="/login">
-                        <Button
-                            fontSize={'sm'}
-                            fontWeight={600}
-                            colorScheme={'blue'}>
-                            Se connecter
-                        </Button>
-                    </Link></> : <Center><Badge colorScheme={'teal'}>Bienvenue, {pseudo}</Badge></Center>}
-                    {auth?.user && <Link as={ReactRouterLink} to="/settings"><IconButton colorScheme={'teal'} icon={<FontAwesomeIcon icon={faGear}/>}></IconButton></Link>}
+                    spacing={3}>
+                    {!auth?.user && <>
+                        <Link textDecoration={'none'} as={ReactRouterLink} to="/choice">
+                            <Button
+                                display={{ base: 'none', md: 'inline-flex' }}
+                                variant={'unstyled'}
+                                fontSize={'sm'}
+                                fontWeight={400}>
+                                S'inscrire
+                            </Button>
+                        </Link>
+                        <Link textDecoration={'none'} as={ReactRouterLink} to="/login">
+                            <Button
+                                fontSize={'sm'}
+                                fontWeight={600}
+                                colorScheme={'blue'}>
+                                Se connecter
+                            </Button>
+                        </Link></>}
+                    {auth?.user && <Link as={ReactRouterLink} to="/settings"><IconButton colorScheme={'teal'} icon={<FontAwesomeIcon icon={faGear} />}></IconButton></Link>}
                     <ColorModeSwitcher />
-                    {auth?.user && <><Center><Divider height={'1rem'} orientation='vertical'/></Center>
-                    <Button onClick={signOut} colorScheme={'red'}>Déconnexion</Button></>}
+                    {auth?.user && <><Center><Divider height={'2rem'} orientation='vertical' /></Center>
+                        <Button display={{ base: 'none', md: 'inline-flex' }} onClick={signOut} colorScheme={'red'}>Déconnexion</Button>
+                        <IconButton display={{ base: 'inline-flex', md: 'none' }} onClick={signOut} colorScheme={'red'} icon={<FontAwesomeIcon icon={faPowerOff} />}></IconButton></>}
                 </Stack>
             </Flex>
 

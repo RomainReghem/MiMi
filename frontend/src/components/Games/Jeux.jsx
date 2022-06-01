@@ -5,8 +5,8 @@ import { Text, Heading, Box, Stack, Center, Image, Wrap, Badge } from "@chakra-u
 const Jeux = () => {
     return (
         <Center flexGrow={1} >
-            <Wrap spacing={10}>
-                <Link to="/tictactoe" style={{ textDecoration: "none", color: "black" }} >
+            <Wrap spacing={10} justify={'center'} p={5}>
+                <Link to="/tictactoe" style={{ textDecoration: "none" }} >
                     <Box maxW={'xs'} p={2} transition={'transform 200ms'} _hover={{ transform: 'translate(0px, -0.3rem)', transition: 'transform 500ms' }}>
                         <Image src="https://i.pinimg.com/originals/ce/6f/7f/ce6f7ffd885e477efa2110437ab779dd.gif"></Image>
                         <Stack mt={2} direction={'column'} align="flex-start">

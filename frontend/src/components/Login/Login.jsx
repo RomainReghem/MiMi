@@ -3,8 +3,8 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { createSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { useRef, useState, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
-import axios from '../api/axios'
-import useAuth from '../hooks/useAuth'
+import axios from '../../api/axios'
+import useAuth from '../../hooks/useAuth'
 
 
 const LOGIN_URL = '/login';

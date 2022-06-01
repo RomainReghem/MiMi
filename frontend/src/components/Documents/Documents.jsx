@@ -1,10 +1,10 @@
-import PDFSender from "../components/PDFSender"
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import PDFSender from "../Documents/PDFSender"
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useToast, Tooltip, Text, Button, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue } from "@chakra-ui/react";
-import PDFViewer from "../components/PDFViewer";
+import PDFViewer from "../Documents/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faXmark } from "@fortawesome/free-solid-svg-icons";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import { useState, useEffect } from "react";
 
 
