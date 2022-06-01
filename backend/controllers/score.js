@@ -169,7 +169,7 @@ const Classe = require('../models/users').Classe
 // }
 
 
-// /**
+// // /**
 //  * Remet à 0 le score de l'élève donné pour le score du jeu donné. 
 // * * @param {*} req la requête du client, doit contenir :  
 //  * • le mail de l'élève : mail  
@@ -259,11 +259,14 @@ const getScoreTicTacToe = (req, res) => {
 
     if (email == emailToken) {
         if (role == "eleve") {
-            Eleve.findOne({ attributes: ['idclasse'], where: { courriel: email, invitation: "acceptee" } })
+            Eleve.findOne({ attributes: ['idclasse', 'invitation'], where: { courriel: email} })
                 .then(eleve => {
                     if (!eleve) {
                         console.log("eleve pas trouve avec l'addresse : " + email)
                         return res.send("Pas de compte correspondant à cette addresse.\nElève non trouvé").status(404);
+                    }else if(eleve.invitation!="acceptee"){
+                        console.log("Cet élève n'est pas dans une classe ! " + email)
+                        return res.sendStatus(409);
                     }
                     getScore(eleve.idclasse, "tictactoe", function (err, data) {
                         if (err) {
@@ -272,7 +275,8 @@ const getScoreTicTacToe = (req, res) => {
                         return res.json({ scores: [data.scoreeleves, data.scoreclasse] })
                     })
                 }).catch(err => {
-                    return res.status(500).send("Erreur récuperation compte eleve \n" + err);
+                    console.log("Erreur récuperation compte eleve \n" + err)
+                    return res.status(500).send("Erreur lors de la récuperation du compte eleve");
                 });
 
         } else if (role == "classe") {
@@ -347,7 +351,7 @@ const putScoreTicTacToe = (req, res) => {
                             return res.send(err).status(409)
                         }
                         // on ajoute d'abord le nouveau score
-                        Score.update({ scoreeleves: data.scoreeleves + gain, victoireeleves: data.victoireeleves + gain },
+                        Score.update({ scoreeleves: data.scoreeleves + gain },
                             { where: { idclasse: eleve.idclasse } })
                             .then(() => {
                                 return res.json({ scores: [data.scoreeleves + gain, data.scoreclasse] })
@@ -376,7 +380,7 @@ const putScoreTicTacToe = (req, res) => {
                         return res.send(err).status(520)
                     }
                     // on ajoute d'abord le nouveau score
-                    Score.update({ scoreclasse: data.scoreclasse + gain, nbpartie: data.nbpartie + 1, victoireclasse: data.victoireclasse + gain },
+                    Score.update({ scoreclasse: data.scoreclasse + gain, nbpartie: data.nbpartie + 1},
                         { where: { idclasse: classe.idclasse } })
                         .then(() => {
                             return res.json({ scores: [data.scoreeleves, data.scoreclasse + gain] })
@@ -402,7 +406,7 @@ const putScoreTicTacToe = (req, res) => {
 function getScore(id, jeu, callback) {
     Score.findOne(
         {
-            attributes: ['scoreclasse', 'scoreeleves', 'victoireclasse', 'victoireeleves', 'nbpartie'],
+            attributes: ['scoreclasse', 'scoreeleves', 'nbpartie'],
             where: { idclasse: id, jeu: jeu }
         }
     ).then(score => {
@@ -422,78 +426,11 @@ function getScore(id, jeu, callback) {
         return callback(null, score)
     }).catch(err => {
         console.log("Erreur récuperation score \n" + err)
-        return callback(err);
+        return callback(new Error("Erreur lors de la récupération du score."));
     });
 
 }
-/*
-function getScoreEleve(email, jeu, callback) {
-    Eleve.findOne(
-        {
-            attributes: ['ideleve'],
-            where: { courriel: email }
-        }).then(eleve => {
-            if (!eleve) {
-                console.log("Pas de compte correspondant à cette addresse.\nEleve non trouvé : " + email)
-                return callback(404, null)
-            }
-            Score.findOne(
-                { attributes: ['score', "victoire", 'nbpartie'], where: { ideleve: eleve.ideleve, jeu: jeu } }
-            ).then(score => {
-                if (!score) {
-                    console.log("pas de score pour le jeu trouvé : création du score ")
-                    Score.create({ jeu: jeu, ideleve: eleve.ideleve })
-                        .then(newscore => {
-                            console.log("Création du score effectuée");
-                            return callback(null, newscore);
-                        })
-                        .catch(err => {
-                            console.log("Erreur serveur creation des données pour le jeu \n")
-                            return callback(500, null);
-                        });
-                }
-                // on renvoie le score
-                return callback(null, score)
-            }).catch(err => {
-                console.log("Erreur récuperation score \n" + err)
-                return callback(500, null);
-            });
-        })
-}
 
-function getScoreClasse(email, jeu, callback) {
-    Classe.findOne(
-        {
-            attributes: ['idclasse'],
-            where: { courriel: email }
-        }).then(classe => {
-            if (!classe) {
-                console.log("Pas de compte correspondant à cette addresse.\nClasse non trouvée avec l'addresse : " + email)
-                return callback(404, null)
-            }
-            Score.findOne(
-                { attributes: ['score', 'victoire', 'nbpartie'], where: { idclasse: classe.idclasse, jeu: jeu } }
-            ).then(score => {
-                if (!score) {
-                    console.log("pas de score pour le jeu trouvé : création du score ")
-                    Score.create({ jeu: jeu, idclasse: classe.idclasse })
-                        .then(newscore => {
-                            console.log("Création du score effectuée");
-                            return callback(null, newscore);
-                        })
-                        .catch(err => {
-                            console.log("Erreur serveur creation des données pour le jeu \n" + err)
-                            return callback(500, null);
-                        });
-                }
-                // on renvoie le score
-                return callback(null, score)
-            }).catch(err => {
-                console.log("Erreur récuperation score \n" + err)
-                return error(500, null);
-            });
-        })
-}*/
 
 module.exports = {
     putScoreTicTacToe,
