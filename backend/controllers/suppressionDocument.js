@@ -13,7 +13,7 @@ const deleteCoursEleve = (req, res) => {
     console.log("\n*** Suppression de cours de l'eleve ***")
     const email = req.body.mail;
     const cours = req.body.cours;
-    const matiere = req.body.matiere;
+    const matiere =  "maths"//req.body.matiere;
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
@@ -65,7 +65,7 @@ const deleteCoursClasse = (req, res) => {
 
     const id = req.body.id;
     const cours = req.body.cours;
-    const matiere = req.body.matiere;
+    const matiere =  "maths"//req.body.matiere;
 
     const role = req.role;
     const emailToken = req.mail
@@ -110,7 +110,7 @@ const deleteCoursClasse = (req, res) => {
 const deleteMatiereEleve = (req, res) => {
     console.log("\n*** Suppression de matiere de l'eleve ***")
     const email = req.body.mail;
-    const matiere = req.body.matiere;
+    const matiere = "maths"// req.body.matiere;
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
@@ -158,7 +158,7 @@ const deleteMatiereEleve = (req, res) => {
 const deleteMatiereClasse = (req, res) => {
     console.log("\n*** Suppression de matiere de la classe ***")
     const id = req.body.id;
-    const matiere = req.body.matiere;
+    const matiere =  "maths"//req.body.matiere;
 
     const role = req.role;
     const emailToken = req.mail

@@ -11,7 +11,7 @@ const fs = require('fs');
  */
 const saveCoursEleve = (req, res, next) => {
     console.log("\n*** Sauvegarde de cours d'un eleve ***")
-    const matiere = req.body.cours;
+    const matiere = "maths"//req.body.cours;
     const email = req.body.mail;
     const file = req.file
 
@@ -88,7 +88,7 @@ const saveCoursEleve = (req, res, next) => {
  */
 const saveCoursClasse = (req, res) => {
     console.log("\n*** Sauvegarde de cours d'une classe ***")
-    const matiere = req.body.cours;
+    const matiere =  "maths"//req.body.cours;
     const email = req.body.mail;
     const file = req.file
 
@@ -155,7 +155,7 @@ const saveCoursClasse = (req, res) => {
 const addMatiereEleve = (req, res) => {
     console.log("\n*** Ajout d'une matière ***")
     const email = req.query.mail;
-    const matiere = req.query.matiere;
+    const matiere =  "maths"//req.query.matiere;
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
@@ -194,7 +194,7 @@ const addMatiereEleve = (req, res) => {
 const addMatiereClasse = (req, res) => {
     console.log("\n*** Ajout d'une matière dans la classe***")
     const email = req.query.mail;
-    const matiere = req.query.matiere;
+    const matiere =  "maths"//req.query.matiere;
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")

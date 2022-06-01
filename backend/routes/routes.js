@@ -103,15 +103,15 @@ router.delete('/coursEleve', verifyJWT, SuppressionDoc.deleteCoursEleve)
 // route pour supprimer un cours à la classe
 router.delete('/coursClasse', verifyJWT, SuppressionDoc.deleteCoursClasse)
 
-/* PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
+ /*PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
 // route pour renommer la matière d'une classe
 router.put("matiereClass", ChangeDoc.renameMatiereClasse)
 // route pour renommer la matière d'une classe
-router.put("coursClass", ChangeDoc.renameMatiereClasse)
+router.put("coursClass", ChangeDoc.renameMatiereClasse)*/
 // route pour renommer le nom d'un cours(fichier) d'une classe
-router.put("matiereEleve", ChangeDoc.renameMatiereClasse)
+router.post("/editFileClasse", verifyJWT, ChangeDoc.renameCoursClasse)
 // route pour renommer le nom d'un cours(fichier) d'un élève
-router.put("coursEleve", ChangeDoc.renameMatiereClasse)*/
+router.post("/editFileEleve", verifyJWT, ChangeDoc.renameCoursEleve)
 
 // PAS IMPLEMENTE : SUPPRESSION
 // route pour supprimer l'élève

@@ -11,7 +11,7 @@ const fs = require('fs');
 const getCoursEleve = (req, res) => {
     console.log("\n*** Récupération d'un cours ***")
     const email = req.query.mail;
-    const matiere = req.query.cours;
+    const matiere =  "maths"//req.query.cours;
     const name = req.query.name;
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
@@ -107,7 +107,7 @@ const getCoursEleve = (req, res) => {
 const getAllCoursEleve = (req, res) => {
     console.log("\n*** Récupération des cours d'une matiere***")
     const email = req.query.mail;
-    const matiere = req.query.cours;
+    const matiere =  "maths"//req.query.cours;
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
@@ -289,7 +289,7 @@ const getAllMatieresEleve = (req, res) => {
 const getCoursClasse = (req, res) => {
     console.log("\n*** Récupération d'un cours d'une classe***")
     const id = req.query.id;
-    const matiere = req.query.cours;
+    const matiere =  "maths"//req.query.cours;
     const name = req.query.name;
 
     if (id == null) {
@@ -386,7 +386,7 @@ const getCoursClasse = (req, res) => {
 const getAllCoursClasse = (req, res) => {
     console.log("\n*** Récupération des cours d'une classe pour une matiere***")
     const id = req.query.id;
-    const matiere = req.query.cours;
+    const matiere =  "maths"//req.query.cours;
 
     if (id == null) {
         return res.status(403).send("Accès interdit")
