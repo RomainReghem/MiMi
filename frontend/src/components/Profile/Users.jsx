@@ -36,7 +36,7 @@ const Users = () => {
                 // a changer et faire par rapport à l'id de la classe + récupération de(s) eleve par l'api
                 localStorage.setItem("mailEleve", response.data.eleves[0].courriel)
             } catch (err) {
-                console.error(err);
+                
                 {/*navigate('/login', { state: { from: location }, replace: true });*/ }
             }
         }
@@ -54,7 +54,7 @@ const Users = () => {
         try {
             await axiosPrivate.post("/inviteEleve", JSON.stringify({ classe: auth?.user, eleve: newEleve }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
-            toast({ title: "Elève invité", description: "", status: "Success", duration: 5000, isClosable: true, position: "top" })
+            toast({ title: "Elève invité", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
 
         }
         catch (err) {
@@ -75,7 +75,7 @@ const Users = () => {
         try {
             await axiosPrivate.post("/deleteEleve", JSON.stringify({ classe: auth?.user, eleve: eleveToDelete }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
-            toast({ title: "Elève supprimé", description: "", status: "Success", duration: 5000, isClosable: true, position: "top" })
+            toast({ title: "Elève supprimé", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
         }
         catch (err) {
             if (!err?.response) {
@@ -100,14 +100,14 @@ const Users = () => {
                     <Input placeholder="Adresse mail de l'élève" _focus={{ outline: 'none' }} onChange={(e) => setNewEleve(e.target.value)} />
                     <InputRightElement>
                         <Tooltip bg={'green.400'} label="Inviter l'élève" fontSize='md' placement="top">
-                            <IconButton colorScheme={"green"} borderRadius={'0px 5px 5px 0px'} _focus={{ outline: 'none' }} onClick={handleSubmit} icon={<FontAwesomeIcon icon={faCheck} />}>
+                            <IconButton colorScheme={'green'} borderRadius={'0px 5px 5px 0px'} _focus={{ outline: 'none' }} onClick={handleSubmit} icon={<FontAwesomeIcon icon={faCheck} />}>
                             </IconButton>
                         </Tooltip>
                     </InputRightElement>
                 </InputGroup>
                 <Divider my={5} />
                 <Heading fontSize={'2xl'}>Eleve(s) de la classe :</Heading><Stack h={'sm'} >
-                    {users?.length
+                    {users?.length > 0
                         ? <>
                             {users.map((user, i) => <Stack key={i} align={'center'} justify={'flex-start'} direction={'row'}>
                                 <Popover placement="left">

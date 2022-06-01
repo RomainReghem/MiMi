@@ -19,7 +19,7 @@ import Jitsi from "../components/jitsi";
 import TicTacToe from "./Games/TicTacToe";
 import Jeux from "./Games/Jeux"
 
-import Settings from "../Settings/Settings";
+import Settings from "./Settings/Settings";
 
 
 import '../styles/tictactoe.css'

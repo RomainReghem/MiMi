@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import { useToast } from "@chakra-ui/react";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Heading, Stack, Input, Button, IconButton, InputGroup, InputRightElement, Text } from "@chakra-ui/react"
 import { ViewIcon, ViewOffIcon, CheckIcon } from '@chakra-ui/icons';
 

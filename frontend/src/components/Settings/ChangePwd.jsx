@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import useAuth from "../hooks/useAuth";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useAuth from "../../hooks/useAuth";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { FormHelperText, useToast } from "@chakra-ui/react";
 import { Heading, Stack, Input, Button, IconButton, InputGroup, InputRightElement, Text, FormControl, FormErrorMessage } from "@chakra-ui/react"
 import { ViewIcon, ViewOffIcon, CheckIcon } from '@chakra-ui/icons';
@@ -85,7 +85,7 @@ const ChangePwd = () => {
 
     return (
         <Stack spacing={4}>
-            <Heading fontSize={'2xl'}>Changer d'adresse mail</Heading>
+            <Heading fontSize={'2xl'}>Changer de mot de passe</Heading>
 
             <InputGroup mb={2}>
                     <Input placeholder="Mot de passe actuel" type={showPassword ? 'text' : 'password'} onChange={(e) => setPwd(e.target.value)} />
