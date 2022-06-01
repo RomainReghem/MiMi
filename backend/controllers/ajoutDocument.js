@@ -15,22 +15,30 @@ const saveCoursEleve = (req, res, next) => {
     const email = req.body.mail;
     const file = req.file
 
+    // verify if multer couldn't find the file
     if (file == null) {
         console.log("Pas de fichier")
-        return res.status(600).send("Erreur serveur")
+        return res.status(520).send("Erreur lecture du fichier : aucun fichier trouvé")
     }
+    // verify if variable not undefined, meaning that we didn't get anything
+    if (typeof matiere == undefined || typeof email == undefined) {
+        console.log("valeurs nulles")
+        return res.status(400).send("Erreur lecture des données : aucune donnée trouvée")
+    }
+    // on vérifie le type du fichier
     if (file.mimetype != "application/pdf") {
         console.log("Pas le bon type de fichier")
         return res.status(403).send("Le fichier n'est pas un pdf.")
     }
+    // le nom du fichier, tel qu'il a été envoyé, avec l'extension
     const nom = file.originalname;
-    console.log(" nom fichier " + nom + ' type ' + file.mimetype)
+    //console.log(" nom fichier " + nom + ' type ' + file.mimetype)
+    // on vérifie la forme du mail
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(407)
+        return res.status(400).send("Le mail donné n'est pas de la bonne forme.")
     }
-
+    // le middleware qui vérifie les tokens a consigné le mail et le role du token 
     const role = req.role;
     const emailToken = req.mail
     // seul un eleve peut sauvegarder un fichier ici, celui à qui appartient les cours
@@ -62,9 +70,10 @@ const saveCoursEleve = (req, res, next) => {
                 });
             })
             .catch(err => {
-                console.log(err)
-                return res.send(err).status(520)
+                console.log("Erreur eleve.findOne : "+err)
+                return res.send("Erreur lors de la récupération du compte élève").status(520)
             });
+        // si ce n'est pas la meme personne à qui appartient les fichiers (role différent de celui d'eleve et/ou email qui ne correspond pas) 
     } else {
         console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
         return res.status(403).send("Tentative de sauvegarde de cours d'un autre utilisateur")
