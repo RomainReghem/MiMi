@@ -290,6 +290,8 @@ const getPicture = (req, res) => {
             return res.send(err).status(520)
         })
 }
+
+
 /**
  * Cette fonction permet de vérifier si le chemin passé en paramètre existe, et si ce n'est pas le cas, il le crée
  * @param {String} pathToVerify le chemin dont l'existence doit être vérifiée
@@ -310,4 +312,4 @@ function verificationChemin(pathToVerify) {
     }
 }
 
-module.exports = { saveAvatar, getAvatar, savePicture, getPicture }
+module.exports = { saveAvatar, getAvatar, savePicture, getPicture, verificationChemin }

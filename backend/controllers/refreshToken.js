@@ -1,10 +1,8 @@
 const jwt = require('jsonwebtoken');
-const { getInvitation } = require('./eleve');
+const { getInvitation, getAvatar, getImage } = require('./eleve');
 const Users = require('../models/users');
 const Classe = Users.Classe;
 const Eleve = Users.Eleve;
-const Refresh = Users.RefreshToken;
-
 
 require('dotenv').config()
 
@@ -48,7 +46,7 @@ const refreshToken = (req, res) => {
                 if (role == "eleve") {
                     console.log("token eleve " + mail)
                     Eleve.findOne({
-                        attributes: ['token'],
+                        attributes: ['ideleve','token', "pseudo"],
                         where: { courriel: mail }
                     })
                         .then(eleve => {
@@ -63,12 +61,24 @@ const refreshToken = (req, res) => {
                             }
                             // on doit récupèrer l'état de l'invitation pour le transmettre au serveur
                             getInvitation(mail, function (reponse) {
-                                if (reponse == 404 || reponse == 407) {
+                                if (reponse == 404 || reponse == 400) {
                                     console.log("Erreur lors de la récupération de l'invitation " + reponse)
                                     return res.sendStatus(reponse)
                                 } else {
-                                    console.log('envoi des infos')
-                                    return res.status(201).json(Object.assign({ role: role, accessToken: accessToken }, reponse));
+                                        getAvatar(eleve.ideleve, function(reponseAvatar){
+                                            if(reponseAvatar==520){
+                                                return res.send("Erreur lors de la récupération de l'avatar !").status(520);
+                                            }else{
+                                                getImage(eleve.ideleve, function(err, reponseImage){
+                                                    if(err){
+                                                        return res.send(err).status(520);
+                                                    }
+                                                    console.log('envoi des infos')
+                                                    return res.status(201).json(Object.assign({ role: role, accessToken: accessToken }, reponse, {pseudo:eleve.pseudo}, reponseAvatar, reponseImage));
+                                                })
+                                            }
+                                        })
+
                                 }
                             })
                         }).catch(err => {

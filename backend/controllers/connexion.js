@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken")
 
 const Users = require('../models/users');
-const { getInvitation } = require('./eleve');
+const { getInvitation, getAvatar, getImage } = require('./eleve');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
@@ -30,7 +30,7 @@ const Connexion = (req, res) => {
     }
     // on regarde si le mail correspond à un élève
     Eleve.findOne({
-        attributes: ['motdepasse', 'courriel'],
+        attributes: ['motdepasse', 'courriel', 'ideleve', 'pseudo'],
         where:
             { courriel: email }
     })
@@ -62,13 +62,25 @@ const Connexion = (req, res) => {
                                 //console.log("refresh token connexion " + refreshToken)
                                 console.log("** Connexion de l'élève effectuée **")
                                 getInvitation(eleve.courriel, function (reponse) {
-                                    if (reponse == 404 || reponse == 407) {
+                                    if (reponse == 404 || reponse == 400) {
+                                        console.log("Erreur lors de la récupération de l'invitation " + reponse)
                                         return res.sendStatus(reponse)
                                     } else {
-                                        let json = reponse
-                                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                        json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
-                                        res.status(200).json(json)
+                                            getAvatar(eleve.ideleve, function(reponseAvatar){
+                                                if(reponseAvatar==520){
+                                                    return res.send("Erreur lors de la récupération de l'avatar !").status(520);
+                                                }else{
+                                                    getImage(eleve.ideleve, function(err, reponseImage){
+                                                        if(err){
+                                                            return res.send(err).status(520);
+                                                        }
+                                                        console.log('envoi des infos')
+                                                        return res.status(201).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, {pseudo:eleve.pseudo}, reponseAvatar, reponseImage));
+                                                    })
+                                                }
+                                            })
+                                        
+    
                                     }
                                 })
                             })
