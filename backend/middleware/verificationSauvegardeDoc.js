@@ -52,7 +52,7 @@ function fileFilter(req, file, cb) {
   const mimetype = filetypes.test(file.mimetype);
 
   if (mimetype && extname) {
-    console.log("bon type")
+    console.log("bon type (pdf)")
     return cb(null, true);
   } else {
     console.log("ps le bon type")

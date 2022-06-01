@@ -1,5 +1,3 @@
-//const db = require('../utils/database');
-const Sequelize = require('sequelize')
 const bcrypt = require('bcrypt');
 
 const jwt = require("jsonwebtoken")
@@ -8,7 +6,6 @@ const Users = require('../models/users');
 const { getInvitation } = require('./eleve');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
-const Refresh = Users.RefreshToken;
 
 require('dotenv').config()
 
@@ -16,24 +13,29 @@ require('dotenv').config()
  * Permet de valider ou non la connexion d'un utilisateur (élève ou classe.)
  * Génère des tokens si l'authentification est validée
  * 
- * @param {*} req la requête du client
+ * @param {*} req la requête du client, doit contenir :  
+ * • user : l'adresse mail utilisée pour se connecter
+ * • mdp : le mot de passe en clair utilisé pour se connecter
  * @param {*} res la réponse du serveur
  */
 const Connexion = (req, res) => {
     console.log("\n*** Connexion ***")
+    console.log("connexion.js -> Connexion")
 
-    const pseudo = req.body.user;
+    const email = req.body.user;
     const mdp = req.body.pwd;
-    //console.log("connexion " + mdp + " " + pseudo)
-    if (mdp == "" || pseudo == "") {
+    //console.log("connexion " + mdp + " " + email)
+    if (mdp == "" || email == "") {
         res.sendStatus(402)
     }
+    // on regarde si le mail correspond à un élève
     Eleve.findOne({
         attributes: ['motdepasse', 'courriel'],
         where:
-            { courriel: pseudo }
+            { courriel: email }
     })
         .then(eleve => {
+            // si le mail correspond à un compte d'un élève, on va comparer le mdp donné
             if (eleve) {
                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                     // si le mot de passe entré correspond bien au mot de passe dans la base de données
@@ -43,7 +45,7 @@ const Connexion = (req, res) => {
                         const accessToken = jwt.sign(
                             { "UserInfo": { "mail": eleve.courriel, "role": "eleve" } },
                             process.env.ACCESS_TOKEN_SECRET,
-                            { expiresIn: '10m' }
+                            { expiresIn: '20m' }
                         );
                         const refreshToken = jwt.sign(
                             { "mail": eleve.courriel, "role": "eleve" },
@@ -53,37 +55,37 @@ const Connexion = (req, res) => {
                             token: refreshToken
                         })*/
                         Eleve.update(
-                            {token:refreshToken},
-                            { where:{courriel:eleve.courriel}}
-                            )
-                        .then(token => {
-                            //console.log("refresh token connexion " + refreshToken)
-                            console.log("** Connexion de l'élève effectuée **")
-                            getInvitation(eleve.courriel, function (reponse) {
-                                if (reponse == 404 || reponse == 407) {
-                                    return res.sendStatus(reponse)
-                                } else {
-                                    let json = reponse
-                                    res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                    json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
-                                    res.status(200).json(json)
-                                }
+                            { token: refreshToken },
+                            { where: { courriel: eleve.courriel } }
+                        )
+                            .then(() => {
+                                //console.log("refresh token connexion " + refreshToken)
+                                console.log("** Connexion de l'élève effectuée **")
+                                getInvitation(eleve.courriel, function (reponse) {
+                                    if (reponse == 404 || reponse == 407) {
+                                        return res.sendStatus(reponse)
+                                    } else {
+                                        let json = reponse
+                                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                        json = Object.assign({ role: "eleve", accessToken: accessToken }, json)
+                                        res.status(200).json(json)
+                                    }
+                                })
                             })
-                        })
                             .catch(err => {
-                                console.log("Erreur lors de l'ajout de Token"+err);
+                                console.log("Erreur lors de l'ajout de Token" + err);
                                 res.sendStatus(520)
                             })
                     } else {
-                        console.log("Mauvais mot de passe ELEVE"+err)
-                        // sinon, si ce n'est pas le bon mdp mais le bon pseudo
+                        console.log("Mauvais mot de passe ELEVE" + err)
+                        // sinon, si ce n'est pas le bon mdp mais le bon email
                         res.sendStatus(400)
                     }
                 });
-            } else if (pseudo.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) {
+            } else {
                 Classe.findOne({
                     attributes: ['courriel', 'motdepasse', 'idclasse'],
-                    where: { courriel: pseudo }
+                    where: { courriel: email }
                 })
                     .then(classe => {
                         if (classe) {
@@ -92,55 +94,57 @@ const Connexion = (req, res) => {
                                     console.log("Création des cookies pour la classe")
                                     // cookie 
                                     const accessToken = jwt.sign(
-                                        {"UserInfo": {
+                                        {
+                                            "UserInfo": {
                                                 "mail": classe.courriel,
                                                 "role": "classe"
-                                            }},
+                                            }
+                                        },
                                         process.env.ACCESS_TOKEN_SECRET,
-                                        { expiresIn: '10m' }
+                                        { expiresIn: '20m' }
                                     );
                                     const refreshToken = jwt.sign(
                                         { "mail": classe.courriel, "role": "classe" },
                                         process.env.REFRESH_TOKEN_SECRET,
                                         { expiresIn: '1d' }
                                     );
-                                   /* Refresh.create({
-                                        token: refreshToken
-                                    })*/
-                                    Classe.update({token:refreshToken}, {where:{idclasse:classe.idclasse}})
-                                    .then(() => {
-                                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                        res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
-                                        console.log("CONNEXION de la classe OK")
-                                        // si le mot de passe entré correspond bien au mot de passe dans la base de données
-                                        //res.send(classe)
-                                    }).catch(err => {
+                                    /* Refresh.create({
+                                         token: refreshToken
+                                     })*/
+                                    Classe.update({ token: refreshToken }, { where: { idclasse: classe.idclasse } })
+                                        .then(() => {
+                                            res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                            res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
+                                            console.log("CONNEXION de la classe OK")
+                                            // si le mot de passe entré correspond bien au mot de passe dans la base de données
+                                            //res.send(classe)
+                                        }).catch(err => {
                                             console.log(err);
                                             res.sendStatus(520)
                                         })
                                 } else {
                                     console.log("Mauvais mot de passe CLASSE")
-                                    // si ce n'est pas le bon mdp mais le bon pseudo
+                                    // si ce n'est pas le bon mdp mais le bon email
                                     res.sendStatus(400)
                                 }
                             });
                         } else {
                             // Sinon c'est que l'utilisateur s'est soit trompé, soit qu'il n'existe pas
-                            console.log("Utilisateur pas trouvé Classe")
-                            // si pour le pseudo donné, aucun utilisateur ne correspond 
+                            console.log("Utilisateur pas trouvé.")
+                            // si pour l'adresse mail donnée, aucun utilisateur ne correspond 
                             res.sendStatus(401);
                         }
-                    });
-            } else {
-                // Sinon c'est que l'utilisateur s'est soit trompé, soit qu'il n'existe pas
-                console.log("Utilisateur pas trouvé ELEVE")
-                // si pour le pseudo donné, aucun utilisateur ne correspond 
-                res.sendStatus(401);
+                    })
+                    .catch(err => {
+                        // console.log(err);
+                        console.log("Erreur impossible de récupérer  les informations de la classe: " + err)
+                        res.sendStatus(520)
+                    })
             }
         })
         .catch(err => {
             // console.log(err);
-            console.log("Erreur : délai d'attente dépassé")
+            console.log("Erreur : délai d'attente dépassé : " + err)
             res.sendStatus(504)
         })
 }

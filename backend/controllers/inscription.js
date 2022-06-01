@@ -27,7 +27,7 @@ const bucket = storage.bucket("bucket_projet_mimi");
  * @param {*} res la réponse du serveur
  */
 const InscriptionEleve = (req, res) => {
-    console.log("***\n Inscription de l'élève ***")
+    console.log("\n*** Inscription de l'élève ***")
     /*données de test valides
     const pseudo = "eleve10";
     const prenom = "test";
@@ -70,95 +70,96 @@ const InscriptionEleve = (req, res) => {
     // Hashage du mot de passe
     bcrypt.hash(mdp, 10, (err, hash) => {
         if (err) {
-            console.log(err)
-            return res.status(600)
+            console.log("erreur hashage "+err)
+            return res.status(600).send("Erreur lors du chiffrement du mot de passe.")
         }
 
         // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
-        Eleve.findOne({attributes:['ideleve'], where: { courriel: email } })
+        Eleve.findOne({ attributes: ['ideleve'], where: { courriel: email } })
             .then(searchEleve => {
                 if (searchEleve) {
                     console.log("Mail pas unique");
                     return res.sendStatus(409)
-                } else {
-                    console.log("mail unique pour eleves");
-                    Classe.findOne({attributes:['idclasse'], where: { courriel: email } })
-                        .then(classe => {
-                            if (classe) {
-                                console.log("Mail existant pour la classe");
-                                return res.sendStatus(410)
-                            } else {
-                                console.log("inscription ok")
-                                console.log("mdp" + hash)
-                                Eleve.create(({
-                                    pseudo: pseudo,
-                                    courriel: email,
-                                    motdepasse: hash,
-                                    nom: nom,
-                                    prenom: prenom
-                                }))
-                                    .then((eleve) => {
-                                        console.log("Création de compte élève réussie")
-                                        const num = eleve.ideleve
-                                        //const path = "./Eleves/eleve" + num + "/avatar"
-                                        // console.log("*** Création d'un dossier ***")
-
-                                        // enregistrement de l'avatar par défaut
-                                        let avatar = {
-                                            bgColor: "#E0DDFF",
-                                            earSize: "small",
-                                            eyeBrowStyle: "up",
-                                            eyeStyle: "oval",
-                                            faceColor: "#AC6651",
-                                            glassesStyle: "none",
-                                            hairColor: "#000",
-                                            hairStyle: "thick",
-                                            hatColor: "#000",
-                                            hatStyle: "none",
-                                            mouthStyle: "laugh",
-                                            noseStyle: "round",
-                                            shape: "square",
-                                            shirtColor: "#6BD9E9",
-                                            shirtStyle: "polo"
-                                        }
-                                        // avatar=JSON.parse(avatar)
-                                        //  console.log("\n2."+avatar)
-                                        avatar = JSON.stringify(avatar)
-                                        /*console.log("dossiers créés")
-                                        console.log("enregistrement d'un avatar")
-                                        fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
-                                        if (err) {
-                                            console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
-                                            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-                                        }
-                                        console.log("Le fichier JSON a bien été sauvegardé");
-                                        //res.status(201).send("Enregistrement effectué");
-                                                                                            });
-                                        */
-                                        bucket.file(path + "/avatar" + num + ".json").save(avatar, function (err) {
-                                            if (err) {
-                                                return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
-                                            }
-                                            console.log("Le fichier JSON a bien été sauvegardé");
-                                            return res.status(201).send("Enregistrement effectué");
-                                        })
-
-                                        //return res.send(neweleve);
-                                    })
-                                    .catch(err => {
-                                        console.log("erreur inscription eleve : " + err)
-                                    })
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            return res.send(err).status(520)
-                        });
                 }
-            }
-            )
-    }
-    )
+                console.log("mail unique pour eleves");
+                Classe.findOne({ attributes: ['idclasse'], where: { courriel: email } })
+                    .then(classe => {
+                        if (classe) {
+                            console.log("Mail existant pour la classe");
+                            return res.sendStatus(410)
+                        }
+                        console.log("inscription ok")
+                        console.log("mdp" + hash)
+                        Eleve.create(({
+                            pseudo: pseudo,
+                            courriel: email,
+                            motdepasse: hash,
+                            nom: nom,
+                            prenom: prenom
+                        }))
+                            .then((eleve) => {
+                                console.log("Création de compte élève réussie")
+                                const num = eleve.ideleve
+                                //const path = "./Eleves/eleve" + num + "/avatar"
+                                // console.log("*** Création d'un dossier ***")
+
+                                // enregistrement de l'avatar par défaut
+                                let avatar = {
+                                    bgColor: "#E0DDFF",
+                                    earSize: "small",
+                                    eyeBrowStyle: "up",
+                                    eyeStyle: "oval",
+                                    faceColor: "#AC6651",
+                                    glassesStyle: "none",
+                                    hairColor: "#000",
+                                    hairStyle: "thick",
+                                    hatColor: "#000",
+                                    hatStyle: "none",
+                                    mouthStyle: "laugh",
+                                    noseStyle: "round",
+                                    shape: "square",
+                                    shirtColor: "#6BD9E9",
+                                    shirtStyle: "polo"
+                                }
+                                // avatar=JSON.parse(avatar)
+                                //  console.log("\n2."+avatar)
+                                avatar = JSON.stringify(avatar)
+                                /*console.log("dossiers créés")
+                                console.log("enregistrement d'un avatar")
+                                fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
+                                if (err) {
+                                    console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+                                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                                }
+                                console.log("Le fichier JSON a bien été sauvegardé");
+                                //res.status(201).send("Enregistrement effectué");
+                                                                                    });
+                                */
+                                const path = "testeleve/eleve" + num + "/avatar"
+                                bucket.file(path + "/avatar" + num + ".json").save(avatar, function (err) {
+                                    if (err) {
+                                        return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
+                                    }
+                                    console.log("Le fichier JSON a bien été sauvegardé");
+                                    return res.status(201).send("Enregistrement effectué");
+                                })
+
+                                //return res.send(neweleve);
+                            })
+                            .catch(err => {
+                                console.log("erreur inscription eleve : " + err)
+                                return res.send(err).status(520)
+                            })
+                    })
+                    .catch(err => {
+                        console.log("Erreur lors de la recherche de classe \n" + err)
+                        return res.send("Erreur serveur sur la vérification de la validité de l'adresse mail.").status(520)
+                    });
+            })   .catch(err => {
+                console.log("Erreur lors de la recherche d'eleve avec la meme adresse \n" + err)
+                return res.send("Erreur serveur sur la vérification de la validité de l'adresse mail.").status(520)
+            });
+    })
 }
 
 /**
@@ -195,13 +196,13 @@ const InscriptionClasse = (req, res) => {
     // La base de données a déjà des contraintes mais il faut éviter d'insérer et de causer une erreur SQL
 
     // On vérifie que dans la table classe aucun classe ne possède déjà cet email
-    Classe.findOne({attributes:['idclasse'], where: { courriel: email } })
+    Classe.findOne({ attributes: ['idclasse'], where: { courriel: email } })
         .then(searchClass => {
             if (searchClass) {
                 console.log("Mail existant pour la classe");
                 return res.sendStatus(409)
             } else {
-                Eleve.findOne({attributes:['ideleve'], where: { courriel: email } })
+                Eleve.findOne({ attributes: ['ideleve'], where: { courriel: email } })
                     .then(eleve => {
                         if (eleve) {
                             console.log("Mail existant pour un eleve");

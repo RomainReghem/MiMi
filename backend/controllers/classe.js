@@ -13,7 +13,7 @@ const getAllStudents = (req, res) => {
     // on cherche tous les élèves qui appartiennent à la classe dont l'email est donné
     // on veut spécifiquement l'attribut courriel
     Eleve.findAll({
-        attributes: ['courriel'],
+        attributes: ['courriel', 'nom', 'prenom'],
         where: { invitation: "acceptee" },
         // jointure avec la table classe
         include: [{
@@ -57,37 +57,49 @@ const deleteClass = (req, res) => {
             // on cherche tous les élèves qui appartiennent à la classe dont l'id est donné
             Eleve.update({ idclass: null, invitation: "aucune" }, { where: { idclasse: num } })
                 .then(() => {
-                    console.log("Suppression des infos sur la classe effectué.")
-                    // Delete
-                    Classe.destroy({
+                    // on supprime maintenant les scores pour respecter les contraintes de clé étrangère
+                    Score.destroy({
                         where: {
                             idclasse: num
                         }
-                    }).then(result => {
-                        if (!result) {
-                            console.log("erreur non déf")
-                            return res.status(520);
-                        }
-                        // maintenant on doit supprimer les dossiers et les documents de la classe
-                        const path = "./Classes/eleve" + num
-                        // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
-                        fs.rmdir(path, { recursive: true }, (err) => {
-                            if (err) {
-                                console.log("erreur suppression dossiers : " + err)
-                                return res.status(500).send("Erreur lors de la suppression de documents.")
-                            }
-                            console.log("Suppression effectuée !")
-                            return res.send("Suppression effectuée").status(201)
-                        });
-                    }).catch(err => {
-                        console.log(err)
-                        return res.status(404).send("Serveur injoignable.")
                     })
+                        .then(() => {
+                            console.log("Suppression des infos sur la classe effectué.")
+                            // Delete
+                            Classe.destroy({
+                                where: {
+                                    idclasse: num
+                                }
+                            }).then(result => {
+                                if (!result) {
+                                    console.log("erreur non déf")
+                                    return res.status(520);
+                                }
+                                // maintenant on doit supprimer les dossiers et les documents de la classe
+                                const path = "./Classes/eleve" + num
+                                // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
+                                fs.rmdir(path, { recursive: true }, (err) => {
+                                    if (err) {
+                                        console.log("erreur suppression dossiers : " + err)
+                                        return res.status(500).send("Erreur lors de la suppression de documents.")
+                                    }
+                                    console.log("Suppression effectuée !")
+                                    return res.send("Suppression effectuée").status(201)
+                                });
+                            }).catch(err => {
+                                console.log(err)
+                                return res.status(500).send("Erreur survenue lors de la suppression de la classe.")
+                            })
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return res.status(500).send("Erreur survenue lors de la suppression du score.")
+                        })
                 })
                 .catch(err => {
                     console.log(err)
-                    return res.status(404).send("Serveur injoignable.")
-                })
+                    return res.send(err).status(520)
+                });
         }).catch(err => {
             console.log(err)
             return res.status(404).send("Serveur injoignable.")

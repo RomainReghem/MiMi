@@ -106,7 +106,13 @@ const getAvatar = (req, res) => {
                 // on envoie le fichier json au front
                 res.json({ avatar: avatar })
             })*/
-            getJSON(path, num, res)
+            getJSON(path, num, res, function(err, avatar){
+                if(err){
+                    return res.send(err).status(520);
+                }
+                return res.json(avatar).status(200)
+            })
+            
         })
         .catch(err => {
             console.log(err)
@@ -120,12 +126,12 @@ const getAvatar = (req, res) => {
  * @param {Number} num le numéro de l'élève
  * @param {*} res la réponse à renvoyer au client
  */
-async function getJSON(path, num, res) {
+async function getJSON(path, num, res, callback) {
     let avatar = "";
     await bucket.file(path + "/avatar" + num + ".json").createReadStream()
         .on('error', function (err) {
             console.log(err);
-            return res.status(520)
+            callback(err);
         })
         .on('data', function (response) {
             avatar += response;
@@ -134,7 +140,7 @@ async function getJSON(path, num, res) {
             //console.log("AVATAR : " + avatar)
             console.log("avatar récupéré");
             // on envoie le fichier json au front
-            return res.json({ avatar: avatar });
+            callback({ avatar: avatar });
         })
 }
 
@@ -186,6 +192,7 @@ const savePicture = (req, res) => {
                     console.log("erreur durant la récupération " + err)
                     return res.status(600).send('Erreur lors de la récupèration de la pp.');
                 }
+                // on va supprimer l'ancienne photo de profil
                 for (const f of files) {
                     if (f.startsWith('photo')) {
                         fs.unlink(path + "/" + f, function (err) {
@@ -258,15 +265,23 @@ const getPicture = (req, res) => {
                     }
                     if (file == "") {
                         console.log("pas d'image")
-                        return res.status(204).send("L'élève n'a pas de photo de profil.")
+                        // on va retourner une image par défaut 
+                        fs.readFile("./Image/chat.jpg", function (error, img) {
+                            if (err) {
+                                console.log("erreur lors de la recup de la photo par défeut " + error)
+                                return res.send("L'élève n'a pas de photo de profil.").status(204)
+                            }
+                            return res.send({ image: img });
+                        })
+                    }else{
+                        fs.readFile(path + "/" + file, function (err, image) {
+                            if (err) {
+                                console.log("erreur lors de la recup de pp " + err)
+                                return res.status(520).send(err)
+                            }
+                            return res.send({ image: image });
+                        });
                     }
-                    fs.readFile(path + "/" + file, function (err, image) {
-                        if (err) {
-                            console.log("erreur lors de la recup de pp " + err)
-                            return res.status(520).send(err)
-                        }
-                        return res.send({ image: image });
-                    });
                 }
             })
         })

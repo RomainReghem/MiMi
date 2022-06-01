@@ -266,7 +266,7 @@ const ChangementMail = (req, res) => {
                                 if (classe) {
                                     console.log("Mail existant pour la classe");
                                     res.sendStatus(410)
-                                } else {
+                                }
                                     // on vérifie maintenant dans la bd si le mdp donné est bien celui associé au mail
                                     bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                                         if (estValide) {
@@ -285,7 +285,7 @@ const ChangementMail = (req, res) => {
                                             const accessToken = jwt.sign(
                                                 { "UserInfo": { "mail": newEmail, "role": "eleve" } },
                                                 process.env.ACCESS_TOKEN_SECRET,
-                                                { expiresIn: '10m' }
+                                                { expiresIn: '20m' }
                                             );
                                             const refreshToken = jwt.sign(
                                                 { "mail": newEmail, "role": "eleve" },
@@ -321,7 +321,6 @@ const ChangementMail = (req, res) => {
                                             return res.sendStatus(400)
                                         }
                                     });
-                                }
                             }).catch(err => {
                                 return res.send(err).status(600)
                             });

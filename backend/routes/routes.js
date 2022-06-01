@@ -98,6 +98,7 @@ router.get('/getMatiereClass', verifyJWT, Document.getAllMatieresClasse)
 // route pour supprimer une matiere à la classe
 //router.delete('matiereClasse', SuppressionDoc.deleteMatiereClasse)
 // route pour supprimer un cours à l'élève
+//router.delete('/coursEleve', verifyJWT, Eleve.deleteStudent)
 router.delete('/coursEleve', verifyJWT, SuppressionDoc.deleteCoursEleve)
 // route pour supprimer un cours à la classe
 router.delete('/coursClasse', verifyJWT, SuppressionDoc.deleteCoursClasse)

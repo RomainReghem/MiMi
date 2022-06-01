@@ -209,7 +209,7 @@ const changementMailClasse = (req, res) => {
                                         const accessToken = jwt.sign(
                                             { "UserInfo": { "mail": newEmail, "role": "classe" } },
                                             process.env.ACCESS_TOKEN_SECRET,
-                                            { expiresIn: '10m' }
+                                            { expiresIn: '20m' }
                                         );
                                         const refreshToken = jwt.sign(
                                             { "mail": newEmail, "role": "classe" },
