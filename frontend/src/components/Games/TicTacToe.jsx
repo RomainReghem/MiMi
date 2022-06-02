@@ -35,6 +35,7 @@ const TicTacToe = () => {
     useEffect(() => {
         if (roomCode && !roomJoined) {
             socket.emit("joinRoom", roomCode, auth?.user);
+            getScore();
             console.log("joining room...");
         }
     }, [roomCode]);
@@ -89,27 +90,14 @@ const TicTacToe = () => {
         });
     })
 
-    const postScore = async () => {
-        try {
-            await axiosPrivate.post("/score", JSON.stringify({ mail: auth?.user, win: winner }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                });
-        }
-        catch (err) { console.log(err) }
-    }
-
     const getScore = async () => {
         try {
-            console.log("mail envoyé au serveur : " +  auth?.user)
             const response = await axiosPrivate.get("/score",
                 {
                     params: { mail: auth?.user }
                 }
             );
             setScore(response.data.scores)
-            console.log(score)
         } catch (err) { console.log("Erreur du chargement du score"); }
     }
 
