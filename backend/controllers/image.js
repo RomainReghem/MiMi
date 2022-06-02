@@ -235,13 +235,13 @@ const savePicture = (req, res) => {
                     }
                 }
                 // sauvegarde image
-                fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err) {
+                fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err, data) {
                     if (err) {
                         console.log("Erreur lors de l'enregistrement de la photo : " + err);
                         return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
                     }
                     console.log("La photo a bien été sauvegardée");
-                    return res.status(201).send(img.buffer);
+                    return res.json(img.buffer).status(201);
                 });
             })
         })
