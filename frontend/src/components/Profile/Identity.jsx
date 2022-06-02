@@ -8,6 +8,7 @@ import Invitations from "./Invitations";
 import useGetImage from "../../hooks/useGetImage";
 import useGetAvatar from "../../hooks/useGetAvatar";
 import { useToast, InputGroup ,Tooltip, FormLabel, IconButton, Input, InputRightElement, Text, Button, Heading, Stack, Image, InputRightAddon, Divider, Center } from "@chakra-ui/react";
+import useUserData from "../../hooks/useUserData";
 
 const CHANGEPSEUDO_URL = '/changePseudo';
 const PSEUDO_REGEX = /^[A-z0-9-_]{3,24}$/;
@@ -16,6 +17,7 @@ const PSEUDO_REGEX = /^[A-z0-9-_]{3,24}$/;
 const Identity = () => {
     const toast = useToast();
     const { auth, setAuth } = useAuth();
+    const { userData, setUserData } = useUserData();
     const axiosPrivate = useAxiosPrivate();
 
     const getImage = useGetImage();
@@ -42,28 +44,16 @@ const Identity = () => {
         shape: "square"
     };
 
-    const [avatar, setAvatar] = useState(JSON.parse(localStorage.getItem("avatar")) || avatar_base);
     const [pictureWaitingToBeSent, setPictureWaitingToBeSent] = useState(false);
 
-    const [picture, setPicture] = useState("https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg");
-
-    useEffect(() => {
-        async function avatar() {
-            if (auth?.user != undefined) {
-                let a = await getAvatar();
-                setAvatar(a);
-            }
-        }
-        avatar();
-        avatar();
-    }, [auth?.user, auth?.somethingchanged])
+    const [picture, setPicture] = useState("");
 
     // On ne récupère l'image que si une image a été envoyée
     useEffect(() => {
         async function image() {
             // On reçoit la réponse en Buffer.
             // Il faut la convertir en base64 pour pouvoir l'afficher.
-            let data = await getImage()
+            let data = userData?.image
             let binary = '';
             let bytes = new Uint8Array(data);
             for (let i = 0; i < bytes.byteLength; i++) {
@@ -74,8 +64,7 @@ const Identity = () => {
                 setPicture("data:image/png;base64," + window.btoa(binary))
         }
         image();
-
-    }, [pictureWaitingToBeSent])
+    }, [userData?.image])
 
     // Submit du pseudo
     const handleSubmit = async (e) => {
@@ -95,10 +84,10 @@ const Identity = () => {
                 }
             );
             toast({ title: "Pseudo modifié", description: "Votre nouveau pseudo est : " + newPseudo, status: "success", duration: 5000, isClosable: true, position: "top" })
-            setAuth({
-                ...auth,
-                somethingchanged: (0 + Math.random() * (10000 - 0))
-            });
+            setUserData({
+                ...userData,
+                pseudo:newPseudo
+            })
 
         } catch (err) {
             if (!err?.response) {
@@ -147,13 +136,15 @@ const Identity = () => {
                 {
                     headers: { "Content-Type": "image/*" },
                 });
-            toast({ title: "Image de profil sauvegardée", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
+            console.log(response)    
             setPictureWaitingToBeSent(false);
-            setAuth({
-                ...auth,
-                somethingchanged: (0 + Math.random() * (10000 - 0))
-            });
-            console.log(response)
+            setUserData({
+                ...userData,
+                image:response.data.image.data
+            })
+            toast({ title: "Image de profil sauvegardée", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
+            
+            
         } catch (error) {
             toast({ title: "Erreur", description: "Vérifiez le fichier", status: "error", duration: 5000, isClosable: true, position: "top" })
 
@@ -180,7 +171,7 @@ const Identity = () => {
                         <Button onClick={(e) => { setAuth({ ...auth, preference: "image" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("image")) }}>Choisir l'image</Button>
                     </Stack>
                     <Stack align={'center'}>
-                        <Avatar style={{ width: '8.5rem', height: '8.5rem' }}  {...avatar} />
+                        <Avatar style={{ width: '8.5rem', height: '8.5rem' }}  {...userData?.avatar} />
                         <Button onClick={(e) => { setAuth({ ...auth, preference: "avatar" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar")) }}>Choisir l'avatar</Button>
                     </Stack>
                 </Stack>

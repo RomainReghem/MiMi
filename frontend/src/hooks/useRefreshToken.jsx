@@ -1,11 +1,11 @@
 import axios from '../api/axios';
 import useAuth from './useAuth';
-import useUserData from './useUserData'
+//import useUserData from './useUserData'
 import jwt_decode from "jwt-decode";
 
 const useRefreshToken = () => {
     const { setAuth } = useAuth();
-    const { setUserData } = useUserData();
+    //const { setUserData } = useUserData();
 
     const refresh = async () => {
         const response = await axios.get('/refresh', {

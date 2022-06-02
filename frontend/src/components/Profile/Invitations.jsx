@@ -10,7 +10,6 @@ const Invitations = () => {
     const axiosPrivate = useAxiosPrivate();
     const classe = auth?.idclasse;
     const user = auth?.user;
-    console.log(auth);
 
     const acceptInvite = async () => {
         try {

@@ -18,6 +18,7 @@ import useGetImage from '../../hooks/useGetImage';
 import useGetAvatar from '../../hooks/useGetAvatar';
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import useUserData from '../../hooks/useUserData';
 
 
 export default function Nav() {
@@ -25,58 +26,37 @@ export default function Nav() {
     const navigate = useNavigate();
     const { isOpen, onToggle } = useDisclosure();
     const { auth } = useAuth();
+    const { userData } = useUserData();
     const axiosPrivate = useAxiosPrivate();
-    const getImage = useGetImage();
-    const getAvatar = useGetAvatar();
-    const [pseudo, setPseudo] = useState("Profil");
 
-    let avatar_base = {
-        bgColor: "#E0DDFF",
-        earSize: "small",
-        eyeBrowStyle: "up",
-        eyeStyle: "oval",
-        faceColor: "#AC6651",
-        glassesStyle: "none",
-        hairColor: "#000",
-        hairStyle: "thick",
-        hatColor: "#000",
-        hatStyle: "none",
-        mouthStyle: "laugh",
-        noseStyle: "round",
-        shirtColor: "#6BD9E9",
-        shirtStyle: "polo",
-        shape: "square"
-    };
+    // let avatar_base = {
+    //     bgColor: "#E0DDFF",
+    //     earSize: "small",
+    //     eyeBrowStyle: "up",
+    //     eyeStyle: "oval",
+    //     faceColor: "#AC6651",
+    //     glassesStyle: "none",
+    //     hairColor: "#000",
+    //     hairStyle: "thick",
+    //     hatColor: "#000",
+    //     hatStyle: "none",
+    //     mouthStyle: "laugh",
+    //     noseStyle: "round",
+    //     shirtColor: "#6BD9E9",
+    //     shirtStyle: "polo",
+    //     shape: "square"
+    // };
 
-    const [avatar, setAvatar] = useState(JSON.parse(localStorage.getItem("avatar")) || avatar_base);
-    const [imageURL, setImageURL] = useState("https://img-19.commentcamarche.net/cI8qqj-finfDcmx6jMK6Vr-krEw=/1500x/smart/b829396acc244fd484c5ddcdcb2b08f3/ccmcms-commentcamarche/20494859.jpg");
+    const [imageURL, setImageURL] = useState("");
 
     const signOut = async () => {
         await logout();
         navigate('/')
     }
 
-    const getPseudo = async (e) => {
-        try {
-            const response = await axiosPrivate.get("/pseudo",
-                {
-                    params: { mail: auth?.user },
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                });
-            setPseudo(response?.data.pseudo)
-            localStorage.setItem("pseudo", response?.data.pseudo);
-        } catch (err) { console.log("Erreur du chargement du pseudo"); }
-    }
-
-    useEffect(() => {
-        if (auth?.user != undefined)
-            getPseudo()
-    }, [auth?.user, auth?.somethingchanged])
-
     useEffect(() => {
         async function image() {
-            let data = await getImage()
+            let data = userData?.image
             let binary = '';
             let bytes = new Uint8Array(data);
             for (let i = 0; i < bytes.byteLength; i++) {
@@ -85,26 +65,7 @@ export default function Nav() {
             setImageURL("data:image/png;base64," + window.btoa(binary))
         }
         image();
-    }, [auth?.user, auth?.somethingchanged])
-
-
-
-    // On ne récupère l'avatar que s'il y a eu un changement, ou une connexion. Pour ne pas spammer les requetes
-    useEffect(() => {
-        async function avatar() {
-            if (auth?.user != undefined) {
-                let a = await getAvatar();
-                setAvatar(a);
-            }
-        }
-        avatar();
-        avatar();
-    }, [auth?.user, auth?.somethingchanged])
-
-    useEffect(() => {
-        if (auth?.user != undefined)
-            getPseudo()
-    }, [auth?.user, auth?.somethingchanged])
+    }, [userData?.image])
 
     return (
         <Box>
@@ -134,14 +95,14 @@ export default function Nav() {
                 <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }} align={'center'}>
                     {auth?.user && auth?.role == "eleve" ?
                         <Box boxSize={'2rem'} mr={2}>{auth?.preference === "avatar" ?
-                            (<Avatar style={{ width: '2rem', height: '2rem' }} {...avatar} />) :
+                            (<Avatar style={{ width: '2rem', height: '2rem' }} {...userData?.avatar} />) :
                             (
                                 <Image maxH={'100%'} width={'100%'} objectFit={'cover'} src={imageURL}></Image>
                             )}</Box> : <></>}
                         <Badge
                             textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
                             colorScheme='gray'>
-                            {auth?.role == "eleve" ? pseudo : auth?.role == "classe" ? "classe #" + auth?.idclasse : <></>}
+                            {auth?.role == "eleve" ? userData?.pseudo : auth?.role == "classe" ? "classe #" + auth?.idclasse : <></>}
                         </Badge>
 
                     <Flex display={{ base: 'none', md: 'flex' }} ml={5}>

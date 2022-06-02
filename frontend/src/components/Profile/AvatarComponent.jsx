@@ -11,29 +11,19 @@ import { BiFace } from 'react-icons/bi';
 import { Stack, Text, IconButton, Button, Tooltip } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
+import useUserData from '../../hooks/useUserData';
 
 
 const AvatarComponent = () => {
     const toast = useToast();
-    const { auth } = useAuth();
-    const { setAuth } = useAuth();
+    const { auth, setAuth } = useAuth();
+    const { userData, setUserData } = useUserData();
     const axiosPrivate = useAxiosPrivate();
 
-    const [config, setConfig] = useState(JSON.parse(localStorage.getItem("avatar")));
+    console.log(userData?.avatar)
+    const [config, setConfig] = useState(userData?.avatar);
 
     let mail = auth?.user;
-
-    useEffect(() => {
-        getAvatar()
-    }, [])
-
-    const getAvatar = async (e) => {
-        try {
-            const response = await axiosPrivate.get("/avatar", { params: { mail: auth?.user } });
-            setConfig(JSON.parse(response.data.avatar));
-        } catch (err) { console.log("Erreur du chargement de l'avatar"); }
-    }
-
 
     const shirts = ["hoody", "short", "polo"]
     const glasses = ["none", "round", "square"]
@@ -74,13 +64,10 @@ const AvatarComponent = () => {
     }
 
     const Save = () => {
-        localStorage.setItem("avatar", JSON.stringify(config))
-        setAuth({
-            ...auth,
-            somethingchanged: (0 + Math.random() * (10000 - 0))
-        });
-
-
+        setUserData({
+            ...userData,
+            avatar:config
+        })
     }
 
     const SaveDB = async (e) => {
@@ -93,9 +80,6 @@ const AvatarComponent = () => {
             toast({ title: "Avatar sauvegardé !", description: "Rechargez la page s'il ne s'affiche pas correctement", status: "success", duration: 5000, isClosable: true, position: "top" })
         } catch (err) { console.log("couldnt save avatar"); }
     }
-
-    const iconSize = 28;
-
 
     return (
         <>

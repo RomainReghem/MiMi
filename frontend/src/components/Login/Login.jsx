@@ -29,15 +29,14 @@ export default function Login() {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            //const accessToken = response?.data?.accessToken;
             console.log(response.data)
             const accessToken = response?.data?.accessToken;
             const role = response?.data?.role;
             const invitation = response?.data?.invitation;
             const idclasse = response?.data?.idclasse;
-            // const image = response?.data?.image?.data;
-            // const avatar = response?.data?.avatar;
-            // const pseudo = response?.data?.pseudo;          
+            const image = response?.data?.image?.data;
+            const avatar = response?.data?.avatar;
+            const pseudo = response?.data?.pseudo;          
 
 
             // Au login, si rien ne correspond dans le local storage, on attribue "avatar" à "préférence"
@@ -49,7 +48,7 @@ export default function Login() {
 
             setAuth({ user, accessToken, role, preference, invitation, idclasse });
             // Si c'est un élève on aura besoin d'afficher son pseudo et ses images, la classe n'en a pas.
-            // role == "eleve" && setUserData({image, avatar, pseudo})
+            role == "eleve" && setUserData({image, avatar, pseudo})
             setPwd('');
             setUser('');
             toast({title: "Bienvenue !", description: "Vous êtes connecté", status: "success", duration: 9000, isClosable: true, position:"top"})
