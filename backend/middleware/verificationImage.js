@@ -16,7 +16,7 @@ const storage = multer.memoryStorage();
 function fileFilter(req, file, cb) {
   console.log("** Verification de type d'image **")
   // Allowed ext
-  const filetypes = /png|jpg|jpeg|jfif/;
+  const filetypes = /png|jpg|jpeg|jfif|gif/;
 
   // Check ext
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
