@@ -111,8 +111,8 @@ const Identity = () => {
             data: event.target.files[0],
         }
         // PNG / JPEG only
-        if (img.data.type != "image/png" && img.data.type != "image/jpeg" && img.data.type != "image/jpg") {
-            toast({ title: "Erreur type de fichier", description: "Les seules images acceptées sont les PNG et JPEG", status: "error", duration: 5000, isClosable: true, position: "top" })
+        if (img.data.type != "image/png" && img.data.type != "image/jpeg" && img.data.type != "image/jpg" && img.data.type != "image/gif") {
+            toast({ title: "Erreur type de fichier", description: "Les seules images acceptées sont les PNG, JPEG et GIF", status: "error", duration: 5000, isClosable: true, position: "top" })
             return;
         }
         // Fichiers < 10 Mo

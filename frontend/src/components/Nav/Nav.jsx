@@ -28,25 +28,6 @@ export default function Nav() {
     const { auth } = useAuth();
     const { userData } = useUserData();
     const axiosPrivate = useAxiosPrivate();
-
-    // let avatar_base = {
-    //     bgColor: "#E0DDFF",
-    //     earSize: "small",
-    //     eyeBrowStyle: "up",
-    //     eyeStyle: "oval",
-    //     faceColor: "#AC6651",
-    //     glassesStyle: "none",
-    //     hairColor: "#000",
-    //     hairStyle: "thick",
-    //     hatColor: "#000",
-    //     hatStyle: "none",
-    //     mouthStyle: "laugh",
-    //     noseStyle: "round",
-    //     shirtColor: "#6BD9E9",
-    //     shirtStyle: "polo",
-    //     shape: "square"
-    // };
-
     const [imageURL, setImageURL] = useState("");
 
     const signOut = async () => {
