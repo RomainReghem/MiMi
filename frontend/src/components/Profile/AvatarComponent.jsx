@@ -77,7 +77,7 @@ const AvatarComponent = () => {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            toast({ title: "Avatar sauvegardé !", description: "Rechargez la page s'il ne s'affiche pas correctement", status: "success", duration: 5000, isClosable: true, position: "top" })
+            toast({ title: "Avatar sauvegardé !", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
         } catch (err) { console.log("couldnt save avatar"); }
     }
 

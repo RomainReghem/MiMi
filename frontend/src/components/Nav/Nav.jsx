@@ -91,13 +91,14 @@ export default function Nav() {
                         variant={'ghost'}
                         aria-label={'Toggle Navigation'}
                     />
+                    <ColorModeSwitcher />
                 </Flex>
                 <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }} align={'center'}>
                     {auth?.user && auth?.role == "eleve" ?
                         <Box boxSize={'2rem'} mr={2}>{auth?.preference === "avatar" ?
                             (<Avatar style={{ width: '2rem', height: '2rem' }} {...userData?.avatar} />) :
                             (
-                                <Image maxH={'100%'} width={'100%'} objectFit={'cover'} src={imageURL}></Image>
+                                <Image h={'100%'} w={'100%'} objectFit={'cover'} src={imageURL}></Image>
                             )}</Box> : <></>}
                         <Badge
                             textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
@@ -134,8 +135,8 @@ export default function Nav() {
                             </Button>
                         </Link></>}
                     {auth?.user && <Link as={ReactRouterLink} to="/settings"><IconButton colorScheme={'teal'} icon={<FontAwesomeIcon icon={faGear} />}></IconButton></Link>}
-                    <ColorModeSwitcher />
-                    {auth?.user && <><Center><Divider height={'2rem'} orientation='vertical' /></Center>
+                    <ColorModeSwitcher display={{base:'none', md:'inline-flex'}} />
+                    {auth?.user && <>
                         <Button display={{ base: 'none', md: 'inline-flex' }} onClick={signOut} colorScheme={'red'}>Déconnexion</Button>
                         <IconButton display={{ base: 'inline-flex', md: 'none' }} onClick={signOut} colorScheme={'red'} icon={<FontAwesomeIcon icon={faPowerOff} />}></IconButton></>}
                 </Stack>

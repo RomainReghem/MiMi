@@ -1,11 +1,11 @@
 import axios from '../api/axios';
 import useAuth from './useAuth';
-//import useUserData from './useUserData'
+import useUserData from './useUserData'
 import jwt_decode from "jwt-decode";
 
 const useRefreshToken = () => {
     const { setAuth } = useAuth();
-    //const { setUserData } = useUserData();
+    const { setUserData } = useUserData();
 
     const refresh = async () => {
         const response = await axios.get('/refresh', {
@@ -25,15 +25,15 @@ const useRefreshToken = () => {
         });
 
         // Si c'est un élève on aura besoin d'afficher son pseudo et ses images, la classe n'en a pas.
-        // console.log(response.data)
-        // response.data.role == "eleve" && setUserData(prev => {
-        //     return {
-        //         ...prev,
-        //         image:response.data.image.data,
-        //         avatar:response.data.avatar,
-        //         pseudo:response.data.pseudo
-        //     }
-        // })
+        console.log(response.data)
+        response.data.role == "eleve" && setUserData(prev => {
+            return {
+                ...prev,
+                image:response.data.image.data,
+                avatar:response.data.avatar,
+                pseudo:response.data.pseudo
+            }
+        })
         
         return response.data.accessToken;
     }

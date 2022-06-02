@@ -34,40 +34,41 @@ export default function Login() {
             const role = response?.data?.role;
             const invitation = response?.data?.invitation;
             const idclasse = response?.data?.idclasse;
-            const image = response?.data?.image?.data;
-            const avatar = response?.data?.avatar;
-            const pseudo = response?.data?.pseudo;          
-
-
             // Au login, si rien ne correspond dans le local storage, on attribue "avatar" à "préférence"
             // On ajoute aussi la variable au localstorage, default "avatar"
-            let preference = JSON.parse(localStorage.getItem("preference"+user)) || "avatar";
-            if(!localStorage.getItem("preference"+user)){
-                localStorage.setItem("preference"+user, JSON.stringify("avatar"));
+            let preference = JSON.parse(localStorage.getItem("preference" + user)) || "avatar";
+            if (!localStorage.getItem("preference" + user)) {
+                localStorage.setItem("preference" + user, JSON.stringify("avatar"));
+            }
+            setAuth({ user, accessToken, role, preference, invitation, idclasse });
+
+            // Si c'est un élève on aura besoin d'afficher son pseudo et ses images, la classe n'en a pas.
+            if (role == "eleve") {
+                const image = response?.data?.image?.data;
+                const avatar = response?.data?.avatar;
+                const pseudo = response?.data?.pseudo;
+                setUserData({ image, avatar, pseudo })
             }
 
-            setAuth({ user, accessToken, role, preference, invitation, idclasse });
-            // Si c'est un élève on aura besoin d'afficher son pseudo et ses images, la classe n'en a pas.
-            role == "eleve" && setUserData({image, avatar, pseudo})
             setPwd('');
             setUser('');
-            toast({title: "Bienvenue !", description: "Vous êtes connecté", status: "success", duration: 9000, isClosable: true, position:"top"})
+            toast({ title: "Bienvenue !", description: "Vous êtes connecté", status: "success", duration: 9000, isClosable: true, position: "top" })
             navigate("/profile");
 
 
         } catch (err) {
             if (!err?.response) {
-                toast({title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 5000, isClosable: true, position:"top"})
+                toast({ title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 5000, isClosable: true, position: "top" })
             } else if (err.response?.status === 400) {
-                toast({title: "Erreur", description: "Mot de passe erroné", status: "error", duration: 5000, isClosable: true, position:"top"})
+                toast({ title: "Erreur", description: "Mot de passe erroné", status: "error", duration: 5000, isClosable: true, position: "top" })
 
             } else if (err.response?.status === 401) {
-                toast({title: "Erreur", description: "Adresse mail inconnue", status: "error", duration: 5000, isClosable: true, position:"top"})
+                toast({ title: "Erreur", description: "Adresse mail inconnue", status: "error", duration: 5000, isClosable: true, position: "top" })
             }
             else if (err.response?.status === 402) {
-                toast({title: "Erreur", description: "Remplissez tous les champs", status: "error", duration: 5000, isClosable: true, position:"top"})
+                toast({ title: "Erreur", description: "Remplissez tous les champs", status: "error", duration: 5000, isClosable: true, position: "top" })
             } else {
-                toast({title: "Erreur", description: "Erreur", status: "error", duration: 3000, isClosable: true, position:"top"})
+                toast({ title: "Erreur", description: "Erreur", status: "error", duration: 3000, isClosable: true, position: "top" })
 
             }
         }

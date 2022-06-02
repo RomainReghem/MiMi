@@ -7,7 +7,7 @@ import Avatar from 'react-nice-avatar';
 import Invitations from "./Invitations";
 import useGetImage from "../../hooks/useGetImage";
 import useGetAvatar from "../../hooks/useGetAvatar";
-import { useToast, InputGroup ,Tooltip, FormLabel, IconButton, Input, InputRightElement, Text, Button, Heading, Stack, Image, InputRightAddon, Divider, Center } from "@chakra-ui/react";
+import { useToast, InputGroup, Tooltip, FormLabel, IconButton, Input, InputRightElement, Text, Button, Heading, Stack, Image, InputRightAddon, Divider, Center } from "@chakra-ui/react";
 import useUserData from "../../hooks/useUserData";
 
 const CHANGEPSEUDO_URL = '/changePseudo';
@@ -75,7 +75,6 @@ const Identity = () => {
             return;
         }
         try {
-            console.log(JSON.stringify({ mail, newPseudo }))
             const response = await axiosPrivate.post(CHANGEPSEUDO_URL,
                 JSON.stringify({ mail, newPseudo }),
                 {
@@ -86,7 +85,7 @@ const Identity = () => {
             toast({ title: "Pseudo modifié", description: "Votre nouveau pseudo est : " + newPseudo, status: "success", duration: 5000, isClosable: true, position: "top" })
             setUserData({
                 ...userData,
-                pseudo:newPseudo
+                pseudo: newPseudo
             })
 
         } catch (err) {
@@ -112,7 +111,6 @@ const Identity = () => {
             data: event.target.files[0],
         }
         // PNG / JPEG only
-        console.log(img)
         if (img.data.type != "image/png" && img.data.type != "image/jpeg" && img.data.type != "image/jpg") {
             toast({ title: "Erreur type de fichier", description: "Les seules images acceptées sont les PNG et JPEG", status: "error", duration: 5000, isClosable: true, position: "top" })
             return;
@@ -136,15 +134,14 @@ const Identity = () => {
                 {
                     headers: { "Content-Type": "image/*" },
                 });
-            console.log(response)    
             setPictureWaitingToBeSent(false);
             setUserData({
                 ...userData,
-                image:response.data.image.data
+                image: response.data.data
             })
             toast({ title: "Image de profil sauvegardée", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
-            
-            
+
+
         } catch (error) {
             toast({ title: "Erreur", description: "Vérifiez le fichier", status: "error", duration: 5000, isClosable: true, position: "top" })
 
@@ -158,7 +155,7 @@ const Identity = () => {
                 <InputGroup>
                     <Input placeholder='Nouveau pseudo' _focus={{ outline: 'none' }} onChange={(e) => setNewPseudo(e.target.value)} />
                     <InputRightElement>
-                        <IconButton colorScheme={"green"} borderRadius={'0px 5px 5px 0px'} _focus={{ outline: 'none' }} onClick={handleSubmit} icon={<FontAwesomeIcon icon={faCheck}/>}>
+                        <IconButton colorScheme={"green"} borderRadius={'0px 5px 5px 0px'} _focus={{ outline: 'none' }} onClick={handleSubmit} icon={<FontAwesomeIcon icon={faCheck} />}>
                         </IconButton>
                     </InputRightElement>
                 </InputGroup>
@@ -178,14 +175,14 @@ const Identity = () => {
 
                 <Stack w={'100%'} spacing={0} direction={'row'}>
                     <Input type="file" display={'none'} id="picture" onChange={handlePictureSelect} />
-                        <FormLabel w={'90%'} htmlFor="picture" border={'0.5px solid'} borderRight={'none'} cursor={'pointer'} borderRadius={'3px 0px 0px 3px'}>
-                            <Center h={'100%'}>                         
-                                <FontAwesomeIcon icon={faUpload} />
-                                <Text display={'inline'} fontFamily={'body'} ml={2}>{selectedPicture?.data && pictureWaitingToBeSent ? (selectedPicture?.data.name).substring(0, 10) + "..." : "Importer une image"}</Text>
-                            </Center>
-                        </FormLabel>
-                        <Tooltip bg={'green.400'} label="Valider l'image" fontSize='md' placement="top">
-                    <IconButton borderRadius={'0px 3px 3px 0px'} colorScheme={"green"} onClick={(e) => { pictureSubmit(e); e.currentTarget.blur() }}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></IconButton>
+                    <FormLabel w={'90%'} htmlFor="picture" border={'0.5px solid'} borderRight={'none'} cursor={'pointer'} borderRadius={'3px 0px 0px 3px'}>
+                        <Center h={'100%'}>
+                            <FontAwesomeIcon icon={faUpload} />
+                            <Text display={'inline'} fontFamily={'body'} ml={2}>{selectedPicture?.data && pictureWaitingToBeSent ? (selectedPicture?.data.name).substring(0, 10) + "..." : "Importer une image"}</Text>
+                        </Center>
+                    </FormLabel>
+                    <Tooltip bg={'green.400'} label="Valider l'image" fontSize='md' placement="top">
+                        <IconButton borderRadius={'0px 3px 3px 0px'} colorScheme={"green"} onClick={(e) => { pictureSubmit(e); e.currentTarget.blur() }}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></IconButton>
                     </Tooltip>
                 </Stack>
 
