@@ -4,6 +4,7 @@ const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 const rooms = io.sockets.adapter.rooms
+const {addVictory, addPartie} = require("./controllers/score")
 
 io.on("connection", (socket) => {
 
@@ -65,12 +66,20 @@ io.on("connection", (socket) => {
     for (let i = 0; i <= 6; i += 3) {
       if (board[i] == "X" && board[i + 1] == "X" && board[i + 2] == "X") {
         io.in(roomCode).emit("victory", rooms.get(roomCode).player1);
-        console.log(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
+        try {
+          addVictory(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
+        } catch (error) {
+          console.log(error)
+        }
         io.in(roomCode).socketsLeave(roomCode);
 
       } else if (board[i] == "O" && board[i + 1] == "O" && board[i + 2] == "O") {
         io.in(roomCode).emit("victory", rooms.get(roomCode).player2);
-        console.log(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+        try {
+          addVictory(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+        } catch (error) {
+          console.log(error)
+        }
         io.in(roomCode).socketsLeave(roomCode);
 
       }
@@ -79,12 +88,20 @@ io.on("connection", (socket) => {
     for (let i = 0; i <= 3; i += 1) {
       if (board[i] == "X" && board[i + 3] == "X" && board[i + 6] == "X") {
         io.in(roomCode).emit("victory", rooms.get(roomCode).player1);
-        console.log(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
+        try {
+          addVictory(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
+        } catch (error) {
+          console.log(error)
+        }
         io.in(roomCode).socketsLeave(roomCode);
 
       } else if (board[i] == "O" && board[i + 3] == "O" && board[i + 6] == "O") {
         io.in(roomCode).emit("victory", rooms.get(roomCode).player2);
-        console.log(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+        try {
+          addVictory(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+        } catch (error) {
+          console.log(error)
+        }
         io.in(roomCode).socketsLeave(roomCode);
 
       }
@@ -92,18 +109,33 @@ io.on("connection", (socket) => {
     // Diagonals victory conditions
     if ((board[0] == "X" && board[4] == "X" && board[8] == "X") || (board[2] == "X" && board[4] == "X" && board[6] == "X")) {
       io.in(roomCode).emit("victory", rooms.get(roomCode).player1);
-      console.log(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
+      try {
+        console.log('test'+io.sockets.sockets.get(rooms.get(roomCode).player1).mail)
+        addVictory(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
+      } catch (error) {
+        console.log(error)
+      }
       io.in(roomCode).socketsLeave(roomCode);
 
     } else if ((board[0] == "O" && board[4] == "O" && board[8] == "O") || (board[2] == "O" && board[4] == "O" && board[6] == "O")) {
       io.in(roomCode).emit("victory", rooms.get(roomCode).player2);
-      console.log(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+      try {
+        addVictory(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+      } catch (error) {
+        console.log(error)
+      }
       io.in(roomCode).socketsLeave(roomCode);
     }
 
     // If no more spaces to play on the board, then stops the game. They both lose (victory without a winner parameter)
     if (!board.includes("")) {
       io.in(roomCode).emit("victory");
+      try{
+        console.log("maillllllllllllll"+io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+        addPartie(io.sockets.sockets.get(rooms.get(roomCode).player2).mail)
+      }catch (error){
+        console.log(error)
+      }
       io.in(roomCode).socketsLeave(roomCode);
       return;
     }

@@ -108,6 +108,7 @@ const resetScore = (req, res) => {
     }
 }
 
+
 const getScoreTicTacToe = (req, res) => {
     console.log("\n*** Récupération du score ***");
     const email = req.query.mail;
@@ -176,6 +177,7 @@ const getScoreTicTacToe = (req, res) => {
         return res.status(403).send("Accès interdit : tentative de changement du score")
     }
 }
+
 
 const putScoreTicTacToe = (req, res) => {
     console.log("\n*** Enregistrement du score ***");
@@ -267,6 +269,14 @@ const putScoreTicTacToe = (req, res) => {
     }
 }
 
+
+/**
+ * Renvoie dans une fonction callback le score d'un jeu joué avec une classe spécifiée.  
+ * Si aucun score n'existe pour le jeu et la classe, alors le crée.
+ * @param {number} id l'identifiant unique de la classe
+ * @param {String} jeu le nom du jeu dont on veut récupérer le score
+ * @param {*} callback la fonction callback, retourne s'il y en a une erreur, ou alors le score trouvé
+ */
 function getScore(id, jeu, callback) {
     Score.findOne(
         {
@@ -292,40 +302,62 @@ function getScore(id, jeu, callback) {
         console.log("Erreur récuperation score \n" + err)
         return callback(new Error("Erreur lors de la récupération du score."));
     });
-
 }
 
 // pour ajouter des points quand victoire 
 async function addVictory(email){
-    const eleve = await Eleve.findOne({attributes:["idclasse"], where:{courriel:email}})
-    if(!eleve){
-        const classe = await Classe.findOne({attributes:["idclasse"], where:{courriel:email}});
-        if(!classe){
-            //error
-            throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
+    if(email==undefined){
+        throw new Error("pas de mail")
+    }
+    try{
+        const eleve = await Eleve.findOne({attributes:["idclasse"], where:{courriel:email}})
+        if(!eleve){
+            const classe = await Classe.findOne({attributes:["idclasse"], where:{courriel:email}});
+            if(!classe){
+                //error
+                throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
+            }
+            await Score.increment({scoreclasse:+1, nbpartie:+1}, {where:{idclasse:classe.idclasse}})
+            console.log("ajout de point pour la classe %s", email)
+        }else{
+            await Score.increment({scoreeleves:+1, nbpartie:+1}, {where:{idclasse:eleve.idclasse}})
+            console.log("ajout de point pour l'eleve %s", email)
         }
-        await Score.increment({scoreclasse:+1, nbpartie:+1}, {where:{idclasse:classe.idclasse}})
-    }else{
-        await Score.increment({scoreeleves:+1, nbpartie:+1}, {where:{idclasse:classe.idclasse}})
+    }catch (error){
+        console.log("erreur lors des requetes "+error)
+        throw error
     }
 }
 
 // pour ajouter nb partie quand aucune victoire
 async function addPartie(email){
-    const eleve = await Eleve.findOne({attributes:["idclasse"], where:{courriel:email}})
-    if(!eleve){
-        const classe = await Classe.findOne({attributes:["idclasse"], where:{courriel:email}});
-        if(!classe){
-            //error
-            throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
-        }
-        await Score.increment({nbpartie:+1}, {where:{idclasse:classe.idclasse}})
-    }else{
-        await Score.increment({nbpartie:+1}, {where:{idclasse:classe.idclasse}})
+    if(email==undefined){
+        throw new Error("pas de mail")
     }
+    try{
+        const eleve = await Eleve.findOne({attributes:["idclasse"], where:{courriel:email}})
+        if(!eleve){
+            const classe = await Classe.findOne({attributes:["idclasse"], where:{courriel:email}});
+            if(!classe){
+                //error
+                throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
+            }
+            await Score.increment({nbpartie:+1}, {where:{idclasse:classe.idclasse}})
+            console.log("ajout de partie classe ok")
+        }else{
+            await Score.increment({nbpartie:+1}, {where:{idclasse:eleve.idclasse}})
+            console.log("ajout de partie pour l'élève ok")
+        }
+    }catch (err){
+        console.log("Erreur : %",err)
+        throw err;
+    }
+   
 }
 
 module.exports = {
     putScoreTicTacToe,
-    getScoreTicTacToe
+    getScoreTicTacToe,
+    addVictory,
+    addPartie
 }
