@@ -243,7 +243,6 @@ function getAvatar(id, callback) {
                 shirtColor: "#6BD9E9",
                 shirtStyle: "polo"
             }
-            avatar = JSON.parse(avatar)
         }
         avatar = JSON.parse(avatar)
 
