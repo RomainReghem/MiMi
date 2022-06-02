@@ -233,7 +233,7 @@ function getAvatar(id, callback) {
         .on('end', function () {
             //console.log("AVATAR : " + avatar)
             console.log("avatar récupéré");
-            avatar=JSON.parse(avatar)
+            avatar=JSON.parse(avatar);
             return callback({ avatar: avatar });
             // on envoie le fichier json au front
         })

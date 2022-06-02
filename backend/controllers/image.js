@@ -40,12 +40,22 @@ const saveAvatar = (req, res) => {
                 return res.status(404).send("Élève pas trouvé")
             }
             const num = eleve.ideleve;
-            const path = "testeleve/eleve" + num + "/avatar"
+            const path = "Eleves/eleve" + num + "/avatar"
 
             // mise en forme du JSON pour son enregistrement            
-            avatar = JSON.stringify(avatar)
+           avatar = JSON.stringify(avatar)
+            verificationChemin(path)
+            // on enregistre le fichier JSON correspondant à l'avatar de l'élève
+            fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
+                if (err) {
+                    console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                }
+                console.log("Le fichier JSON a bien été sauvegardé");
+                res.status(201).send("Enregistrement effectué");
+            });
+                        //saveJSON(path, avatar, num, res);
 
-            saveJSON(path, avatar, num, res);
 
         })
         .catch(err => {
@@ -96,22 +106,42 @@ const getAvatar = (req, res) => {
                 return res.status(404).send("Élève pas trouvé")
             }
             const num = eleve.ideleve;
-            const path = "testeleve/eleve" + num + "/avatar"
-            /*fs.readFile(path, 'utf-8', function (err, avatar) {
+            const path = "Eleves/eleve" + num + "/avatar";
+            verificationChemin(path)
+            fs.readFile(path+"/avatar"+num+".json", 'utf-8', function (err, avatar) {
                 if (err) {
-                    console.log('erreur lors de la récupération de l\'avatar')
-                    return res.status(600).send("Problème de lecture de l'avatar.")
+                    console.log('erreur lors de la récupération de l\'avatar : '+err)
+                    //return res.status(600).send("Problème de lecture de l'avatar.")
+                    avatar = {
+                        bgColor: "#E0DDFF",
+                        earSize: "small",
+                        eyeBrowStyle: "up",
+                        eyeStyle: "oval",
+                        faceColor: "#AC6651",
+                        glassesStyle: "none",
+                        hairColor: "#000",
+                        hairStyle: "thick",
+                        hatColor: "#000",
+                        hatStyle: "none",
+                        mouthStyle: "laugh",
+                        noseStyle: "round",
+                        shape: "square",
+                        shirtColor: "#6BD9E9",
+                        shirtStyle: "polo"
+                    }
+                    avatar = JSON.stringify(avatar)
                 }
                 console.log("avatar récupéré")
                 // on envoie le fichier json au front
                 res.json({ avatar: avatar })
-            })*/
-            getJSON(path, num, res, function(err, avatar){
+            })
+
+           /* getJSON(path, num, res, function(err, avatar){
                 if(err){
                     return res.send(err).status(520);
                 }
                 return res.json(avatar).status(200)
-            })
+            })*/
             
         })
         .catch(err => {
