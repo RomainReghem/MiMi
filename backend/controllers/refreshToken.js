@@ -75,7 +75,7 @@ const refreshToken = (req, res) => {
                                                     return res.send(err).status(520);
                                                 }
                                                 console.log('envoi des infos')
-                                                return res.status(201).json(Object.assign({ role: role, accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
+                                                return res.status(200).json(Object.assign({ role: role, accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
                                             })
                                         }
                                     })

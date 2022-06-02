@@ -220,24 +220,35 @@ function getInvitation(emailEleve, cb) {
 // fonction pour récupérer l'avatar
 function getAvatar(id, callback) {
     const num = id;
-    const path = "testeleve/eleve" + num + "/avatar";
-    let avatar = "";
-    bucket.file(path + "/avatar" + num + ".json").createReadStream()
-        .on('error', function (err) {
-            console.log(err);
-            return callback(520);
-        })
-        .on('data', function (response) {
-            avatar += response;
-        })
-        .on('end', function () {
-            //console.log("AVATAR : " + avatar)
-            console.log("avatar récupéré");
-            avatar=JSON.parse(avatar);
-            return callback({ avatar: avatar });
-            // on envoie le fichier json au front
-        })
-
+    const path = "Eleves/eleve" + num + "/avatar";
+    verificationChemin(path)
+    fs.readFile(path+"/avatar"+num+".json", 'utf-8', function (err, avatar) {
+        if (err) {
+            console.log('erreur lors de la récupération de l\'avatar : '+err)
+            //return res.status(600).send("Problème de lecture de l'avatar.")
+            let avatar = {
+                bgColor: "#E0DDFF",
+                earSize: "small",
+                eyeBrowStyle: "up",
+                eyeStyle: "oval",
+                faceColor: "#AC6651",
+                glassesStyle: "none",
+                hairColor: "#000",
+                hairStyle: "thick",
+                hatColor: "#000",
+                hatStyle: "none",
+                mouthStyle: "laugh",
+                noseStyle: "round",
+                shape: "square",
+                shirtColor: "#6BD9E9",
+                shirtStyle: "polo"
+            }
+            avatar = JSON.stringify(avatar)
+        }
+        console.log("avatar récupéré"+avatar)
+        // on envoie le fichier json au front
+        return callback({ avatar: avatar });
+    })
 }
 /*
 // fonction pour récupérer l'avatar
