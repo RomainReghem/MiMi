@@ -7,7 +7,7 @@ const rooms = io.sockets.adapter.rooms
 
 io.on("connection", (socket) => {
 
-  socket.on("joinRoom", (roomCode) => {
+  socket.on("joinRoom", (roomCode, mail) => {
     if (socket.rooms.has(roomCode)) {
       socket.leave(roomCode);
     }
@@ -19,8 +19,9 @@ io.on("connection", (socket) => {
     if (numClients == 0) {
       socket.join(roomCode);
       socket.emit("YoureIn");
-      // On donne un pseudo au socket 
+      // On donne un pseudo au socket et on défini son mail
       socket.nickname = "player1";
+      socket.mail = mail;
       rooms.get(roomCode).player1 = socket.id;
     }
 
@@ -30,6 +31,7 @@ io.on("connection", (socket) => {
       socket.emit("YoureIn");
       // On donne un pseudo au socket 
       socket.nickname = "player2";
+      socket.mail = mail;
       rooms.get(roomCode).player2 = socket.id;
 
       // ... et on commence la partie
@@ -63,10 +65,12 @@ io.on("connection", (socket) => {
     for (let i = 0; i <= 6; i += 3) {
       if (board[i] == "X" && board[i + 1] == "X" && board[i + 2] == "X") {
         io.in(roomCode).emit("victory", rooms.get(roomCode).player1);
+        console.log(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
         io.in(roomCode).socketsLeave(roomCode);
 
       } else if (board[i] == "O" && board[i + 1] == "O" && board[i + 2] == "O") {
         io.in(roomCode).emit("victory", rooms.get(roomCode).player2);
+        console.log(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
         io.in(roomCode).socketsLeave(roomCode);
 
       }
@@ -75,10 +79,12 @@ io.on("connection", (socket) => {
     for (let i = 0; i <= 3; i += 1) {
       if (board[i] == "X" && board[i + 3] == "X" && board[i + 6] == "X") {
         io.in(roomCode).emit("victory", rooms.get(roomCode).player1);
+        console.log(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
         io.in(roomCode).socketsLeave(roomCode);
 
       } else if (board[i] == "O" && board[i + 3] == "O" && board[i + 6] == "O") {
         io.in(roomCode).emit("victory", rooms.get(roomCode).player2);
+        console.log(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
         io.in(roomCode).socketsLeave(roomCode);
 
       }
@@ -86,10 +92,12 @@ io.on("connection", (socket) => {
     // Diagonals victory conditions
     if ((board[0] == "X" && board[4] == "X" && board[8] == "X") || (board[2] == "X" && board[4] == "X" && board[6] == "X")) {
       io.in(roomCode).emit("victory", rooms.get(roomCode).player1);
+      console.log(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
       io.in(roomCode).socketsLeave(roomCode);
 
     } else if ((board[0] == "O" && board[4] == "O" && board[8] == "O") || (board[2] == "O" && board[4] == "O" && board[6] == "O")) {
       io.in(roomCode).emit("victory", rooms.get(roomCode).player2);
+      console.log(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
       io.in(roomCode).socketsLeave(roomCode);
     }
 

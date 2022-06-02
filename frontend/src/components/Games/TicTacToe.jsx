@@ -34,7 +34,7 @@ const TicTacToe = () => {
 
     useEffect(() => {
         if (roomCode && !roomJoined) {
-            socket.emit("joinRoom", roomCode);
+            socket.emit("joinRoom", roomCode, auth?.user);
             console.log("joining room...");
         }
     }, [roomCode]);
