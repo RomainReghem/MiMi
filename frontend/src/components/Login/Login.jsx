@@ -5,6 +5,7 @@ import { useRef, useState, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
 import axios from '../../api/axios'
 import useAuth from '../../hooks/useAuth'
+import useUserData from '../../hooks/useUserData';
 
 
 const LOGIN_URL = '/login';
@@ -12,6 +13,7 @@ const LOGIN_URL = '/login';
 export default function Login() {
     const toast = useToast();
     const { setAuth } = useAuth();
+    const { setUserData } = useUserData();
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
@@ -28,12 +30,14 @@ export default function Login() {
                     withCredentials: true
                 });
             //const accessToken = response?.data?.accessToken;
-            console.log(response)
+            console.log(response.data)
             const accessToken = response?.data?.accessToken;
             const role = response?.data?.role;
             const invitation = response?.data?.invitation;
             const idclasse = response?.data?.idclasse;
-            
+            // const image = response?.data?.image?.data;
+            // const avatar = response?.data?.avatar;
+            // const pseudo = response?.data?.pseudo;          
 
 
             // Au login, si rien ne correspond dans le local storage, on attribue "avatar" à "préférence"
@@ -44,6 +48,8 @@ export default function Login() {
             }
 
             setAuth({ user, accessToken, role, preference, invitation, idclasse });
+            // Si c'est un élève on aura besoin d'afficher son pseudo et ses images, la classe n'en a pas.
+            // role == "eleve" && setUserData({image, avatar, pseudo})
             setPwd('');
             setUser('');
             toast({title: "Bienvenue !", description: "Vous êtes connecté", status: "success", duration: 9000, isClosable: true, position:"top"})

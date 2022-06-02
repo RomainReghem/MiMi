@@ -1,6 +1,6 @@
 import PDFSender from "../Documents/PDFSender"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useToast, Tooltip, Text, Button, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls } from "@chakra-ui/react";
+import { useToast, Tooltip, Text, Button, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls, Badge, Kbd } from "@chakra-ui/react";
 import PDFViewer from "../Documents/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faXmark, faPencil, faEye } from "@fortawesome/free-solid-svg-icons";
@@ -29,8 +29,8 @@ const Documents = () => {
     let myFilesURL = (auth?.role == "classe" ? "/getCoursClass" : "/getCours");
     let sharedFilesURL = (auth?.role == "classe" ? "/getCours" : "/getCoursClass");
     let myFilesParams = (auth?.role == "classe" ? { id: auth?.idclasse } : { mail: auth?.user })
-    let sharedFilesParams = (auth?.role == "classe" ? { mail: localStorage.getItem("mailEleve")} : { id: auth?.idclasse })
-    
+    let sharedFilesParams = (auth?.role == "classe" ? { mail: localStorage.getItem("mailEleve") } : { id: auth?.idclasse })
+
     let deleteParams;
     let deleteFileURL;
     let editFileURL;
@@ -103,11 +103,12 @@ const Documents = () => {
     const editFileName = async (newName, currentName) => {
         try {
             console.log(newName, currentName)
-            await axiosPrivate.post(editFileURL, JSON.stringify({...editFileParams, newName, currentName }),
+            await axiosPrivate.post(editFileURL, JSON.stringify({ ...editFileParams, newName, currentName }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
+            toast({ title: "Fichier modifié", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
         }
         catch (err) {
             console.log(err)
@@ -119,8 +120,9 @@ const Documents = () => {
             <Wrap spacing={10} p={5} justify={'center'} align={'center'}>
                 <Stack spacing={4} w={useBreakpointValue({ base: "xs", md: "md" })}>
                     <Heading fontSize={'2xl'}>Gestion des documents</Heading>
+                    <Text fontSize={'xs'} fontFamily={'mono'}><Kbd colorScheme={'green'}>Clic</Kbd> sur le nom d'un document pour le renommer</Text>
                     <Stack w={'100%'} direction={'row'}>
-                        <Tooltip bg={'blue.500'} label="Charger les fichiers" fontSize='md' placement="top">
+                        <Tooltip label="Charger les fichiers" fontSize='md' placement="top">
                             <Button onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></Button>
                         </Tooltip>
                         <Button colorScheme={'blue'} onClick={() => { setMenuSelection(myFiles); setSelectedUI("my") }} style={selectedUI == "my" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Mes documents partagés</Text></Button>
@@ -129,16 +131,22 @@ const Documents = () => {
                     <Stack w={'100%'} h={'xs'} overflowY="auto" p={1}>
                         {Array.from(Array(menuSelection?.length), (e, i) => {
                             return <Stack key={i} direction={'row'} w={'100%'}>
+
                                 <Button w={'100%'} justifyContent={'flex-start'}>
                                     <Editable defaultValue={menuSelection[i]} noOfLines={1} onSubmit={(e) => { editFileName(e, menuSelection[i]) }}>
                                         <EditablePreview />
                                         <EditableInput />
                                     </Editable>
                                 </Button>
+
                                 {selectedUI == "my" ? <>
-                                    <IconButton colorScheme={'gray'} onClick={() => setFile(menuSelection[i])} icon={<FontAwesomeIcon icon={faEye} />}></IconButton>
-                                    <IconButton colorScheme={'red'} onClick={(e) => { deleteFile(menuSelection[i]) }} icon={<FontAwesomeIcon icon={faXmark} />}></IconButton>
-                                </> : <></>}</Stack>
+                                    <Tooltip label="Voir le fichier" fontSize='md' placement="top">
+                                        <IconButton colorScheme={'gray'} onClick={() => setFile(menuSelection[i])} icon={<FontAwesomeIcon icon={faEye} />}></IconButton>
+                                    </Tooltip>
+
+                                    <Tooltip bg={'red.400'} label="Supprimer le fichier" fontSize='md' placement="top">
+                                        <IconButton colorScheme={'red'} onClick={(e) => { deleteFile(menuSelection[i]) }} icon={<FontAwesomeIcon icon={faXmark} />}></IconButton>
+                                    </Tooltip></> : <></>}</Stack>
                         })}
                     </Stack>
                     <Stack w={'100%'}>

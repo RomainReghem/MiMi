@@ -132,7 +132,7 @@ export default function Nav() {
                     />
                 </Flex>
                 <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }} align={'center'}>
-                    {auth?.user ?
+                    {auth?.user && auth?.role == "eleve" ?
                         <Box boxSize={'2rem'} mr={2}>{auth?.preference === "avatar" ?
                             (<Avatar style={{ width: '2rem', height: '2rem' }} {...avatar} />) :
                             (
@@ -143,7 +143,6 @@ export default function Nav() {
                             colorScheme='gray'>
                             {auth?.role == "eleve" ? pseudo : auth?.role == "classe" ? "classe #" + auth?.idclasse : <></>}
                         </Badge>
-                    
 
                     <Flex display={{ base: 'none', md: 'flex' }} ml={5}>
                         <DesktopNav />

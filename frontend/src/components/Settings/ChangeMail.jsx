@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import useAuth from "../../hooks/useAuth";
 import { useToast } from "@chakra-ui/react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { Heading, Stack, Input, Button, IconButton, InputGroup, InputRightElement, Text } from "@chakra-ui/react"
+import { Heading, Stack, Input, Button, IconButton, InputGroup, InputRightElement,Badge, Text } from "@chakra-ui/react"
 import { ViewIcon, ViewOffIcon, CheckIcon } from '@chakra-ui/icons';
 
 const MAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -79,6 +79,7 @@ const ChangeMail = () => {
     return (
         <Stack spacing={4}>
             <Heading fontSize={'2xl'}>Changer d'adresse mail</Heading>
+            <Text fontFamily={'mono'} fontSize={'xs'}>Vous devrez vous reconnecter après le changement de mail</Text>
                 <Input mb={2} placeholder="Nouveau mail" onChange={(e) => setnewMail(e.target.value)} />
                 <InputGroup mb={2}>
                     <Input placeholder="Mot de passe actuel" type={showPassword ? 'text' : 'password'} onChange={(e) => setPwd(e.target.value)} />
