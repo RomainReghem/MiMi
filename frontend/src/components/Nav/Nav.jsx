@@ -103,18 +103,21 @@ export default function Nav() {
                                 display={{ base: 'none', md: 'inline-flex' }}
                                 variant={'unstyled'}
                                 fontSize={'sm'}
-                                fontWeight={400}>
+                                fontWeight={400}
+                                _focus={{outline:'none'}}>
                                 S'inscrire
                             </Button>
                         </Link>
-                        <Link textDecoration={'none'} as={ReactRouterLink} to="/login">
+                        
                             <Button
+                            onClick={() => {navigate('/login')}}
                                 fontSize={'sm'}
                                 fontWeight={600}
-                                colorScheme={'blue'}>
+                                colorScheme={'blue'}
+                                >
                                 Se connecter
                             </Button>
-                        </Link></>}
+                        </>}
                     {auth?.user && <Link as={ReactRouterLink} to="/settings"><IconButton colorScheme={'teal'} icon={<FontAwesomeIcon icon={faGear} />}></IconButton></Link>}
                     <ColorModeSwitcher display={{base:'none', md:'inline-flex'}} />
                     {auth?.user && <>

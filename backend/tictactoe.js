@@ -12,10 +12,10 @@ io.on("connection", (socket) => {
     if (socket.rooms.has(roomCode)) {
       socket.leave(roomCode);
     }
-
+    
     const clients = io.sockets.adapter.rooms.get(roomCode);
     const numClients = clients ? clients.size : 0;
-
+    
     // Il n'y a personne, on ajoute donc le premier joueur à la salle
     if (numClients == 0) {
       socket.join(roomCode);
@@ -25,7 +25,7 @@ io.on("connection", (socket) => {
       socket.mail = mail;
       rooms.get(roomCode).player1 = socket.id;
     }
-
+    
     // Il y a déjà quelqu'un dans la salle, on ajoute un deuxième joueur...
     else if (numClients == 1) {
       socket.join(roomCode);
@@ -34,10 +34,10 @@ io.on("connection", (socket) => {
       socket.nickname = "player2";
       socket.mail = mail;
       rooms.get(roomCode).player2 = socket.id;
-
+      
       // ... et on commence la partie
-      rooms.get(roomCode).board = ["", "", "", "", "", "", "", "", ""]
       io.in(roomCode).emit("maxPlayersReached", rooms.get(roomCode).board, rooms.get(roomCode).player1);
+      rooms.get(roomCode).board = ["", "", "", "", "", "", "", "", ""]
     }
 
     else {
@@ -142,7 +142,7 @@ io.on("connection", (socket) => {
   }
 
   socket.on("disconnect", () => {
-    io.in(socket.rooms).socketsLeave(socket.rooms);
+    //io.in(socket.rooms).socketsLeave(socket.rooms);
     console.log("User Disconnected");
   });
 });
