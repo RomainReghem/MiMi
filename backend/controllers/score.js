@@ -23,7 +23,7 @@ const resetScore = (req, res) => {
     console.log("** Vérification jeu **")
     if (jeu != 'tictactoe') {
         console.log("jeu inconnu")
-        return res.send('Jeu inconnu').status(400)
+        return res.send('Jeu %s inconnu',jeu).status(400)
     }
 
     console.log("** Vérification droit d'accès au score **")
@@ -295,14 +295,35 @@ function getScore(id, jeu, callback) {
 
 }
 
-
+// pour ajouter des points quand victoire 
 async function addVictory(email){
     const eleve = await Eleve.findOne({attributes:["idclasse"], where:{courriel:email}})
     if(!eleve){
-        const classe = await Classe.findOne({attributes:["idclasse"], where:{courriel:email}})
+        const classe = await Classe.findOne({attributes:["idclasse"], where:{courriel:email}});
+        if(!classe){
+            //error
+            throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
+        }
+        await Score.increment({scoreclasse:+1, nbpartie:+1}, {where:{idclasse:classe.idclasse}})
+    }else{
+        await Score.increment({scoreeleves:+1, nbpartie:+1}, {where:{idclasse:classe.idclasse}})
     }
 }
 
+// pour ajouter nb partie quand aucune victoire
+async function addPartie(email){
+    const eleve = await Eleve.findOne({attributes:["idclasse"], where:{courriel:email}})
+    if(!eleve){
+        const classe = await Classe.findOne({attributes:["idclasse"], where:{courriel:email}});
+        if(!classe){
+            //error
+            throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
+        }
+        await Score.increment({nbpartie:+1}, {where:{idclasse:classe.idclasse}})
+    }else{
+        await Score.increment({nbpartie:+1}, {where:{idclasse:classe.idclasse}})
+    }
+}
 
 module.exports = {
     putScoreTicTacToe,

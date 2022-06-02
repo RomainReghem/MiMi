@@ -217,30 +217,6 @@ function getInvitation(emailEleve, cb) {
         });
 }
 
-
-// function pour récupérer le pseudo
-function getUsername(email, cb) {
-    Eleve.findOne({
-        attributes: ['pseudo'],
-        where: {
-            courriel: email
-        }
-    }).then(eleve => {
-        if (eleve) {
-            console.log('pseudo ' + eleve.pseudo)
-            return cb({ pseudo: eleve.pseudo })
-        } else {
-            console.log("Aucun élève avec cette adresse");
-            return cb(404)
-        }
-    })
-        .catch(err => {
-            console.log(err)
-            return cb(520)
-        });
-}
-
-
 // fonction pour récupérer l'avatar
 function getAvatar(id, callback) {
     const num = id;
@@ -257,10 +233,47 @@ function getAvatar(id, callback) {
         .on('end', function () {
             //console.log("AVATAR : " + avatar)
             console.log("avatar récupéré");
-            // on envoie le fichier json au front
+            avatar=JSON.parse(avatar)
             return callback({ avatar: avatar });
+            // on envoie le fichier json au front
         })
+
 }
+/*
+// fonction pour récupérer l'avatar
+function getAvatar(id, callback) {
+    const num = id;
+    const path = "testeleve/eleve" + num + "/avatar";
+    getJSON(path, num, function(err, avatar){
+        if(err){
+            return callback(520);
+        }
+        return callback(avatar)
+    })
+}
+
+/**
+ * Permet de retourner l'avatar au format json, au chemin passé, avec l'identifiant de l'élève donné.
+ * @param {String} path le chemin vers l'avatar
+ * @param {Number} num le numéro de l'élève
+ */
+ /*async function getJSON(path, num, callback) {
+    let avatar = "";
+    await bucket.file(path + "/avatar" + num + ".json").createReadStream()
+        .on('error', function (err) {
+            console.log(err);
+            callback(err);
+        })
+        .on('data', function (response) {
+            avatar += response;
+        })
+        .on('end', function () {
+            //console.log("AVATAR : " + avatar)
+            console.log("avatar récupéré");
+            // on envoie le fichier json au front
+            callback({ avatar: avatar });
+        })
+}*/
 
 // fonction pour récuperer l'image de profil
 function getImage(id, callback) {
@@ -308,5 +321,4 @@ module.exports = {
     getInvitation,
     getAvatar,
     getImage,
-    getUsername
 }

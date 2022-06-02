@@ -211,7 +211,7 @@ const savePicture = (req, res) => {
                         return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
                     }
                     console.log("La photo a bien été sauvegardée");
-                    return res.status(201).send("Enregistrement effectué");
+                    return res.status(201).send(img.buffer);
                 });
             })
         })

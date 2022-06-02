@@ -41,19 +41,19 @@ const Connexion = (req, res) => {
                     // si le mot de passe entré correspond bien au mot de passe dans la base de données
                     if (estValide) {
                         console.log("** Création des cookies pour l'élève **")
-                        // cookie 
+                        // l'acces token se périme au bout de 20 min sans activités
                         const accessToken = jwt.sign(
                             { "UserInfo": { "mail": eleve.courriel, "role": "eleve" } },
                             process.env.ACCESS_TOKEN_SECRET,
                             { expiresIn: '20m' }
                         );
+                        // le refreshtoken permet de créer de nouveaux accesstoken, il dure donc plus de temps, 1jour
                         const refreshToken = jwt.sign(
                             { "mail": eleve.courriel, "role": "eleve" },
                             process.env.REFRESH_TOKEN_SECRET,
                             { expiresIn: '1d' }
-                        )   /* Refresh.create({
-                            token: refreshToken
-                        })*/
+                        )
+                        // on met à jour la table Eleve pour pouvoir enregistrer le nouveau token dedans
                         Eleve.update(
                             { token: refreshToken },
                             { where: { courriel: eleve.courriel } }
@@ -61,26 +61,29 @@ const Connexion = (req, res) => {
                             .then(() => {
                                 //console.log("refresh token connexion " + refreshToken)
                                 console.log("** Connexion de l'élève effectuée **")
+                                // pour récupérer le statut de l'invitation de l'élève
                                 getInvitation(eleve.courriel, function (reponse) {
                                     if (reponse == 404 || reponse == 400) {
                                         console.log("Erreur lors de la récupération de l'invitation " + reponse)
                                         return res.sendStatus(reponse)
                                     } else {
-                                            getAvatar(eleve.ideleve, function(reponseAvatar){
-                                                if(reponseAvatar==520){
-                                                    return res.send("Erreur lors de la récupération de l'avatar !").status(520);
-                                                }else{
-                                                    getImage(eleve.ideleve, function(err, reponseImage){
-                                                        if(err){
-                                                            return res.send(err).status(520);
-                                                        }
-                                                        console.log('envoi des infos')
-                                                        return res.status(201).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, {pseudo:eleve.pseudo}, reponseAvatar, reponseImage));
-                                                    })
-                                                }
-                                            })
-                                        
-    
+                                        // pour récupérer l'avatar de l'élève
+                                        getAvatar(eleve.ideleve, function (reponseAvatar) {
+                                            if (reponseAvatar == 520) {
+                                                return res.send("Erreur lors de la récupération de l'avatar !").status(520);
+                                            } else {
+                                                //pour récupèrer l'image de profil de l'élève 
+                                                getImage(eleve.ideleve, function (err, reponseImage) {
+                                                    if (err) {
+                                                        return res.send(err).status(520);
+                                                    }
+                                                    console.log('envoi des infos')
+                                                    return res.status(201).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
+                                                })
+                                            }
+                                        })
+
+
                                     }
                                 })
                             })

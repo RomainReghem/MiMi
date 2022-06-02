@@ -15,10 +15,11 @@ require('dotenv').config()
 const refreshToken = (req, res) => {
     console.log("\n*** Rafraichissement des tokens ***")
     const cookies = req.cookies;
+    
     if (!cookies?.jwt) {
         console.log("accès refusé")
         // 401 : authentification raté
-        return res.status(401).send("accès refusé")
+        return res.status(401).send("Accès refusé : aucun cookie présent")
     }
     const refreshToken = cookies.jwt;
     console.log("refreshToken : " + refreshToken)
@@ -46,7 +47,7 @@ const refreshToken = (req, res) => {
                 if (role == "eleve") {
                     console.log("token eleve " + mail)
                     Eleve.findOne({
-                        attributes: ['ideleve','token', "pseudo"],
+                        attributes: ['ideleve', 'token', "pseudo"],
                         where: { courriel: mail }
                     })
                         .then(eleve => {
@@ -65,19 +66,19 @@ const refreshToken = (req, res) => {
                                     console.log("Erreur lors de la récupération de l'invitation " + reponse)
                                     return res.sendStatus(reponse)
                                 } else {
-                                        getAvatar(eleve.ideleve, function(reponseAvatar){
-                                            if(reponseAvatar==520){
-                                                return res.send("Erreur lors de la récupération de l'avatar !").status(520);
-                                            }else{
-                                                getImage(eleve.ideleve, function(err, reponseImage){
-                                                    if(err){
-                                                        return res.send(err).status(520);
-                                                    }
-                                                    console.log('envoi des infos')
-                                                    return res.status(201).json(Object.assign({ role: role, accessToken: accessToken }, reponse, {pseudo:eleve.pseudo}, reponseAvatar, reponseImage));
-                                                })
-                                            }
-                                        })
+                                    getAvatar(eleve.ideleve, function (reponseAvatar) {
+                                        if (reponseAvatar == 520) {
+                                            return res.send("Erreur lors de la récupération de l'avatar !").status(520);
+                                        } else {
+                                            getImage(eleve.ideleve, function (err, reponseImage) {
+                                                if (err) {
+                                                    return res.send(err).status(520);
+                                                }
+                                                console.log('envoi des infos')
+                                                return res.status(201).json(Object.assign({ role: role, accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
+                                            })
+                                        }
+                                    })
 
                                 }
                             })
@@ -87,7 +88,7 @@ const refreshToken = (req, res) => {
                         });
                 } else if (role == "classe") {
                     console.log("token classe")
-                    Classe.findOne({ attributes: ['idclasse','token'], where: { courriel: mail } })
+                    Classe.findOne({ attributes: ['idclasse', 'token'], where: { courriel: mail } })
                         .then(classe => {
                             if (!classe) {
                                 console.log("pas de classe avec ce token ")
