@@ -15,7 +15,7 @@ require('dotenv').config()
 const refreshToken = (req, res) => {
     console.log("\n*** Rafraichissement des tokens ***")
     const cookies = req.cookies;
-    
+
     if (!cookies?.jwt) {
         console.log("accès refusé")
         // 401 : authentification raté
@@ -67,17 +67,13 @@ const refreshToken = (req, res) => {
                                     return res.sendStatus(reponse)
                                 } else {
                                     getAvatar(eleve.ideleve, function (reponseAvatar) {
-                                        if (reponseAvatar == 520) {
-                                            return res.send("Erreur lors de la récupération de l'avatar !").status(520);
-                                        } else {
-                                            getImage(eleve.ideleve, function (err, reponseImage) {
-                                                if (err) {
-                                                    return res.send(err).status(520);
-                                                }
-                                                console.log('envoi des infos')
-                                                return res.status(200).json(Object.assign({ role: role, accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
-                                            })
-                                        }
+                                        getImage(eleve.ideleve, function (err, reponseImage) {
+                                            if (err) {
+                                                return res.send(err).status(520);
+                                            }
+                                            console.log('envoi des infos')
+                                            return res.status(200).json(Object.assign({ role: role, accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
+                                        })
                                     })
 
                                 }

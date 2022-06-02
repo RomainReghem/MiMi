@@ -69,9 +69,6 @@ const Connexion = (req, res) => {
                                     } else {
                                         // pour récupérer l'avatar de l'élève
                                         getAvatar(eleve.ideleve, function (reponseAvatar) {
-                                            if (reponseAvatar == 520) {
-                                                return res.send("Erreur lors de la récupération de l'avatar !").status(520);
-                                            } else {
                                                 //pour récupèrer l'image de profil de l'élève 
                                                 getImage(eleve.ideleve, function (err, reponseImage) {
                                                     if (err) {
@@ -81,7 +78,6 @@ const Connexion = (req, res) => {
                                                     res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                                                     return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
                                                 })
-                                            }
                                         })
 
 
