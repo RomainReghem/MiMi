@@ -99,7 +99,7 @@ const refreshToken = (req, res) => {
                                 return res.send("Le token donné ne correspond pas à l'utilisateur : accès interdit").status(403)
                             }
                             // sinon si c'est une classe on retourne juste le role et le nouveau accesstoken + l'id de la classe
-                            return res.status(201).json({ role: role, accessToken: accessToken, idclasse: classe.idclasse });
+                            return res.status(200).json({ role: role, accessToken: accessToken, idclasse: classe.idclasse });
                         }
                         ).catch(err => {
                             console.log("erreur lors de la recup de classe " + err)
