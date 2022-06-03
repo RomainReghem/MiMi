@@ -133,7 +133,7 @@ router.post('/changeMailEleve',verifyJWT, ModificationEleve.ChangementMail)
 // route pour récupérer un score de jeu (appel à chaque fin de partie)
 router.get('/score', verifyJWT, Score.getScoreTicTacToe)
 // route pour changer le score d'un jeu
-router.post('/score', verifyJWT, Score.putScoreTicTacToe)
+//router.post('/score', verifyJWT, Score.putScoreTicTacToe)
 
 
 module.exports = router;

@@ -131,7 +131,7 @@ io.on("connection", (socket) => {
     if (!board.includes("")) {
       io.in(roomCode).emit("victory");
       try{
-        console.log("maillllllllllllll"+io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+        console.log("mail"+io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
         addPartie(io.sockets.sockets.get(rooms.get(roomCode).player2).mail)
       }catch (error){
         console.log(error)

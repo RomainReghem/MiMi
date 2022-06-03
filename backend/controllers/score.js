@@ -23,7 +23,7 @@ const resetScore = (req, res) => {
     console.log("** Vérification jeu **")
     if (jeu != 'tictactoe') {
         console.log("jeu inconnu")
-        return res.send('Jeu %s inconnu',jeu).status(400)
+        return res.send('Jeu %s inconnu', jeu).status(400)
     }
 
     console.log("** Vérification droit d'accès au score **")
@@ -87,7 +87,7 @@ const resetScore = (req, res) => {
                         return res.send(err).status(520)
                     }
                     // on ajoute d'abord le nouveau score
-                    Score.update({ scoreclasse: 0, scoreeleves: 0, nbpartie:0 },
+                    Score.update({ scoreclasse: 0, scoreeleves: 0, nbpartie: 0 },
                         { where: { idclasse: classe.idclasse } })
                         .then(() => {
                             return res.sendStatus(200)
@@ -108,7 +108,14 @@ const resetScore = (req, res) => {
     }
 }
 
-
+/**
+ * Retourne au client le score de l'utilisateur précisé  et de son adversaire au tic-tac-toe.
+ * Si l'utilisateur n'a jamais joué, insère une nouvelle ligne dans la base de données.
+ * @param {*} req la requête du client contient :  
+ * • l'email de l'utilisateur dont on veut le score au tictactoe (cela peut être un élève ou une classe)
+ * @param {*} res la réponse du serveur, une erreur ou bien le score
+ * @returns la réponse du serveur.
+ */
 const getScoreTicTacToe = (req, res) => {
     console.log("\n*** Récupération du score ***");
     const email = req.query.mail;
@@ -122,8 +129,6 @@ const getScoreTicTacToe = (req, res) => {
     console.log("** Vérification droit d'accès au score **")
     const emailToken = req.mail
     const role = req.role;
-
-    //console.log(" email : " + email)
 
     if (email == emailToken) {
         if (role == "eleve") {
@@ -140,7 +145,8 @@ const getScoreTicTacToe = (req, res) => {
                         if (err) {
                             return res.send(err).status(409)
                         }
-                        return res.json({ scores: [data.scoreeleves, data.scoreclasse] })
+                        console.log("%i à %i pour l'élève, nombre de parties jouées %i", data.scoreeleves, data.scoreclasse, data.nbpartie)
+                        return res.json({ scores: [data.scoreeleves, data.scoreclasse], partie: data.nbpartie })
                     })
                 }).catch(err => {
                     console.log("Erreur récuperation compte eleve \n" + err)
@@ -162,7 +168,8 @@ const getScoreTicTacToe = (req, res) => {
                     if (err) {
                         return res.send(err).status(520)
                     }
-                    return res.json({ scores: [data.scoreeleves, data.scoreclasse] })
+                    console.log("%i à %i pour la classe, nombre de parties jouées %i", data.scoreclasse, data.scoreeleves, data.nbpartie)
+                    return res.json({ scores: [data.scoreeleves, data.scoreclasse], partie: data.nbpartie })
                 })
             }).catch(err => {
                 return res.status(500).send("Erreur récuperation compte classe \n" + err);
@@ -171,14 +178,19 @@ const getScoreTicTacToe = (req, res) => {
         } else {
             return res.sendStatus(418)
         }
-
     } else {
         console.log("Tentative de changement de score interdite !")
         return res.status(403).send("Accès interdit : tentative de changement du score")
     }
 }
 
-
+/**
+ * Change le score du jeu tictactoe pour l'utilisateur, en fonction de si elle a gagné ou non 
+ * @param {*} req la requete du client, le mail de l'utilisateur et s'il a gagné ou non
+ * @param {*} res la réponse du serveur
+ * @returns la réponse du serveur
+ * @deprecated 
+ */
 const putScoreTicTacToe = (req, res) => {
     console.log("\n*** Enregistrement du score ***");
     const email = req.body.mail;
@@ -222,7 +234,8 @@ const putScoreTicTacToe = (req, res) => {
                         Score.update({ scoreeleves: data.scoreeleves + gain },
                             { where: { idclasse: eleve.idclasse } })
                             .then(() => {
-                                return res.json({ scores: [data.scoreeleves + gain, data.scoreclasse] })
+                                // le score de l'élève est toujours en premier
+                                return res.json({ scores: [data.scoreeleves + gain, data.scoreclasse], partie: data.nbpartie })
                             })
                             .catch(err => {
                                 return res.status(500).send("Erreur changement score \n" + err);
@@ -251,7 +264,7 @@ const putScoreTicTacToe = (req, res) => {
                     Score.update({ scoreclasse: data.scoreclasse + gain, nbpartie: data.nbpartie + 1 },
                         { where: { idclasse: classe.idclasse } })
                         .then(() => {
-                            return res.json({ scores: [data.scoreeleves, data.scoreclasse + gain] })
+                            return res.json({ scores: [data.scoreeleves, data.scoreclasse + gain], partie: data.nbpartie })
                         })
                         .catch(err => {
                             return res.status(500).send("Erreur changement score \n" + err);
@@ -304,59 +317,65 @@ function getScore(id, jeu, callback) {
     });
 }
 
-// pour ajouter des points quand victoire 
-async function addVictory(email){
-    if(email==undefined){
+/**
+ * Ajoute des points au score au tictactoe de l'adresse fournie
+ * @param {String} email l'adresse du gagnant de la partie, cela peut être une classe ou un élève
+ */
+async function addVictory(email) {
+    if (email == undefined) {
         throw new Error("pas de mail")
     }
-    try{
-        const eleve = await Eleve.findOne({attributes:["idclasse"], where:{courriel:email}})
-        if(!eleve){
-            const classe = await Classe.findOne({attributes:["idclasse"], where:{courriel:email}});
-            if(!classe){
+    try {
+        const eleve = await Eleve.findOne({ attributes: ["idclasse"], where: { courriel: email } })
+        if (!eleve) {
+            const classe = await Classe.findOne({ attributes: ["idclasse"], where: { courriel: email } });
+            if (!classe) {
                 //error
                 throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
             }
-            await Score.increment({scoreclasse:+1, nbpartie:+1}, {where:{idclasse:classe.idclasse}})
+            await Score.increment({ scoreclasse: +1, nbpartie: +1 }, { where: { idclasse: classe.idclasse } })
             console.log("ajout de point pour la classe %s", email)
-        }else{
-            await Score.increment({scoreeleves:+1, nbpartie:+1}, {where:{idclasse:eleve.idclasse}})
+        } else {
+            await Score.increment({ scoreeleves: +1, nbpartie: +1 }, { where: { idclasse: eleve.idclasse } })
             console.log("ajout de point pour l'eleve %s", email)
         }
-    }catch (error){
-        console.log("erreur lors des requetes "+error)
+    } catch (error) {
+        console.log("erreur lors des requetes " + error)
         throw error
     }
 }
 
-// pour ajouter nb partie quand aucune victoire
-async function addPartie(email){
-    if(email==undefined){
-        throw new Error("pas de mail")
-    }
-    try{
-        const eleve = await Eleve.findOne({attributes:["idclasse"], where:{courriel:email}})
-        if(!eleve){
-            const classe = await Classe.findOne({attributes:["idclasse"], where:{courriel:email}});
-            if(!classe){
-                //error
-                throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
+
+/**
+ * A l'instar de la fonction addVictory, incrémente de un le nombre de partie jouée. 
+ * Cette fonction est appelée seulement quand aucun des deux joueurs n'a gagné
+ * @param {String} email le mail du deuxième joueur
+ */
+async function addPartie(email) {
+    if (email != undefined) {
+        try {
+            const eleve = await Eleve.findOne({ attributes: ["idclasse"], where: { courriel: email } })
+            if (!eleve) {
+                const classe = await Classe.findOne({ attributes: ["idclasse"], where: { courriel: email } });
+                if (!classe) {
+                    //error
+                    throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
+                }
+                await Score.increment({ nbpartie: +1 }, { where: { idclasse: classe.idclasse } })
+                console.log("ajout de partie classe ok")
+            } else {
+                await Score.increment({ nbpartie: +1 }, { where: { idclasse: eleve.idclasse } })
+                console.log("ajout de partie pour l'élève ok")
             }
-            await Score.increment({nbpartie:+1}, {where:{idclasse:classe.idclasse}})
-            console.log("ajout de partie classe ok")
-        }else{
-            await Score.increment({nbpartie:+1}, {where:{idclasse:eleve.idclasse}})
-            console.log("ajout de partie pour l'élève ok")
+        } catch (err) {
+            console.log("Erreur : %", err)
+            throw err;
         }
-    }catch (err){
-        console.log("Erreur : %",err)
-        throw err;
     }
-   
 }
 
 module.exports = {
-    putScoreTicTacToe,
+    //putScoreTicTacToe,
     getScoreTicTacToe,
     addVictory,
     addPartie

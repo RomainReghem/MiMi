@@ -79,19 +79,17 @@ const Connexion = (req, res) => {
                                                     return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
                                                 })
                                         })
-
-
                                     }
                                 })
                             })
                             .catch(err => {
                                 console.log("Erreur lors de l'ajout de Token" + err);
-                                res.sendStatus(520)
+                                return res.sendStatus(520)
                             })
                     } else {
                         console.log("Mauvais mot de passe ELEVE" + err)
                         // sinon, si ce n'est pas le bon mdp mais le bon email
-                        res.sendStatus(400)
+                        return res.sendStatus(400)
                     }
                 });
             } else {
@@ -120,44 +118,41 @@ const Connexion = (req, res) => {
                                         process.env.REFRESH_TOKEN_SECRET,
                                         { expiresIn: '1d' }
                                     );
-                                    /* Refresh.create({
-                                         token: refreshToken
-                                     })*/
                                     Classe.update({ token: refreshToken }, { where: { idclasse: classe.idclasse } })
                                         .then(() => {
-                                            res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                            res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
                                             console.log("CONNEXION de la classe OK")
+                                            res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                            return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
                                             // si le mot de passe entré correspond bien au mot de passe dans la base de données
                                             //res.send(classe)
                                         }).catch(err => {
                                             console.log(err);
-                                            res.sendStatus(520)
+                                            return res.sendStatus(520)
                                         })
                                 } else {
                                     console.log("Mauvais mot de passe CLASSE")
                                     // si ce n'est pas le bon mdp mais le bon email
-                                    res.sendStatus(400)
+                                    return res.sendStatus(400)
                                 }
                             });
                         } else {
                             // Sinon c'est que l'utilisateur s'est soit trompé, soit qu'il n'existe pas
                             console.log("Utilisateur pas trouvé.")
                             // si pour l'adresse mail donnée, aucun utilisateur ne correspond 
-                            res.sendStatus(401);
+                            return res.sendStatus(401);
                         }
                     })
                     .catch(err => {
                         // console.log(err);
                         console.log("Erreur impossible de récupérer  les informations de la classe: " + err)
-                        res.sendStatus(520)
+                        return res.sendStatus(520)
                     })
             }
         })
         .catch(err => {
             // console.log(err);
             console.log("Erreur : délai d'attente dépassé : " + err)
-            res.sendStatus(504)
+            return res.sendStatus(504);
         })
 }
 
