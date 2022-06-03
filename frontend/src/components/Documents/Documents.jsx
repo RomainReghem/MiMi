@@ -1,6 +1,6 @@
 import PDFSender from "../Documents/PDFSender"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useToast, Tooltip, Text, Button, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls, Badge, Kbd } from "@chakra-ui/react";
+import { useToast, Tooltip, Text, Button, Container, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls, Badge, Kbd } from "@chakra-ui/react";
 import PDFViewer from "../Documents/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faXmark, faPencil, faEye } from "@fortawesome/free-solid-svg-icons";
@@ -158,9 +158,9 @@ const Documents = () => {
                         <PDFSender reload={loadFiles} />
                     </Stack>
                 </Stack>
-                <section className="fileViewer">
+                <Stack h={'34rem'} overflow={'scroll'} w='xl'>
                     <PDFViewer clickedFile={file} selected={selectedUI} />
-                </section>
+                </Stack>
             </Wrap>
         </Center>
 

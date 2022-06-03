@@ -23,14 +23,12 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(user, pwd)
         try {
             const response = await axios.post(LOGIN_URL, JSON.stringify({ user, pwd }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            console.log(response)
             const accessToken = response?.data?.accessToken;
             const role = response?.data?.role;
             const invitation = response?.data?.invitation;

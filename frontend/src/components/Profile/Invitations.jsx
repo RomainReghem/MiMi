@@ -58,7 +58,7 @@ const Invitations = () => {
 
     return (
         auth?.invitation == "aucune" ? (
-            <Stack p={3} backgroundColor={'red.300'}>
+            <Stack p={3} bg={"blackAlpha.100"} borderRadius={5} >
                 <Text>Aucune invitation de classe en attente</Text>
             </Stack>)
             : auth?.invitation == "en attente" ? (

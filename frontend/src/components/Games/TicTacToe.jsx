@@ -5,7 +5,7 @@ import Cell from "./Cell";
 import "../../styles/tictactoe.css";
 import io from "socket.io-client"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faZ } from "@fortawesome/free-solid-svg-icons";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
 import { faDiceThree } from "@fortawesome/free-solid-svg-icons";
 import { axiosPrivate } from "../../api/axios";
@@ -28,7 +28,7 @@ const TicTacToe = () => {
     const [win, setWin] = useState(false)
     const [board, setBoard] = useState(["", "", "", "", "", "", "", "", ""]);
     const [UIboard, setUIboard] = useState([])
-    const [canPlay, setCanPlay] = useState(true);
+    const [canPlay, setCanPlay] = useState(false);
     const [score, setScore] = useState([0, 0])
     let winner = false;
 
@@ -41,12 +41,11 @@ const TicTacToe = () => {
     }, [roomCode]);
 
     useEffect(() => {
-        socket.on("maxPlayersReached", (b, player1) => {
+        socket.on("maxPlayersReached", (b) => {
+            console.log('maxPlayersReached')
             setBoard(b);
-            setUIboard([])
+            updateUIBoard(b);
             setShowBoard(true);
-            // Si ce socket est le premier joueur, il peut jouer en premier
-            socket.id == player1 ? setCanPlay(true) : setCanPlay(false);
         });
 
         socket.on("YoureIn", () => {
@@ -59,26 +58,17 @@ const TicTacToe = () => {
             setWaitingText("Deux joueurs sont déjà en partie !")
         });
 
+        socket.on('canPlay', (turn) => {
+            auth?.user == turn ? setCanPlay(true) : setCanPlay(false)
+        })
+
         socket.on("updateGame", (updatedBoard) => {
             setBoard(updatedBoard);
-
-            // Making a new array to have nicer UI than just letters "X" and "O"
-            let newUIboard = [];
-            updatedBoard.forEach((cell) => {
-                cell == "X" ? newUIboard.push(<FontAwesomeIcon className="cellX" icon={faXmark} />)
-                    : cell == "O" ? newUIboard.push(<FontAwesomeIcon className="cellO" icon={faCircle} />)
-                        : newUIboard.push("")
-            })
-            setUIboard(newUIboard)
-
+            updateUIBoard(updatedBoard);
         });
 
-        socket.on("ennemyPlayed", () => {
-            setCanPlay(true);
-        });
-
-        socket.on("victory", (player) => {
-            if (socket.id == player) {
+        socket.on("victory", (mailOfTheWinner) => {
+            if (auth?.user == mailOfTheWinner) {
                 winner = true
                 setWin(true)
             } else {
@@ -89,6 +79,16 @@ const TicTacToe = () => {
             setRoomJoined(false);
         });
     })
+
+    const updateUIBoard = (b) => {
+        let newUIboard = [];
+        b.forEach((cell) => {
+            cell == "X" ? newUIboard.push(<FontAwesomeIcon className="cellX" icon={faXmark} />)
+                : cell == "O" ? newUIboard.push(<FontAwesomeIcon className="cellO" icon={faCircle} />)
+                    : newUIboard.push("")
+        })
+        setUIboard(newUIboard)
+    }
 
     const getScore = async () => {
         try {
@@ -113,8 +113,10 @@ const TicTacToe = () => {
         // On remet la partie à 0
         setGameEnded(false);
         setShowBoard(false);
+        setCanPlay(false);
         setWin(false);
-        socket.emit("joinRoom", roomCode);
+        socket.emit("joinRoom", roomCode, auth?.user);
+        getScore();
     }
 
     return (
@@ -125,7 +127,7 @@ const TicTacToe = () => {
                         <Grid minH={{ base: 'xs', md: 'md' }} minW={{ base: 'xs', md: 'md' }} templateRows='repeat(3, 1fr)' templateColumns='repeat(3, 1fr)' gap={2}>
                             {
                                 board.map((board, i) =>
-                                    <GridItem key={i} animation={`floating${i*5} 1s ease-out`} className='cell' cursor={'pointer'} colSpan={1} rowSpan={1} bg={'teal.500'} align={'center'} onClick={handleCellClick} id={i}>
+                                    <GridItem key={i} animation={`floating${i * 5} 1s ease-out`} className='cell' cursor={'pointer'} colSpan={1} rowSpan={1} bg={'teal.500'} align={'center'} onClick={handleCellClick} id={i}>
                                         <Center h={'100%'} ><Heading>{UIboard[i]}</Heading></Center>
                                     </GridItem>
                                 )}
