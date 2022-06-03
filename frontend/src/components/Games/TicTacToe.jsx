@@ -1,15 +1,15 @@
 import { useEffect, useState, useLayoutEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as React from 'react';
-import Cell from "./Cell";
-import "../../styles/tictactoe.css";
 import io from "socket.io-client"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faZ } from "@fortawesome/free-solid-svg-icons";
+import { faEgg, faXmark, faZ } from "@fortawesome/free-solid-svg-icons";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
-import { faDiceThree } from "@fortawesome/free-solid-svg-icons";
+import { faDiceThree, faHand } from "@fortawesome/free-solid-svg-icons";
 import { axiosPrivate } from "../../api/axios";
 import useAuth from '../../hooks/useAuth'
+import { useToast } from "@chakra-ui/react";
+import { motion } from "framer-motion"
 import { CircularProgress, Center, Button, Text, Stack, AlertDialogFooter, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent, Wrap, Grid, Divider, Heading, Badge, StackDivider, Box, GridItem } from "@chakra-ui/react";
 
 
@@ -19,8 +19,9 @@ const TicTacToe = () => {
     const { auth } = useAuth();
     const navigate = useNavigate();
     const cancelRef = useRef();
-
-    const [roomCode, setRoomCode] = useState("53");
+    const toast = useToast();
+    const constraintsRef = useRef(null);
+    const [roomCode, setRoomCode] = useState(auth?.idclasse);
     const [roomJoined, setRoomJoined] = useState(false);
     const [waitingText, setWaitingText] = useState("");
     const [gameEnded, setGameEnded] = useState(false);
@@ -30,10 +31,14 @@ const TicTacToe = () => {
     const [UIboard, setUIboard] = useState([])
     const [canPlay, setCanPlay] = useState(false);
     const [score, setScore] = useState([0, 0])
+    const [clicked, setClicked] = useState(false)
     let winner = false;
 
     useEffect(() => {
-        if (roomCode && !roomJoined) {
+        if (!auth?.idclasse) {
+            auth?.role == "eleve" ? toast({ title: "Problème...", description: "Il faut avoir rejoint une classe pour jouer", status: "warning", duration: 5000, isClosable: true, position: "top" })
+                : toast({ title: "Problème...", description: "Invitez un élève dans la classe avant de pouvoir jouer", status: "warning", duration: 5000, isClosable: true, position: "top" })
+        } else if (roomCode && !roomJoined) {
             socket.emit("joinRoom", roomCode, auth?.user);
             getScore();
             console.log("joining room...");
@@ -42,7 +47,6 @@ const TicTacToe = () => {
 
     useEffect(() => {
         socket.on("maxPlayersReached", (b) => {
-            console.log('maxPlayersReached')
             setBoard(b);
             updateUIBoard(b);
             setShowBoard(true);
@@ -171,8 +175,15 @@ const TicTacToe = () => {
 
             </> :
                 (<div className="waitingRoom">
-                    {roomJoined ? <CircularProgress isIndeterminate color='green.300' /> : <></>}
-                    <p>{waitingText}</p>
+                    {roomJoined ? <><CircularProgress isIndeterminate color='green.300' /><p>{waitingText}</p></> :
+                        <motion.div className="container" ref={constraintsRef}>
+                            <motion.div className="item" drag dragConstraints={constraintsRef}>
+                                <Badge fontSize={'2xl'} colorScheme={'teal'} fontFamily={'mono'} onMouseDown={(e) => { setClicked(true) }} onMouseUp={(e) => {setClicked(false)}}>
+                                    {clicked ? "Texte amovible " : "Texte immobile... "} 
+                                    {clicked ? <FontAwesomeIcon icon={faEgg} /> : <FontAwesomeIcon icon={faHand} />  }
+                                </Badge>
+                            </motion.div>
+                        </motion.div>}
                 </div>)
             }
         </>

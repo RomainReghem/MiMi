@@ -24,6 +24,7 @@ import Settings from "./Settings/Settings";
 
 import '../styles/tictactoe.css'
 import '../styles/documents.css'
+import '../styles/cell.css'
 
 export default function App() {
   return (

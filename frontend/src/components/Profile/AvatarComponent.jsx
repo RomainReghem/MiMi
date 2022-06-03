@@ -19,8 +19,7 @@ const AvatarComponent = () => {
     const { auth, setAuth } = useAuth();
     const { userData, setUserData } = useUserData();
     const axiosPrivate = useAxiosPrivate();
-
-    console.log(userData?.avatar)
+    
     const [config, setConfig] = useState(userData?.avatar);
 
     let mail = auth?.user;

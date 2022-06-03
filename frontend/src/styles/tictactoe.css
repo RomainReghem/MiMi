@@ -50,3 +50,20 @@
             transform: rotate(360deg);
         }
 }
+
+.container {
+    display: flex;
+    flex-grow: 1;
+    width: 80%;
+    place-content: center;
+    place-items: center;
+    overflow: hidden;
+  }
+  
+  .item {
+    cursor: grab;
+  }
+
+  .item:active{
+    cursor: grabbing;
+  }
