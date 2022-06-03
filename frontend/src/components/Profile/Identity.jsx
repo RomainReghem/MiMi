@@ -5,8 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faCheck, faPaperPlane, faDoorOpen, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Avatar from 'react-nice-avatar';
 import Invitations from "./Invitations";
-import useGetImage from "../../hooks/useGetImage";
-import useGetAvatar from "../../hooks/useGetAvatar";
 import { useToast, InputGroup, Tooltip, FormLabel, IconButton, Input, InputRightElement, Text, Button, Heading, Stack, Image, InputRightAddon, Divider, Center } from "@chakra-ui/react";
 import useUserData from "../../hooks/useUserData";
 
@@ -20,8 +18,6 @@ const Identity = () => {
     const { userData, setUserData } = useUserData();
     const axiosPrivate = useAxiosPrivate();
 
-    const getImage = useGetImage();
-    const getAvatar = useGetAvatar();
     const [mail, setMail] = useState(auth?.user);
     const [newPseudo, setNewPseudo] = useState('');
     const [selectedPicture, setSelectedPicture] = useState(null);

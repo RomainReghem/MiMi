@@ -27,12 +27,6 @@
     border-bottom: 3px solid #012E40;
 }
 
-@media screen and (max-width: 700px) {
-    .fileViewer {
-        max-width: 90%;
-    }
-}
-
 /* width */
 .fileList::-webkit-scrollbar,
 .fileViewer::-webkit-scrollbar {

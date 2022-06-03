@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faXmark, faPencil, faEye } from "@fortawesome/free-solid-svg-icons";
 import useAuth from "../../hooks/useAuth";
 import { useState, useEffect } from "react";
+import useGetStudents from "../../hooks/useGetStudents";
 
 
 const Documents = () => {
@@ -14,9 +15,12 @@ const Documents = () => {
     const toast = useToast();
     const axiosPrivate = useAxiosPrivate();
 
+    const getStudents = useGetStudents();
+    const [students, setStudents] = useState([]);
+
     // Tableau de tous les noms des fichiers 
     const [myFiles, setMyFiles] = useState([]);
-    const [sharedFiles, setSharedFiles] = useState([]);
+    const [sharedFiles, setSharedFiles] = useState();
 
     const [menuSelection, setMenuSelection] = useState(myFiles);
     const [selectedUI, setSelectedUI] = useState("my");
@@ -82,6 +86,7 @@ const Documents = () => {
         setLoadingFiles(false);
     }
 
+
     function timeout(delay) {
         return new Promise(res => setTimeout(res, delay));
     }
@@ -129,7 +134,7 @@ const Documents = () => {
                         <Button colorScheme={'blue'} onClick={() => { setMenuSelection(sharedFiles); setSelectedUI("shared") }} style={selectedUI == "shared" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Partagés avec moi</Text></Button>
                     </Stack>
                     <Stack w={'100%'} h={'xs'} overflowY="auto" p={1}>
-                        {Array.from(Array(menuSelection?.length), (e, i) => {
+                        {menuSelection?.length > 0 && Array.from(Array(menuSelection?.length), (e, i) => {
                             return <Stack key={i} direction={'row'} w={'100%'}>
 
                                 <Button w={'100%'} justifyContent={'flex-start'}>

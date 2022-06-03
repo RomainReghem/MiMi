@@ -1,4 +1,4 @@
-import { Flex, Box, FormControl, FormErrorMessage, useToast, FormLabel, Input, InputGroup, HStack, InputRightElement, Stack, Button, Heading, Text, useColorModeValue, Link, } from '@chakra-ui/react';
+import { Flex, Box, FormControl, FormErrorMessage, FormHelperText, useToast, FormLabel, Input, InputGroup, HStack, InputRightElement, Stack, Button, Heading, Text, useColorModeValue, Link, } from '@chakra-ui/react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {createSearchParams, useNavigate } from 'react-router-dom'
@@ -57,9 +57,9 @@ export default function RegisterStudent() {
         setValidMatch(pwd === matchPwd);
     }, [pwd, matchPwd])
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        // recheck les pwd et user in case of JS hack
+
         const v1 = USER_REGEX.test(user);
         const v2 = PWD_REGEX.test(pwd);
         const v3 = MAIL_REGEX.test(mail);
@@ -67,10 +67,18 @@ export default function RegisterStudent() {
         const v5 = NAME_REGEX.test(firstName)
         if (!v1 || !v2 || !v3 || !v4 || !v5) {
             toast({title: "Erreur", description: "Au moins un champ est invalide", status: "error", duration: 5000, isClosable: true, position:"top"})
-
             return;
         }
 
+        if(!validMatch){
+            toast({title: "Erreur", description: "Les mots de passe ne correspondent pas", status: "error", duration: 5000, isClosable: true, position:"top"})
+            return;
+        }
+
+        handleRegister();
+    }
+
+    const handleRegister = async () => {
         try {
             const response = await axios.post(REGISTER_URL,
                 JSON.stringify({ user, firstName, name, mail, pwd }),
@@ -79,9 +87,6 @@ export default function RegisterStudent() {
                     withCredentials: true
                 }
             );
-            console.log(response?.data);
-            console.log(response?.accessToken);
-            console.log(JSON.stringify(response))
             localStorage.setItem("pseudo", user);
             setUser('');
             setPwd('');
@@ -160,6 +165,7 @@ export default function RegisterStudent() {
                                     </Button>
                                 </InputRightElement>
                             </InputGroup>
+                            <FormHelperText>Entre 8 et 24 caractères, majuscule et caractère spécial (!@#$%) obligatoires</FormHelperText>
                         </FormControl>
 
                         <FormControl id="confirm-password" isInvalid={matchPwd && !validMatch} isRequired>

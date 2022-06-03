@@ -1,7 +1,7 @@
 import useAuth from "../../hooks/useAuth";
 import Identity from "./Identity";
 import AvatarComponent from "./AvatarComponent"
-import Users from "./Users"
+import Students from "./Students"
 import { Wrap, Center, Divider, useBreakpointValue } from "@chakra-ui/react"
 
 const Profile = () => {
@@ -20,7 +20,7 @@ const Profile = () => {
                         <AvatarComponent />
                     </Wrap>
                 </Center>) :
-                <Users />
+                <Students />
             }
         </>
     )

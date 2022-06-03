@@ -25,7 +25,6 @@ const useRefreshToken = () => {
         });
 
         // Si c'est un élève on aura besoin d'afficher son pseudo et ses images, la classe n'en a pas.
-        console.log(response.data)
         response.data.role == "eleve" && setUserData(prev => {
             return {
                 ...prev,

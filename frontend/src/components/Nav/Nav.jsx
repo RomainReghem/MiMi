@@ -14,8 +14,6 @@ import useLogout from "../../hooks/useLogout";
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import useAuth from '../../hooks/useAuth';
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import useGetImage from '../../hooks/useGetImage';
-import useGetAvatar from '../../hooks/useGetAvatar';
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useUserData from '../../hooks/useUserData';

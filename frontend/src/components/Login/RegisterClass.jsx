@@ -36,18 +36,26 @@ export default function RegisterClass() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // recheck les pwd et user in case of JS hack
         const v2 = MAIL_REGEX.test(mail);
         const v1 = PWD_REGEX.test(pwd);
-        if(!v2){
-            toast({title: "Erreur", description: "Mail incorrect", status: "error", duration: 3000, isClosable: true, position:"top"})
+        if (!v2) {
+            toast({ title: "Erreur", description: "Mail incorrect", status: "error", duration: 3000, isClosable: true, position: "top" })
             return;
         }
-        if(!v1){
-            toast({title: "Erreur", description: "Mot de passe incorrect", status: "error", duration: 3000, isClosable: true, position:"top"})
+        if (!v1) {
+            toast({ title: "Erreur", description: "Mot de passe incorrect", status: "error", duration: 3000, isClosable: true, position: "top" })
             return;
         }
 
+        if (!validMatch) {
+            toast({ title: "Erreur", description: "Les mots de passe ne correspondent pas", status: "error", duration: 5000, isClosable: true, position: "top" })
+            return
+        }
+
+        handleRegister();
+    }
+
+    const handleRegister = async () => {
 
         try {
             const response = await axios.post(REGISTER_URL,
@@ -57,24 +65,21 @@ export default function RegisterClass() {
                     withCredentials: true
                 }
             );
-            console.log(response?.data);
-            console.log(response?.accessToken);
-            console.log(JSON.stringify(response))
             setPwd('');
             setMatchPwd('');
-            navigate("/login")            
-            toast({title: "Inscription réussie", description: "Connectez-vous avec vos identifiants", status: "success", duration: 5000, isClosable: true, position:"top"})
+            navigate("/login")
+            toast({ title: "Inscription réussie", description: "Connectez-vous avec vos identifiants", status: "success", duration: 5000, isClosable: true, position: "top" })
         } catch (err) {
             if (!err?.response) {
-                toast({title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 5000, isClosable: true, position:"top"})
+                toast({ title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 5000, isClosable: true, position: "top" })
 
             } else if (err.response?.status === 409) {
-                toast({title: "Erreur", description: "Un compte est déjà associé à cette adresse mail", status: "error", duration: 5000, isClosable: true, position:"top"})
+                toast({ title: "Erreur", description: "Un compte est déjà associé à cette adresse mail", status: "error", duration: 5000, isClosable: true, position: "top" })
             }
             else if (err.response?.status === 411) {
-                toast({title: "Erreur", description: "Un compte d'élève est déjà associé à cette adresse mail", status: "error", duration: 5000, isClosable: true, position:"top"})
+                toast({ title: "Erreur", description: "Un compte d'élève est déjà associé à cette adresse mail", status: "error", duration: 5000, isClosable: true, position: "top" })
             } else {
-                toast({title: "Erreur", description: "Veuillez rééssayer", status: "error", duration: 5000, isClosable: true, position:"top"})
+                toast({ title: "Erreur", description: "Veuillez rééssayer", status: "error", duration: 5000, isClosable: true, position: "top" })
 
             }
         }
@@ -108,7 +113,7 @@ export default function RegisterClass() {
                         <FormControl id="password" isRequired>
                             <FormLabel>Mot de passe</FormLabel>
                             <InputGroup>
-                                <Input type={showPassword ? 'text' : 'password'} onChange={(e) => setPwd(e.target.value)}/>
+                                <Input type={showPassword ? 'text' : 'password'} onChange={(e) => setPwd(e.target.value)} />
                                 <InputRightElement h={'full'}>
                                     <Button
                                         variant={'ghost'}

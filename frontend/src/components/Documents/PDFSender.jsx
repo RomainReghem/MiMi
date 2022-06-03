@@ -63,7 +63,7 @@ const PDFSender = (props) => {
                 </Center>
             </FormLabel>
             <Button w={'25%'} borderRadius={'0px 3px 3px 0px'} onClick={handleSubmit} colorScheme={'green'} disabled={fileWaitingToBeSent ? false : true} leftIcon={<FontAwesomeIcon icon={faPaperPlane} bounce={fileWaitingToBeSent ? true : false} />}>
-                <Text>Envoyer</Text>
+                <Text display={{base:'none', md:'inline'}}>Envoyer</Text>
             </Button>
             </Stack>
     )
