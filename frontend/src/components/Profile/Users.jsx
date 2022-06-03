@@ -76,6 +76,7 @@ const Users = () => {
             await axiosPrivate.post("/deleteEleve", JSON.stringify({ classe: auth?.user, eleve: eleveToDelete }),
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
             toast({ title: "Elève supprimé", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
+            setUsersUpdated(currValue => !currValue);
         }
         catch (err) {
             if (!err?.response) {

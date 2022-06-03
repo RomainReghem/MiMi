@@ -1,6 +1,7 @@
 import { Flex, Box, FormControl, FormLabel, Input, InputGroup, HStack, InputRightElement, Stack, Button, Heading, Text, useColorModeValue, Link, } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { createSearchParams, useNavigate, useLocation } from 'react-router-dom'
+import { Link as ReactRouterLink } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
 import axios from '../../api/axios'
@@ -121,8 +122,9 @@ export default function Login() {
                                     bg: 'cyan.700',
                                 }} onClick={handleSubmit}>
                                 Connexion
-                            </Button>
+                            </Button>                            
                         </Stack>
+                        <Text align={'center'} >Pas encore de compte ? <Link to="/choice" as={ReactRouterLink} color={'cyan.600'}>S'inscrire</Link></Text>
                     </Stack>
                 </Box>
             </Stack>

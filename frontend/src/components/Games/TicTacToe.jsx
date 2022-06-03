@@ -10,7 +10,7 @@ import { faCircle } from "@fortawesome/free-regular-svg-icons";
 import { faDiceThree } from "@fortawesome/free-solid-svg-icons";
 import { axiosPrivate } from "../../api/axios";
 import useAuth from '../../hooks/useAuth'
-import { CircularProgress, Center, Button, Text, Stack, AlertDialogFooter, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent, Wrap, Grid, Divider, Heading, Badge, StackDivider, Box } from "@chakra-ui/react";
+import { CircularProgress, Center, Button, Text, Stack, AlertDialogFooter, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent, Wrap, Grid, Divider, Heading, Badge, StackDivider, Box, GridItem } from "@chakra-ui/react";
 
 
 const socket = io.connect("http://localhost:5000");
@@ -122,20 +122,14 @@ const TicTacToe = () => {
             {showBoard ? <>
                 <Center flexGrow={1}>
                     <Wrap spacing={10} justify={'center'} p={5}>
-                        <Grid templateRows='repeat(3, 1fr)' templateColumns='repeat(3, 1fr)' gap={2}>
-                            <Cell handleCellClick={handleCellClick} id={"0"} text={UIboard[0]} />
-                            <Cell handleCellClick={handleCellClick} id={"1"} text={UIboard[1]} />
-                            <Cell handleCellClick={handleCellClick} id={"2"} text={UIboard[2]} />
-
-                            <Cell handleCellClick={handleCellClick} id={"3"} text={UIboard[3]} />
-                            <Cell handleCellClick={handleCellClick} id={"4"} text={UIboard[4]} />
-                            <Cell handleCellClick={handleCellClick} id={"5"} text={UIboard[5]} />
-
-                            <Cell handleCellClick={handleCellClick} id={"6"} text={UIboard[6]} />
-                            <Cell handleCellClick={handleCellClick} id={"7"} text={UIboard[7]} />
-                            <Cell handleCellClick={handleCellClick} id={"8"} text={UIboard[8]} />
+                        <Grid minH={{ base: 'xs', md: 'md' }} minW={{ base: 'xs', md: 'md' }} templateRows='repeat(3, 1fr)' templateColumns='repeat(3, 1fr)' gap={2}>
+                            {
+                                board.map((board, i) =>
+                                    <GridItem key={i} animation={`floating${i*5} 1s ease-out`} className='cell' cursor={'pointer'} colSpan={1} rowSpan={1} bg={'teal.500'} align={'center'} onClick={handleCellClick} id={i}>
+                                        <Center h={'100%'} ><Heading>{UIboard[i]}</Heading></Center>
+                                    </GridItem>
+                                )}
                         </Grid >
-
                         <Stack direction={'column'} w={'md'} spacing={10} >
                             <Heading alignSelf={'center'} fontSize={'2xl'}>Scores</Heading>
                             <Stack direction={'row'} justify={'space-evenly'}>
