@@ -2,6 +2,7 @@
   cursor: pointer;
   transform: scale(1.01);
   transition: transform 300ms;
+  opacity: 1;
 }
 
 .cell:hover .cellX {
@@ -14,17 +15,17 @@
   transition: transform 300ms ease-out;
 }
 
-@keyframes floating0 {  0% {    transform: translate(0, 0.5rem);  }  50% {    transform: translate(0, 0rem);  }}
-@keyframes floating5 {  0% {    transform: translate(0, 0.5rem);  } 5% {    transform: translate(0, 0.5rem);  }  50% {    transform: translate(0, 0rem);  }}
-@keyframes floating10 {  0% {    transform: translate(0, 0.5rem);  } 10% {    transform: translate(0, 0.5rem);  }  50% {    transform: translate(0, 0rem);  }}
+@keyframes floating0 {  0% {    transform: translate(0, 0.5rem); opacity: 0;  }  0% {    transform: translate(0, 0rem); opacity: 0; }}
+@keyframes floating5 {  0% {    transform: translate(0, 0.5rem); opacity: 0;  } 5% {    transform: translate(0, 0.5rem); opacity: 0; }  50% {    transform: translate(0, 0rem); opacity: 1;  }}
+@keyframes floating10 {  0% {    transform: translate(0, 0.5rem); opacity: 0;  } 10% {    transform: translate(0, 0.5rem); opacity: 0; }  50% {    transform: translate(0, 0rem); opacity: 1;  }}
 
-@keyframes floating15 {  0% {    transform: translate(0, 0.5rem);  } 15% {    transform: translate(0, 0.5rem);  }  50% {    transform: translate(0, 0rem);  }}
-@keyframes floating20 {  0% {    transform: translate(0, 0.5rem);  } 20% {    transform: translate(0, 0.5rem);  }  50% {    transform: translate(0, 0rem);  }}
-@keyframes floating25 {  0% {    transform: translate(0, 0.5rem);  } 25% {    transform: translate(0, 0.5rem);  }  50% {    transform: translate(0, 0rem);  }}
+@keyframes floating15 {  0% {    transform: translate(0, 0.5rem); opacity: 0;  } 15% {    transform: translate(0, 0.5rem); opacity: 0; }  50% {    transform: translate(0, 0rem); opacity: 1;  }}
+@keyframes floating20 {  0% {    transform: translate(0, 0.5rem); opacity: 0;  } 20% {    transform: translate(0, 0.5rem); opacity: 0; }  50% {    transform: translate(0, 0rem); opacity: 1;  }}
+@keyframes floating25 {  0% {    transform: translate(0, 0.5rem); opacity: 0;  } 25% {    transform: translate(0, 0.5rem); opacity: 0; }  50% {    transform: translate(0, 0rem); opacity: 1;  }}
 
-@keyframes floating30 {  0% {    transform: translate(0, 0.5rem);  } 30% {    transform: translate(0, 0.5rem);  }  50% {    transform: translate(0, 0rem);  }}
-@keyframes floating35 {  0% {    transform: translate(0, 0.5rem);  } 35% {    transform: translate(0, 0.5rem);  }  50% {    transform: translate(0, 0rem);  }}
-@keyframes floating40 {  0% {    transform: translate(0, 0.5rem);  } 40% {    transform: translate(0, 0.5rem);  }  50% {    transform: translate(0, 0rem);  }}
+@keyframes floating30 {  0% {    transform: translate(0, 0.5rem); opacity: 0;  } 30% {    transform: translate(0, 0.5rem); opacity: 0; }  50% {    transform: translate(0, 0rem); opacity: 1;  }}
+@keyframes floating35 {  0% {    transform: translate(0, 0.5rem); opacity: 0;  } 35% {    transform: translate(0, 0.5rem); opacity: 0; }  50% {    transform: translate(0, 0rem); opacity: 1;  }}
+@keyframes floating40 {  0% {    transform: translate(0, 0.5rem); opacity: 0;  } 40% {    transform: translate(0, 0.5rem); opacity: 0; }  50% {    transform: translate(0, 0rem); opacity: 1;  }}
 
 
 

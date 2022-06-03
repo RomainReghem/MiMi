@@ -36,8 +36,8 @@ io.on("connection", (socket) => {
       rooms.get(roomCode).player2 = socket.id;
       
       // ... et on commence la partie
-      io.in(roomCode).emit("maxPlayersReached", rooms.get(roomCode).board, rooms.get(roomCode).player1);
       rooms.get(roomCode).board = ["", "", "", "", "", "", "", "", ""]
+      io.in(roomCode).emit("maxPlayersReached", rooms.get(roomCode).board, rooms.get(roomCode).player1);
     }
 
     else {
