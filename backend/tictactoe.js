@@ -93,9 +93,9 @@ io.on("connection", (socket) => {
         io.in(roomCode).socketsLeave(roomCode);
 
       } else if (board[i] == "O" && board[i + 1] == "O" && board[i + 2] == "O") {
-        io.in(roomCode).emit("victory", rooms.get(roomCode).player2);
+        io.in(roomCode).emit("victory", rooms.get(roomCode).players[1]);
         try {
-          addVictory(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+          addVictory(rooms.get(roomCode).players[1]);
         } catch (error) {
           console.log(error)
         }
@@ -115,9 +115,9 @@ io.on("connection", (socket) => {
         io.in(roomCode).socketsLeave(roomCode);
 
       } else if (board[i] == "O" && board[i + 3] == "O" && board[i + 6] == "O") {
-        io.in(roomCode).emit("victory", rooms.get(roomCode).player2);
+        io.in(roomCode).emit("victory", rooms.get(roomCode).players[1]);
         try {
-          addVictory(io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+          addVictory(rooms.get(roomCode).players[1]);
         } catch (error) {
           console.log(error)
         }
