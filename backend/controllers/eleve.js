@@ -14,7 +14,7 @@ const storage = new Storage({
 
 const bucket = storage.bucket("bucket_projet_mimi");
 
-const { verificationChemin } =require('./image');
+const { verificationChemin } = require('./image');
 
 /**
  * Renvoie au client le pseudo de l'élève en fonction de son adresse mail.
@@ -222,11 +222,11 @@ function getAvatar(id, callback) {
     const num = id;
     const path = "Eleves/eleve" + num + "/avatar";
     verificationChemin(path)
-    fs.readFile(path+"/avatar"+num+".json", 'utf-8', function (err, avatar) {
+    fs.readFile(path + "/avatar" + num + ".json", 'utf-8', function (err, avatar) {
         if (err) {
-            console.log('erreur lors de la récupération de l\'avatar : '+err)
+            console.log('erreur lors de la récupération de l\'avatar : ' + err)
             //return res.status(600).send("Problème de lecture de l'avatar.")
-            let avatar = {
+            avatar = {
                 bgColor: "#E0DDFF",
                 earSize: "small",
                 eyeBrowStyle: "up",
@@ -240,9 +240,14 @@ function getAvatar(id, callback) {
                 mouthStyle: "laugh",
                 noseStyle: "round",
                 shape: "square",
-                shirtColor: "#6BD9E9",
+                shirtColor: "#000",
                 shirtStyle: "polo"
             }
+            //avatar = JSON.stringify(avatar)
+
+            console.log("avatar crée")
+            // on envoie le fichier json au front
+            return callback({ avatar: avatar });
         }
         avatar = JSON.parse(avatar)
 
@@ -269,22 +274,22 @@ function getAvatar(id, callback) {
  * @param {String} path le chemin vers l'avatar
  * @param {Number} num le numéro de l'élève
  */
- /*async function getJSON(path, num, callback) {
-    let avatar = "";
-    await bucket.file(path + "/avatar" + num + ".json").createReadStream()
-        .on('error', function (err) {
-            console.log(err);
-            callback(err);
-        })
-        .on('data', function (response) {
-            avatar += response;
-        })
-        .on('end', function () {
-            //console.log("AVATAR : " + avatar)
-            console.log("avatar récupéré");
-            // on envoie le fichier json au front
-            callback({ avatar: avatar });
-        })
+/*async function getJSON(path, num, callback) {
+   let avatar = "";
+   await bucket.file(path + "/avatar" + num + ".json").createReadStream()
+       .on('error', function (err) {
+           console.log(err);
+           callback(err);
+       })
+       .on('data', function (response) {
+           avatar += response;
+       })
+       .on('end', function () {
+           //console.log("AVATAR : " + avatar)
+           console.log("avatar récupéré");
+           // on envoie le fichier json au front
+           callback({ avatar: avatar });
+       })
 }*/
 
 // fonction pour récuperer l'image de profil

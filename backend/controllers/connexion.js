@@ -26,7 +26,7 @@ const Connexion = (req, res) => {
     const mdp = req.body.pwd;
     //console.log("connexion " + mdp + " " + email)
     if (mdp == "" || email == "") {
-        res.sendStatus(402)
+        return res.sendStatus(402);
     }
     // on regarde si le mail correspond à un élève
     Eleve.findOne({

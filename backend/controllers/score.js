@@ -118,6 +118,8 @@ const resetScore = (req, res) => {
  */
 const getScoreTicTacToe = (req, res) => {
     console.log("\n*** Récupération du score ***");
+    let date = new Date();
+    console.log("get score : " + (Date.now())/1000)
     const email = req.query.mail;
 
     console.log("** Vérification mail **")
@@ -184,103 +186,104 @@ const getScoreTicTacToe = (req, res) => {
     }
 }
 
-/**
- * Change le score du jeu tictactoe pour l'utilisateur, en fonction de si elle a gagné ou non 
- * @param {*} req la requete du client, le mail de l'utilisateur et s'il a gagné ou non
- * @param {*} res la réponse du serveur
- * @returns la réponse du serveur
- * @deprecated 
- */
-const putScoreTicTacToe = (req, res) => {
-    console.log("\n*** Enregistrement du score ***");
-    const email = req.body.mail;
-    const win = req.body.win;
-    //const loss = !win;
-    console.log("** Vérification mail **")
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        return res.sendStatus(400)
-    }
 
-    console.log("** Vérification droit d'accès au score **")
-    const emailToken = req.mail
-    const role = req.role;
+// /**
+//  * Change le score du jeu tictactoe pour l'utilisateur, en fonction de si elle a gagné ou non 
+//  * @param {*} req la requete du client, le mail de l'utilisateur et s'il a gagné ou non
+//  * @param {*} res la réponse du serveur
+//  * @returns la réponse du serveur
+//  * @deprecated 
+//  */
+// const putScoreTicTacToe = (req, res) => {
+//     console.log("\n*** Enregistrement du score ***");
+//     const email = req.body.mail;
+//     const win = req.body.win;
+//     //const loss = !win;
+//     console.log("** Vérification mail **")
+//     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+//         console.log("forme mail incorrect")
+//         return res.sendStatus(400)
+//     }
 
-    console.log("win : " + win + " email : " + email)
-    let gain = 0;
-    if (win == true) {
-        gain = 1;
-    } else if (win == false) {
-        gain = 0;
-    } else {
-        console.log("nombre de parties gagnées incorrect")
-        return res.sendStatus(400)
-    }
+//     console.log("** Vérification droit d'accès au score **")
+//     const emailToken = req.mail
+//     const role = req.role;
 
-    if (email == emailToken) {
-        if (role == "eleve") {
-            console.log("changement du score de l'eleve")
-            Eleve.findOne({ attributes: ['idclasse'], where: { courriel: email, invitation: "acceptee" } })
-                .then(eleve => {
-                    if (!eleve) {
-                        console.log("eleve pas trouve avec l'addresse : " + email)
-                        return res.send("Pas de compte correspondant à cette addresse.\nElève non trouvé").status(409);
-                    }
-                    getScore(eleve.idclasse, "tictactoe", function (err, data) {
-                        if (err) {
-                            return res.send(err).status(409)
-                        }
-                        // on ajoute d'abord le nouveau score
-                        Score.update({ scoreeleves: data.scoreeleves + gain },
-                            { where: { idclasse: eleve.idclasse } })
-                            .then(() => {
-                                // le score de l'élève est toujours en premier
-                                return res.json({ scores: [data.scoreeleves + gain, data.scoreclasse], partie: data.nbpartie })
-                            })
-                            .catch(err => {
-                                return res.status(500).send("Erreur changement score \n" + err);
-                            });
-                    })
-                }).catch(err => {
-                    return res.status(500).send("Erreur récuperation compte eleve \n" + err);
-                });
+//     console.log("win : " + win + " email : " + email)
+//     let gain = 0;
+//     if (win == true) {
+//         gain = 1;
+//     } else if (win == false) {
+//         gain = 0;
+//     } else {
+//         console.log("nombre de parties gagnées incorrect")
+//         return res.sendStatus(400)
+//     }
 
-        } else if (role == "classe") {
-            console.log("changement de la classe")
-            Classe.findOne({
-                attributes: ['idclasse'],
-                where: { courriel: email }
-            }).then(classe => {
-                if (!classe) {
-                    console.log("Classe pas trouvée avec l'addresse : " + email)
-                    return res.send("Pas de compte correspondant à cette addresse.\nClasse non trouvée").status(404);
-                }
-                // on récupère le score de la classe
-                getScore(classe.idclasse, "tictactoe", function (err, data) {
-                    if (err) {
-                        return res.send(err).status(520)
-                    }
-                    // on ajoute d'abord le nouveau score
-                    Score.update({ scoreclasse: data.scoreclasse + gain, nbpartie: data.nbpartie + 1 },
-                        { where: { idclasse: classe.idclasse } })
-                        .then(() => {
-                            return res.json({ scores: [data.scoreeleves, data.scoreclasse + gain], partie: data.nbpartie })
-                        })
-                        .catch(err => {
-                            return res.status(500).send("Erreur changement score \n" + err);
-                        });
-                })
-            }).catch(err => {
-                return res.status(500).send("Erreur récuperation compte classe \n" + err);
-            });
-        } else {
-            return res.sendStatus(418)
-        }
-    } else {
-        console.log("Tentative de changement de score interdite !")
-        return res.status(403).send("Accès interdit : tentative de changement du score")
-    }
-}
+//     if (email == emailToken) {
+//         if (role == "eleve") {
+//             console.log("changement du score de l'eleve")
+//             Eleve.findOne({ attributes: ['idclasse'], where: { courriel: email, invitation: "acceptee" } })
+//                 .then(eleve => {
+//                     if (!eleve) {
+//                         console.log("eleve pas trouve avec l'addresse : " + email)
+//                         return res.send("Pas de compte correspondant à cette addresse.\nElève non trouvé").status(409);
+//                     }
+//                     getScore(eleve.idclasse, "tictactoe", function (err, data) {
+//                         if (err) {
+//                             return res.send(err).status(409)
+//                         }
+//                         // on ajoute d'abord le nouveau score
+//                         Score.update({ scoreeleves: data.scoreeleves + gain },
+//                             { where: { idclasse: eleve.idclasse } })
+//                             .then(() => {
+//                                 // le score de l'élève est toujours en premier
+//                                 return res.json({ scores: [data.scoreeleves + gain, data.scoreclasse], partie: data.nbpartie })
+//                             })
+//                             .catch(err => {
+//                                 return res.status(500).send("Erreur changement score \n" + err);
+//                             });
+//                     })
+//                 }).catch(err => {
+//                     return res.status(500).send("Erreur récuperation compte eleve \n" + err);
+//                 });
+
+//         } else if (role == "classe") {
+//             console.log("changement de la classe")
+//             Classe.findOne({
+//                 attributes: ['idclasse'],
+//                 where: { courriel: email }
+//             }).then(classe => {
+//                 if (!classe) {
+//                     console.log("Classe pas trouvée avec l'addresse : " + email)
+//                     return res.send("Pas de compte correspondant à cette addresse.\nClasse non trouvée").status(404);
+//                 }
+//                 // on récupère le score de la classe
+//                 getScore(classe.idclasse, "tictactoe", function (err, data) {
+//                     if (err) {
+//                         return res.send(err).status(520)
+//                     }
+//                     // on ajoute d'abord le nouveau score
+//                     Score.update({ scoreclasse: data.scoreclasse + gain, nbpartie: data.nbpartie + 1 },
+//                         { where: { idclasse: classe.idclasse } })
+//                         .then(() => {
+//                             return res.json({ scores: [data.scoreeleves, data.scoreclasse + gain], partie: data.nbpartie })
+//                         })
+//                         .catch(err => {
+//                             return res.status(500).send("Erreur changement score \n" + err);
+//                         });
+//                 })
+//             }).catch(err => {
+//                 return res.status(500).send("Erreur récuperation compte classe \n" + err);
+//             });
+//         } else {
+//             return res.sendStatus(418)
+//         }
+//     } else {
+//         console.log("Tentative de changement de score interdite !")
+//         return res.status(403).send("Accès interdit : tentative de changement du score")
+//     }
+// }
 
 
 /**
@@ -322,26 +325,28 @@ function getScore(id, jeu, callback) {
  * @param {String} email l'adresse du gagnant de la partie, cela peut être une classe ou un élève
  */
 async function addVictory(email) {
-    if (email == undefined) {
-        throw new Error("pas de mail")
-    }
-    try {
-        const eleve = await Eleve.findOne({ attributes: ["idclasse"], where: { courriel: email } })
-        if (!eleve) {
-            const classe = await Classe.findOne({ attributes: ["idclasse"], where: { courriel: email } });
-            if (!classe) {
-                //error
-                throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
+    if (email != undefined) {
+        console.log('\n***Ajout de point***')
+        let date = new Date();
+        console.log("addPoints : " + (Date.now())/1000)
+        try {
+            const eleve = await Eleve.findOne({ attributes: ["idclasse"], where: { courriel: email } })
+            if (!eleve) {
+                const classe = await Classe.findOne({ attributes: ["idclasse"], where: { courriel: email } });
+                if (!classe) {
+                    //error
+                    throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
+                }
+                await Score.increment({ scoreclasse: +1, nbpartie: +1 }, { where: { idclasse: classe.idclasse } })
+                console.log("ajout de point pour la classe %s", email)
+            } else {
+                await Score.increment({ scoreeleves: +1, nbpartie: +1 }, { where: { idclasse: eleve.idclasse } })
+                console.log("ajout de point pour l'eleve %s", email)
             }
-            await Score.increment({ scoreclasse: +1, nbpartie: +1 }, { where: { idclasse: classe.idclasse } })
-            console.log("ajout de point pour la classe %s", email)
-        } else {
-            await Score.increment({ scoreeleves: +1, nbpartie: +1 }, { where: { idclasse: eleve.idclasse } })
-            console.log("ajout de point pour l'eleve %s", email)
+        } catch (error) {
+            console.log("erreur lors des requetes " + error)
+            throw error
         }
-    } catch (error) {
-        console.log("erreur lors des requetes " + error)
-        throw error
     }
 }
 
@@ -353,6 +358,9 @@ async function addVictory(email) {
  */
 async function addPartie(email) {
     if (email != undefined) {
+        console.log('\n***Augmentation du nombre de partie***')
+        let date = new Date();
+        console.log("addPartie : " + (Date.now())/1000)
         try {
             const eleve = await Eleve.findOne({ attributes: ["idclasse"], where: { courriel: email } })
             if (!eleve) {

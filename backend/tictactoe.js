@@ -110,7 +110,7 @@ io.on("connection", (socket) => {
     if ((board[0] == "X" && board[4] == "X" && board[8] == "X") || (board[2] == "X" && board[4] == "X" && board[6] == "X")) {
       io.in(roomCode).emit("victory", rooms.get(roomCode).player1);
       try {
-        console.log('test'+io.sockets.sockets.get(rooms.get(roomCode).player1).mail)
+        console.log('test '+io.sockets.sockets.get(rooms.get(roomCode).player1).mail)
         addVictory(io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
       } catch (error) {
         console.log(error)
@@ -131,7 +131,7 @@ io.on("connection", (socket) => {
     if (!board.includes("")) {
       io.in(roomCode).emit("victory");
       try{
-        console.log("mail"+io.sockets.sockets.get(rooms.get(roomCode).player2).mail);
+        console.log("mail : "+io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
         addPartie(io.sockets.sockets.get(rooms.get(roomCode).player2).mail)
       }catch (error){
         console.log(error)

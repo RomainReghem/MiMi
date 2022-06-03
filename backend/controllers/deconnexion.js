@@ -53,7 +53,7 @@ const Deconnexion = async (req, res) => {
                         })
                         .catch(err => {
                             console.log("erreur lors de la deconnexion : " + err)
-                            return res.send(err).status(520)
+                            return res.send("Erreur survenue lors de la suppression des cookies.").status(520)
                         })
                 } else {
                     console.log("what is this role? " + role)

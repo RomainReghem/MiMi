@@ -1,7 +1,7 @@
 //const db = require('../utils/database');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
-const path = require("path")
+const {verificationChemin} = require("./image")
 
 const Users = require('../models/users');
 const Eleve = Users.Eleve;
@@ -118,31 +118,23 @@ const InscriptionEleve = (req, res) => {
                                     mouthStyle: "laugh",
                                     noseStyle: "round",
                                     shape: "square",
-                                    shirtColor: "#6BD9E9",
+                                    shirtColor: "#99ff99",
                                     shirtStyle: "polo"
                                 }
-                                // avatar=JSON.parse(avatar)
-                                //  console.log("\n2."+avatar)
+                                
+                                const path = "Eleves/eleve" + num
                                 avatar = JSON.stringify(avatar)
-                                /*console.log("dossiers créés")
-                                console.log("enregistrement d'un avatar")
-                                fs.writeFile(path + "/avatar" + num + ".json", avatar, 'utf8', function (err) {
-                                if (err) {
-                                    console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
-                                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-                                }
-                                console.log("Le fichier JSON a bien été sauvegardé");
-                                //res.status(201).send("Enregistrement effectué");
-                                                                                    });
-                                */
-                                const path = "testeleve/eleve" + num + "/avatar"
-                                bucket.file(path + "/avatar" + num + ".json").save(avatar, function (err) {
+                                verificationChemin(path+"/avatar")
+                                verificationChemin(path+"/depot")
+                                // on enregistre le fichier JSON correspondant à l'avatar de l'élève
+                                fs.writeFile(path + "/avatar/avatar" + num + ".json", avatar, 'utf8', function (err) {
                                     if (err) {
-                                        return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
+                                        console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+                                        return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
                                     }
                                     console.log("Le fichier JSON a bien été sauvegardé");
                                     return res.status(201).send("Enregistrement effectué");
-                                })
+                                });
 
                                 //return res.send(neweleve);
                             })
@@ -220,7 +212,8 @@ const InscriptionClasse = (req, res) => {
                                     }))
                                         .then((classe) => {
                                             const num = classe.idclasse;
-
+                                            const path="Classes/classe"+num+"/depot"
+                                            verificationChemin(path)
                                             console.log("Création de compte classe réussie, idclasse : " + num)
 
                                             return res.send(newclasse);
