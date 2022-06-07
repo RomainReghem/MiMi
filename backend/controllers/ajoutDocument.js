@@ -70,7 +70,7 @@ const saveCoursEleve = (req, res, next) => {
                 });
             })
             .catch(err => {
-                console.log("Erreur eleve.findOne : "+err)
+                console.log("Erreur eleve.findOne : " + err)
                 return res.send("Erreur lors de la récupération du compte élève").status(520)
             });
         // si ce n'est pas la meme personne à qui appartient les fichiers (role différent de celui d'eleve et/ou email qui ne correspond pas) 
@@ -88,7 +88,7 @@ const saveCoursEleve = (req, res, next) => {
  */
 const saveCoursClasse = (req, res) => {
     console.log("\n*** Sauvegarde de cours d'une classe ***")
-    const matiere =  "maths"//req.body.cours;
+    const matiere = "maths"//req.body.cours;
     const email = req.body.mail;
     const file = req.file
 
@@ -155,7 +155,7 @@ const saveCoursClasse = (req, res) => {
 const addMatiereEleve = (req, res) => {
     console.log("\n*** Ajout d'une matière ***")
     const email = req.query.mail;
-    const matiere =  "maths"//req.query.matiere;
+    const matiere = "maths"//req.query.matiere;
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
@@ -194,7 +194,7 @@ const addMatiereEleve = (req, res) => {
 const addMatiereClasse = (req, res) => {
     console.log("\n*** Ajout d'une matière dans la classe***")
     const email = req.query.mail;
-    const matiere =  "maths"//req.query.matiere;
+    const matiere = "maths"//req.query.matiere;
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
@@ -224,6 +224,41 @@ const addMatiereClasse = (req, res) => {
         return res.status(403).send("Tentative de sauvegarde de cours d'un autre utilisateur")
     }
 }
+
+
+const saveCours = (req, res) => {
+    const email = req.body.mail;
+    const path = './Documents/' + email
+
+    const file = req.file
+
+    if (file == null) {
+        console.log("Pas de fichier")
+        return res.status(600).send("Erreur serveur")
+    }
+    if (file.mimetype != "application/pdf") {
+        console.log("Pas le bon type de fichier")
+        return res.status(403).send("Le fichier n'est pas un pdf.")
+    }
+    const nom = file.originalname;
+
+    verificationChemin(path);
+
+    // Vérification de si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
+    let name = verifNom(path, nom);
+
+    // Enregistrement du fichier en local sur le serveur
+    fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
+        if (err) {
+            console.log("Erreur lors de l'enregistrement du document : " + err);
+            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+        }
+        console.log("Le fichier a bien été sauvegardé");
+        return res.status(201).send("Enregistrement effectué");
+    });
+
+}
+
 
 /**
  * Cette fonction permet de vérifier si le chemin donné en paramètre existe déjà, sinon crée les dossiers nécessaires
@@ -285,5 +320,6 @@ module.exports = {
     saveCoursEleve,
     saveCoursClasse,
     addMatiereEleve,
-    addMatiereClasse
+    addMatiereClasse, 
+    saveCours
 }

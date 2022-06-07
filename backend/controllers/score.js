@@ -108,6 +108,7 @@ const resetScore = (req, res) => {
     }
 }
 
+
 /**
  * Retourne au client le score de l'utilisateur précisé  et de son adversaire au tic-tac-toe.
  * Si l'utilisateur n'a jamais joué, insère une nouvelle ligne dans la base de données.
@@ -141,14 +142,14 @@ const getScoreTicTacToe = (req, res) => {
                         return res.send("Pas de compte correspondant à cette addresse.\nElève non trouvé").status(404);
                     } else if (eleve.invitation != "acceptee") {
                         console.log("Cet élève n'est pas dans une classe ! " + email)
-                        return res.sendStatus(409);
+                        return res.status(403).send("Cet élève n'est pas dans une classe ! ");
                     }
                     getScore(eleve.idclasse, "tictactoe", function (err, data) {
                         if (err) {
                             return res.send(err).status(409)
                         }
                         console.log("%i à %i pour l'élève, nombre de parties jouées %i", data.scoreeleves, data.scoreclasse, data.nbpartie)
-                        return res.json({ scores: [data.scoreeleves, data.scoreclasse], partie: data.nbpartie })
+                        return res.status(201).json({ scores: [data.scoreeleves, data.scoreclasse], partie: data.nbpartie })
                     })
                 }).catch(err => {
                     console.log("Erreur récuperation compte eleve \n" + err)
@@ -163,7 +164,7 @@ const getScoreTicTacToe = (req, res) => {
             }).then(classe => {
                 if (!classe) {
                     console.log("Classe pas trouvée avec l'addresse : " + email)
-                    return res.send("Pas de compte correspondant à cette addresse.\nClasse non trouvée").status(404);
+                    return res.status(404).send("Pas de compte correspondant à cette addresse.\nClasse non trouvée");
                 }
                 // on récupère le score de la classe
                 getScore(classe.idclasse, "tictactoe", function (err, data) {

@@ -7,7 +7,7 @@ const Connexion = require('../controllers/connexion.js')
 const Inscription = require('../controllers/inscription.js')
 const Deconnexion = require('../controllers/deconnexion.js')
 const refreshToken = require('../controllers/refreshToken.js')
-const Modification = require('../controllers/modification.js')
+const Modification = require('../controllers/modificationInvitation.js')
 const Image = require('../controllers/image.js')
 // pour les documents
 const SuppressionDoc = require('../controllers/suppressionDocument.js')
@@ -24,6 +24,7 @@ const Score = require('../controllers/score.js')
 
 // LIBRAIRIES
 const express = require('express')
+const { verifyAccesGet, verifyAccessSave } = require('../middleware/verifyMail.js')
 const router = express.Router();
 
 // route de la connexion d'un utilisateur
@@ -76,38 +77,18 @@ router.post('/saveFileClass', verifyJWT, verifyDoc.single("file"), AjoutDoc.save
 router.get('/getFile', verifyJWT, Document.getCoursEleve)
 // route pour récupèrer le nom de tous les cours qu'un élève possède dans une matière donnée
 router.get('/getCours', verifyJWT, Document.getAllCoursEleve)
-// route pour récupèrer le nom de toutes les matières qu'un élève possède
-router.get('/getMatieres', verifyJWT, Document.getAllMatieresEleve)
-//PAS IMPLEMENTE : cours des classes
 // route pour accèder à un fichier précis de la classe, dans une matière donnée
 router.get('/getFileClass', verifyJWT, Document.getCoursClasse)
 // route pour récupérer le nom de tous les fichiers présents pour une matière
 router.get('/getCoursClass', verifyJWT, Document.getAllCoursClasse)
-// route pour récupèrer le nom de toutes les matières qu'une classe a
-router.get('/getMatiereClass', verifyJWT, Document.getAllMatieresClasse)
 
-// PAS IMPLEMENTE : ajout de matiere
-// route pour ajouter une matiere à l'élève
-// router.post('matiereEleve', AjoutDoc.addMatiereEleve)
-// route pour ajouter une matiere à la classe
-// router.post('matiereClasse', AjoutDoc.addMatiereClasse)
-// PAS IMPLEMENTE : suppression de matiere/cours
-// route pour supprimer une matiere à l'élève
-//router.delete('matiereEleve', SuppressionDoc.deleteMatiereEleve)
-// PAS IMPLEMENTE
-// route pour supprimer une matiere à la classe
-//router.delete('matiereClasse', SuppressionDoc.deleteMatiereClasse)
+// Supprimer les cours
 // route pour supprimer un cours à l'élève
-//router.delete('/coursEleve', verifyJWT, Eleve.deleteStudent)
 router.delete('/coursEleve', verifyJWT, SuppressionDoc.deleteCoursEleve)
 // route pour supprimer un cours à la classe
 router.delete('/coursClasse', verifyJWT, SuppressionDoc.deleteCoursClasse)
 
- /*PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
-// route pour renommer la matière d'une classe
-router.put("matiereClass", ChangeDoc.renameMatiereClasse)
-// route pour renommer la matière d'une classe
-router.put("coursClass", ChangeDoc.renameMatiereClasse)*/
+// Renommer les cours
 // route pour renommer le nom d'un cours(fichier) d'une classe
 router.post("/editFileClasse", verifyJWT, ChangeDoc.renameCoursClasse)
 // route pour renommer le nom d'un cours(fichier) d'un élève
@@ -132,8 +113,32 @@ router.post('/changeMailEleve',verifyJWT, ModificationEleve.ChangementMail)
 // score de jeu
 // route pour récupérer un score de jeu (appel à chaque fin de partie)
 router.get('/score', verifyJWT, Score.getScoreTicTacToe)
-// route pour changer le score d'un jeu
-//router.post('/score', verifyJWT, Score.putScoreTicTacToe)
 
+// test
+// route pour récupèrer les fichiers d'un utilisateur, en fonction de son adresse mail
+router.get('/cours', verifyJWT, verifyAccesGet, Document.getCours)
+router.post('/cours', verifyJWT, verifyAccessSave, AjoutDoc.saveCours)
+
+// PAS IMPLEMENTE : MATIERES 
+ /*PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
+// route pour renommer la matière d'une classe
+router.put("matiereClass", ChangeDoc.renameMatiereClasse)
+// route pour renommer la matière d'une classe
+router.put("coursClass", ChangeDoc.renameMatiereClasse)*/
+// PAS IMPLEMENTE : ajout de matiere
+// route pour ajouter une matiere à l'élève
+// router.post('matiereEleve', AjoutDoc.addMatiereEleve)
+// route pour ajouter une matiere à la classe
+// router.post('matiereClasse', AjoutDoc.addMatiereClasse)
+// PAS IMPLEMENTE : suppression de matiere/cours
+// route pour supprimer une matiere à l'élève
+//router.delete('matiereEleve', SuppressionDoc.deleteMatiereEleve)
+// PAS IMPLEMENTE
+// route pour supprimer une matiere à la classe
+//router.delete('matiereClasse', SuppressionDoc.deleteMatiereClasse)
+/*// route pour récupèrer le nom de toutes les matières qu'une classe a
+router.get('/getMatiereClass', verifyJWT, Document.getAllMatieresClasse)
+// route pour récupèrer le nom de toutes les matières qu'un élève possède
+router.get('/getMatieres', verifyJWT, Document.getAllMatieresEleve)*/
 
 module.exports = router;

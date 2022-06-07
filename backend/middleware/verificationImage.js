@@ -28,7 +28,7 @@ function fileFilter(req, file, cb) {
     return cb(null, true);
   } else {
     console.log("ps le bon type")
-    cb('Erreur : seuls les images png, jpg, jpeg sont autorisées !');
+    return cb('Erreur : seuls les images png, jpg, jpeg sont autorisées !');
   }
 }
 

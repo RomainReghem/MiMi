@@ -1,12 +1,12 @@
-const Modification = require('../controllers/modification.js')
+const Modification = require('./modificationInvitation.js')
 
 const Users = require('../models/users');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
-const Refresh = Users.RefreshToken;
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
 
 /**
  * Change la valeur d'invitation à en attente et l'id de classe à l'id de la classe dont on reçoit le mail
@@ -27,17 +27,18 @@ const ajoutInvitation = (req, res) => {
             if (code == 201) {
                 return res.status(201).send("Ajout de l'invitation de la classe réussie !")
             }
-            return res.status(code).send("Erreur")
+            return res.status(code).send("Erreur lors de l'ajout de l'invitation !")
         })
     } else {
         console.log("Role %s inconnu ", role)
-        return res.status(403).send("Accès interdit")
+        return res.status(403).send("Accès interdit: tentative d'acceptation de l'invitation par un autre")
     }
 }
 
 
 /**
- * Change la valeur d'invitation à "aucune" et l'id de classe à rien
+ * Change la valeur d'invitation à "aucune" et l'id de classe à rien.
+ * Fait appel à la fonction "setInvitation".
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
  */
@@ -63,7 +64,7 @@ const suppressionEleve = (req, res) => {
 }
 
 /**
- * Change dans la bd le mot de passe de la classe
+ * Change dans la bd le mot de passe de la classe.
  * @param {*} req la requête du client, contient le mail, l'ancien mot de passe et le nouveau mot de passe de la classe
  * @param {*} res la réponse du serveur
  * @returns la réponse 
@@ -74,23 +75,19 @@ const changementMdpClasse = (req, res) => {
     const mdp = req.body.pwd;
     const newMdp = req.body.newPwd;
 
-    console.log("mail " + email + " mdp " + mdp + " newMdp " + newMdp)
-    console.log("** Vérification mot de passe **")
+    //console.log("mail " + email + " mdp " + mdp + " newMdp " + newMdp)
+    console.log("** Vérification des données **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
-        return res.sendStatus(406)
+        return res.status(406).send("Le mot de passe actuel n'est pas de la bonne forme ! ")
     }
     if (!(newMdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
-        return res.sendStatus(406)
+        return res.status(406).send("Le nouveau mot de passe n'est pas de la bonne forme !")
     }
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
-        return res.sendStatus(407)
-    }
-    if (mdp == newMdp) {
-        console.log("Mot de passe inchangé !")
-        return res.status(406).status("Mot de passe inchangé !")
+        return res.status(407).send("L'adresse mail fournie n'est pas de la bonne forme !")
     }
 
     const role = req.role;
@@ -102,8 +99,17 @@ const changementMdpClasse = (req, res) => {
                 if (!classe) {
                     res.status(404).send("Aucun compte correspondant à cet adresse.")
                 }
+                // si les mots de passe sont les mêmes
+                if (mdp == newMdp) {
+                    console.log("Mot de passe inchangé !")
+                    return res.status(204).send("Mot de passe inchangé !")
+                }
                 // comparaion du mdp avec celui connu
                 bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {
+                    if (err) {
+                        console.log("error bcrypt compare " + err)
+                        return res.status(520).send("Erreur lors de la vérification du mot de passe.")
+                    }
                     if (estValide) {
                         console.log("Bon mot de passe de la classe")
                         // on change le mdp
@@ -111,29 +117,28 @@ const changementMdpClasse = (req, res) => {
                         bcrypt.hash(newMdp, 10, (err, hash) => {
                             if (err) {
                                 //erreur lors du hahage
-                                return res.sendStatus(300)
+                                return res.status(520).send("Erreur lors du hashage du mot de passe.")
                             }
-                            const newclasse = Classe.update(
+                            Classe.update(
                                 { motdepasse: hash },
                                 { where: { idclasse: classe.idclasse } }
-                            ).catch(err => {
-                                return res.send(err).status(520)
+                            ).then(() => {
+                                // on envoie la classe avec le mdp modifié 
+                                return res.status(201).send("Mot de passe changé avec succès !");
+                            }).catch(err => {
+                                console.log(`error update classe : ${err}`)
+                                return res.status(520).send("Erreur lors de la modification du mot de passe ")
                             });
-                            // on envoie la classe avec le mdp modifié 
-                            return res.send(newclasse).status(201)
                         });
-                    }
-                    if (err) {
-                        return res.status(520).send(err)
                     }
                     // si le mot de passe
                     console.log("Mauvais mot de passe classe")
-                    return res.sendStatus(400)
+                    return res.status(400).send("Le mot de passe est éronné !");
                 });
             })
             .catch(err => {
-                console.log(err)
-                return res.send(err).status(520)
+                console.log("error classe findone " + err)
+                return res.status(520).send("Erreur lors de la vérification de la validité du compte.")
             });
     } else {
         return res.status(403).send("Accès interdit : tentative de changement de mot de passe de classe !")
@@ -155,15 +160,15 @@ const changementMailClasse = (req, res) => {
     console.log("** Vérification mail **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
-        return res.sendStatus(406)
+        return res.status(406).send("Le mot de passe n'est pas de la bonne forme ! ")
     }
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length || !(newEmail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= newEmail.length) {
         console.log("forme mail incorrect")
-        return res.sendStatus(407)
+        return res.status(407).send("L'adresse mail fournie n'est pas de la bonne forme !")
     }
     if (newEmail == email) {
         console.log("mails identiques")
-        return res.status(200).send("Mail identiques : pas de changement")
+        return res.status(204).send("Mail identiques : pas de changement")
     }
 
     const role = req.role;
@@ -224,52 +229,17 @@ const changementMailClasse = (req, res) => {
                                                 token: refreshToken
                                             },
                                             { where: { idclasse: classe.idclasse } }
-                                        ).then(newclasse => {
-                                            if (newclasse) {
-                                                console.log("update ok")
-
-                                                res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
-                                                // on crée de nouveaux token 
-                                                /* Refresh.findOne({ attributes: ['idtoken'], where: { token: refreshTokenOld } })
-                                                     .then(token => {
-                                                         if (!token) {
-                                                             console.log("pas de token trouvé : accès interdit")
-                                                             return res.status(403)
-                                                         }
-                                                         // cookie 
-                                                         const accessToken = jwt.sign(
-                                                             { "UserInfo": { "mail": newEmail, "role": "classe" } },
-                                                             process.env.ACCESS_TOKEN_SECRET,
-                                                             { expiresIn: '10m' }
-                                                         );
-                                                         const refreshToken = jwt.sign(
-                                                             { "mail": newEmail, "role": "classe" },
-                                                             process.env.REFRESH_TOKEN_SECRET,
-                                                             { expiresIn: '1d' }
-                                                         )
-                                                         // on insère dans la liste le nouveau refreshtoken
-                                                         Refresh.update({ token: refreshToken }, { where: { idtoken: token.idtoken } })
-                                                             .then(() => {
-                                                                 res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                                 return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
-                                                             }).catch(err => {
-                                                                 console.log("erreur update token")
-                                                                 return res.status(500).send("erreur update token " + err);
-                                                             });
-                                                     }).catch(err => {
-                                                         return res.status(500).send("Erreur " + err);
-                                                     });*/
-                                            } else {
-                                                return res.status(500).send("non défini")
-                                            }
+                                        ).then(() => {
+                                            console.log("update ok")
+                                            res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                            return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
                                         }).catch(err => {
                                             return res.status(500).send("Erreur " + err);
                                         });
 
                                     } else {
                                         console.log("Mauvais mot de passe classe")
-                                        return res.sendStatus(400)
+                                        return res.status(400).send("Ce n'est pas le bon mot de passe !")
                                     }
                                 });
                             })

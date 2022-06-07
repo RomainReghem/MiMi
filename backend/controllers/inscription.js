@@ -1,7 +1,7 @@
 //const db = require('../utils/database');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
-const {verificationChemin} = require("./image")
+const { verificationChemin } = require("./image")
 
 const Users = require('../models/users');
 const Eleve = Users.Eleve;
@@ -70,7 +70,7 @@ const InscriptionEleve = (req, res) => {
     // Hashage du mot de passe
     bcrypt.hash(mdp, 10, (err, hash) => {
         if (err) {
-            console.log("erreur hashage "+err)
+            console.log("erreur hashage " + err)
             return res.status(600).send("Erreur lors du chiffrement du mot de passe.")
         }
 
@@ -121,11 +121,11 @@ const InscriptionEleve = (req, res) => {
                                     shirtColor: "#99ff99",
                                     shirtStyle: "polo"
                                 }
-                                
+
                                 const path = "Eleves/eleve" + num
                                 avatar = JSON.stringify(avatar)
-                                verificationChemin(path+"/avatar")
-                                verificationChemin(path+"/depot")
+                                verificationChemin(path + "/avatar")
+                                verificationChemin(path + "/depot")
                                 // on enregistre le fichier JSON correspondant à l'avatar de l'élève
                                 fs.writeFile(path + "/avatar/avatar" + num + ".json", avatar, 'utf8', function (err) {
                                     if (err) {
@@ -147,7 +147,7 @@ const InscriptionEleve = (req, res) => {
                         console.log("Erreur lors de la recherche de classe \n" + err)
                         return res.send("Erreur serveur sur la vérification de la validité de l'adresse mail.").status(520)
                     });
-            })   .catch(err => {
+            }).catch(err => {
                 console.log("Erreur lors de la recherche d'eleve avec la meme adresse \n" + err)
                 return res.send("Erreur serveur sur la vérification de la validité de l'adresse mail.").status(520)
             });
@@ -212,15 +212,15 @@ const InscriptionClasse = (req, res) => {
                                     }))
                                         .then((classe) => {
                                             const num = classe.idclasse;
-                                            const path="Classes/classe"+num+"/depot"
+                                            const path = "Classes/classe" + num + "/depot"
                                             verificationChemin(path)
                                             console.log("Création de compte classe réussie, idclasse : " + num)
 
                                             return res.send(newclasse);
-
                                         })
                                         .catch(err => {
                                             console.log("erreur inscription classe : " + err)
+                                            return res.send("Erreur survenue lors de l'enregistrement du compte classe.").status(520)
                                         })
                                 }
 
@@ -228,14 +228,14 @@ const InscriptionClasse = (req, res) => {
                         }
                     })
                     .catch(err => {
-                        console.log(err)
-                        return res.send(err).status(520)
+                        console.log("erreur inscription classe eleve.findone "+err)
+                        return res.send("Erreur lors de la vérification de l'unicité de l'adresse mail fournie.").status(520)
                     });
             }
         })
         .catch(err => {
-            console.log(err)
-            return res.send(err).status(520)
+            console.log("erreur inscription classe classe.findone "+err);
+            return res.send("Erreur lors de la vérification de l'unicité de l'adresse mail fournie.").status(520)
         });
 }
 

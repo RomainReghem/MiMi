@@ -53,12 +53,12 @@ const refreshToken = (req, res) => {
                         .then(eleve => {
                             if (!eleve) {
                                 console.log("Aucun eleve n'a ce token")
-                                return res.send("Aucun eleve n'a ce token : accès interdit").status(403)
+                                return res.status(403).send("Aucun eleve n'a ce token : accès interdit")
                             }
                             console.log("eleve token " + eleve.token)
                             if (eleve.token != refreshToken) {
                                 console.log("Le token donné ne correspond pas à l'utilisateur")
-                                return res.send("Le token donné ne correspond pas à l'utilisateur : accès interdit").status(403)
+                                return res.status(403).send("Le token donné ne correspond pas à l'utilisateur : accès interdit")
                             }
                             // on doit récupèrer l'état de l'invitation pour le transmettre au serveur
                             getInvitation(mail, function (reponse) {
@@ -69,7 +69,7 @@ const refreshToken = (req, res) => {
                                     getAvatar(eleve.ideleve, function (reponseAvatar) {
                                         getImage(eleve.ideleve, function (err, reponseImage) {
                                             if (err) {
-                                                return res.send(err).status(520);
+                                                return res.status(520).send(err);
                                             }
                                             console.log('envoi des infos')
                                             return res.status(200).json(Object.assign({ role: role, accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
@@ -80,7 +80,7 @@ const refreshToken = (req, res) => {
                             })
                         }).catch(err => {
                             console.log("erreur lors de la recup de classe " + err)
-                            return res.send(err).status(520)
+                            return res.status(520).send(err)
                         });
                 } else if (role == "classe") {
                     console.log("token classe")
@@ -92,18 +92,20 @@ const refreshToken = (req, res) => {
                                 return res.sendStatus(403)
                             }
                             if (classe.token != refreshToken) {
-                                return res.send("Le token donné ne correspond pas à l'utilisateur : accès interdit").status(403)
+                                console.log("token classe correspond pas")
+                                return res.status(403).send("Le token donné ne correspond pas à l'utilisateur : accès interdit")
                             }
+                            console.log('token nickel')
                             // sinon si c'est une classe on retourne juste le role et le nouveau accesstoken + l'id de la classe
                             return res.status(200).json({ role: role, accessToken: accessToken, idclasse: classe.idclasse });
                         }
                         ).catch(err => {
                             console.log("erreur lors de la recup de classe " + err)
-                            return res.send(err).status(520)
+                            return res.status(520).send("Erreur lors de la récupérations des informations du compte Classe");
                         });
                 } else {
                     console.log("what is this role? " + role)
-                    return res.send("Role inexistant : accès interdit").status(403)
+                    return res.status(403).send("Role inexistant : accès interdit");
                 }
             }
         }

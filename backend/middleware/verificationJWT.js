@@ -16,7 +16,7 @@ const verifyJWT = (req, res, next) => {
     // si l'utilisateur n'est pas autorisé
     if (!authHeader) {
         console.log("pas de header")
-        return res.send(401).status("aucun en-tête spécifié")
+        return res.statut(401).send("aucun en-tête spécifié")
     }
     console.log("authHeader : " + authHeader)
     // le token est en deuxième position
@@ -29,7 +29,7 @@ const verifyJWT = (req, res, next) => {
         (err, decoded) => {
             if (err) {
                 console.log("token pas bon : "+err)
-                return res.send("Le token n'est pas défini.").status(403)
+                return res.status(403).send("Le token n'est pas défini.")
             }
             console.log("decoded mail " + decoded.UserInfo.mail)
             console.log("decoded role " + decoded.UserInfo.role)
@@ -46,7 +46,6 @@ const verifyJWT = (req, res, next) => {
             next();
         }
     )
-
 }
 
 module.exports = { verifyJWT }

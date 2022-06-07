@@ -217,6 +217,7 @@ function getInvitation(emailEleve, cb) {
         });
 }
 
+
 // fonction pour récupérer l'avatar
 function getAvatar(id, callback) {
     const num = id;
