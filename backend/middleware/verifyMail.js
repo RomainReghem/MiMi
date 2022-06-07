@@ -125,6 +125,7 @@ const verifyAccesGet = (req, res, next) => {
  * @returns la réponse du serveur en cass d'erreur
  */
 const verifyAccessSave = (req, res, next) => {
+    console.log("\n*** Vérification des droits d'accès au document ***")
     // le mail de la personne qui est censée demander les accès
     const mail = req.body.mail;
     // le mail enregistré dans le cookie de la session, est censé être équivalent au mail donné
@@ -142,7 +143,7 @@ const verifyAccessSave = (req, res, next) => {
         console.log("forme mail incorrect")
         return res.status(400).send("L'adresse mail %s n'est pas de la bonne forme ! ", mail)
     }
-
+    console.log(mail)
     // On veut le role de l'eleve qui veut sauvegarder
     determiningRole(mail, function (err, roleDetermined) {
         if (err) {

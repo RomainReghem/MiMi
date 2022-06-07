@@ -95,7 +95,7 @@ const saveCoursClasse = (req, res) => {
     const file = req.file
 
     if (file == null) {
-        console.log("Pas de fichier")
+        console.log("Pas de fichier "+file+" maybe "+req.files)
         return res.status(600).send("Erreur serveur")
     }
     if (file.mimetype != "application/pdf") {
@@ -156,18 +156,22 @@ const saveCoursClasse = (req, res) => {
  * @param {*} res la réponse du serveur
  */
 const saveFile = (req, res) => {
+    console.log("\n*** Sauvegarde du fichier ***");
     const email = req.body.mail;
     const path = './Documents/' + email
 
     const file = req.file
 
     if (file == null) {
-        console.log("Pas de fichier")
-        return res.status(600).send("Erreur serveur")
+        for(r in req.body.formData){
+            console.log("-"+r)
+        }
+        console.log("Pas de fichier "+file+" maybe "+req.files)
+        return res.status(600).send("Erreur : aucun fichier n'a été trouvé")
     }
     if (file.mimetype != "application/pdf") {
         console.log("Pas le bon type de fichier")
-        return res.status(403).send("Le fichier n'est pas un pdf.")
+        return res.status(400).send("Le fichier n'est pas un pdf.")
     }
     const nom = file.originalname;
 

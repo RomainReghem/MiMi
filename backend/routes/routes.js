@@ -101,13 +101,13 @@ router.post("/editFileEleve", verifyJWT, ChangeDoc.renameCoursEleve)
 // router.delete("/classe", Classe.deleteClass)
 
 // route pour changer le mot de passe de la classe
-router.post('/changePwdClasse',verifyJWT, ModificationClasse.changementMdpClasse)
+router.post('/changePwdClasse', verifyJWT, ModificationClasse.changementMdpClasse)
 // route pour changer l'adresse mail de la classe
-router.post('/changeMailClasse',verifyJWT, ModificationClasse.changementMailClasse)
+router.post('/changeMailClasse', verifyJWT, ModificationClasse.changementMailClasse)
 // route pour changer le mot de passe de l'élève
-router.post('/changePwdEleve',verifyJWT, ModificationEleve.ChangementMdp)
+router.post('/changePwdEleve', verifyJWT, ModificationEleve.ChangementMdp)
 // route pour changer l'adresse mail de l'élève
-router.post('/changeMailEleve',verifyJWT, ModificationEleve.ChangementMail)
+router.post('/changeMailEleve', verifyJWT, ModificationEleve.ChangementMail)
 
 // score de jeu
 // route pour récupérer un score de jeu (appel à chaque fin de partie)
@@ -119,14 +119,14 @@ router.get('/files', verifyJWT, verifyAccesGet, Document.getFiles)
 // route pour récupèrer un fichier particulier
 router.get('/file', verifyJWT, verifyAccesGet, Document.getFile)
 // route pour déposer un fichier
-router.post('/file', verifyJWT, verifyAccessSave, AjoutDoc.saveFile)
+router.post('/file', verifyJWT, verifyDoc.single("file"), verifyAccessSave, AjoutDoc.saveFile)
 // route pour supprimer un fichier
 router.delete('/file', verifyJWT, verifyAccessSave, SuppressionDoc.deleteFile)
 // route pour renommer un fichier
-router.put('/file', verifyJWT, verifyAccessSave, ChangeDoc.renameFile )
+router.put('/file', verifyJWT, verifyAccessSave, ChangeDoc.renameFile)
 
 // PAS IMPLEMENTE : MATIERES 
- /*PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
+/*PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
 // route pour renommer la matière d'une classe
 router.put("matiereClass", ChangeDoc.renameMatiereClasse)
 // route pour renommer la matière d'une classe
