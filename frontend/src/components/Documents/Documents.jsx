@@ -30,28 +30,10 @@ const Documents = () => {
 
     const [loadingFiles, setLoadingFiles] = useState(false);
 
-    let myFilesURL = (auth?.role == "classe" ? "/getCoursClass" : "/getCours");
-    let sharedFilesURL = (auth?.role == "classe" ? "/getCours" : "/getCoursClass");
-    let myFilesParams = (auth?.role == "classe" ? { id: auth?.idclasse } : { mail: auth?.user })
-    let sharedFilesParams = (auth?.role == "classe" ? { mail: localStorage.getItem("mailEleve") } : { id: auth?.idclasse })
+    let myFilesParams = (auth?.role == "classe" ? { mail: auth?.user, findMail: auth?.user } : { mail: auth?.user, findMail: auth?.user })
+    let sharedFilesParams = (auth?.role == "classe" ? { mail: auth?.user, findMail: localStorage.getItem("mailEleve") } : { mail: auth?.user, findMail: auth?.mailclasse })
 
-    let deleteParams;
-    let deleteFileURL;
-    let editFileURL;
     let editFileParams;
-
-    if (auth?.role == "classe") {
-        deleteFileURL = "/coursClasse";
-        editFileURL = "/editFileClasse"
-        editFileParams = { id: auth?.idclasse }
-        deleteParams = { id: auth?.idclasse }
-
-    } else if (auth?.role == "eleve") {
-        deleteFileURL = "/coursEleve";
-        editFileURL = "/editFileEleve"
-        editFileParams = { mail: auth?.user }
-        deleteParams = { mail: auth?.user }
-    }
 
     useEffect(() => {
         loadFiles()
@@ -60,7 +42,7 @@ const Documents = () => {
     const loadFiles = async () => {
         try {
             setLoadingFiles(true);
-            const myFilesResponse = await axiosPrivate.get(myFilesURL, {
+            const myFilesResponse = await axiosPrivate.get('files', {
                 params: { ...myFilesParams }
             });
             setMyFiles(myFilesResponse.data.files)
@@ -68,10 +50,11 @@ const Documents = () => {
                 setMenuSelection(myFilesResponse.data.files)
 
             // Si la classe possède un élève ou si l'éleve possède une classe, on load aussi les docs partagés
-            if (sharedFilesParams.id || sharedFilesParams.mail) {
-                const sharedFilesResponse = await axiosPrivate.get(sharedFilesURL, {
+            if (sharedFilesParams.findMail) {
+                const sharedFilesResponse = await axiosPrivate.get('files', {
                     params: { ...sharedFilesParams }
                 });
+                console.log(sharedFilesResponse.data.files)
                 setSharedFiles(sharedFilesResponse.data.files)
                 if (selectedUI == "shared")
                     setMenuSelection(sharedFilesResponse.data.files)
@@ -86,15 +69,10 @@ const Documents = () => {
         setLoadingFiles(false);
     }
 
-
-    function timeout(delay) {
-        return new Promise(res => setTimeout(res, delay));
-    }
-
-    const deleteFile = async (f) => {
+    const deleteFile = async (fileName) => {
         try {
-            const response = await axiosPrivate.delete(deleteFileURL, {
-                data: { ...deleteParams, cours: f },
+            const response = await axiosPrivate.delete('file', {
+                data: { mail:auth?.user, name:fileName },
             });
             loadFiles()
             toast({ title: "Fichier supprimé", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
@@ -108,7 +86,7 @@ const Documents = () => {
     const editFileName = async (newName, currentName) => {
         try {
             console.log(newName, currentName)
-            await axiosPrivate.post(editFileURL, JSON.stringify({ ...editFileParams, newName, currentName }),
+            await axiosPrivate.put('file', JSON.stringify({ ...editFileParams, newName, currentName }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
@@ -138,16 +116,17 @@ const Documents = () => {
                             return <Stack key={i} direction={'row'} w={'100%'}>
 
                                 <Button w={'100%'} justifyContent={'flex-start'}>
-                                    <Editable defaultValue={menuSelection[i]} noOfLines={1} onSubmit={(e) => { editFileName(e, menuSelection[i]) }}>
+                                    <Text>{menuSelection[i]}</Text>
+                                    {/* <Editable defaultValue={menuSelection[i]} noOfLines={1} onSubmit={(e) => { editFileName(e, menuSelection[i]) }}>
                                         <EditablePreview />
                                         <EditableInput />
-                                    </Editable>
+                                    </Editable> */}
                                 </Button>
+                                <Tooltip label="Voir le fichier" fontSize='md' placement="top">
+                                    <IconButton colorScheme={'gray'} onClick={() => setFile(menuSelection[i])} icon={<FontAwesomeIcon icon={faEye} />}></IconButton>
+                                </Tooltip>
 
                                 {selectedUI == "my" ? <>
-                                    <Tooltip label="Voir le fichier" fontSize='md' placement="top">
-                                        <IconButton colorScheme={'gray'} onClick={() => setFile(menuSelection[i])} icon={<FontAwesomeIcon icon={faEye} />}></IconButton>
-                                    </Tooltip>
 
                                     <Tooltip bg={'red.400'} label="Supprimer le fichier" fontSize='md' placement="top">
                                         <IconButton colorScheme={'red'} onClick={(e) => { deleteFile(menuSelection[i]) }} icon={<FontAwesomeIcon icon={faXmark} />}></IconButton>

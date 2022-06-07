@@ -33,13 +33,14 @@ export default function Login() {
             const role = response?.data?.role;
             const invitation = response?.data?.invitation;
             const idclasse = response?.data?.idclasse;
+            const mailclasse = response?.data?.mailClasse;
             // Au login, si rien ne correspond dans le local storage, on attribue "avatar" à "préférence"
             // On ajoute aussi la variable au localstorage, default "avatar"
             let preference = JSON.parse(localStorage.getItem("preference" + user)) || "avatar";
             if (!localStorage.getItem("preference" + user)) {
                 localStorage.setItem("preference" + user, JSON.stringify("avatar"));
             }
-            setAuth({ user, accessToken, role, preference, invitation, idclasse });
+            setAuth({ user, accessToken, role, preference, invitation, idclasse, mailclasse });
 
             // Si c'est un élève on aura besoin d'afficher son pseudo et ses images, la classe n'en a pas.
             if (role == "eleve") {

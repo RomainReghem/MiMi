@@ -13,24 +13,17 @@ const PDFViewer = (props) => {
 
     const [numPages, setNumPages] = useState(null);
     const [file, setFile] = useState(null);
-    let url;
+  
     let parameters;
 
-    if (auth?.role == "classe" && props.selected == "my") {
-        url = "/getFileClass"
-        parameters = { id: auth?.idclasse, name:props.clickedFile}
+    if (props.selected == "my") {
+        parameters = { findMail: auth?.user }
 
     } else if (auth?.role == "classe" && props.selected == "shared") {
-        url = "/getFile"
-        parameters = { mail:localStorage.getItem("mailEleve"), name:props.clickedFile}
-
-    } else if (auth?.role == "eleve" && props.selected == "my") {
-        url = "/getFile"
-        parameters = { mail: auth?.user, name:props.clickedFile}
+        parameters = { findMail:localStorage.getItem("mailEleve")}
 
     } else if (auth?.role == "eleve" && props.selected == "shared") {
-        url = "/getFileClass"
-        parameters = { id: auth?.idclasse, name:props.clickedFile}
+        parameters = { findMail: auth?.mailclasse }
     }
 
 
@@ -63,10 +56,9 @@ const PDFViewer = (props) => {
     }, [props.clickedFile])
 
     const getFile = async () => {
-        try {
-            console.log(url, parameters)
-            const response = await axiosPrivate.get(url, {
-                params: { ...parameters },
+        try {            
+            const response = await axiosPrivate.get('file', {
+                params: { ...parameters, mail: auth?.user, name:props.clickedFile },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });

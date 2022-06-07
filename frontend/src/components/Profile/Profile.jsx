@@ -13,7 +13,7 @@ const Profile = () => {
     return (
         <>
             {role == "eleve" ? (
-                <Center flexGrow={1}>
+                <Center flexGrow={1}>                    
                     <Wrap spacing={10} p={5} justify={'center'} align={'center'}>
                         <Identity />
                         <Divider orientation={orientation} height={height} />

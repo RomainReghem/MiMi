@@ -1,15 +1,14 @@
-import { useEffect, useState, useLayoutEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import * as React from 'react';
 import io from "socket.io-client"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEgg, faXmark, faZ } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faZ } from "@fortawesome/free-solid-svg-icons";
 import { faCircle } from "@fortawesome/free-regular-svg-icons";
 import { faDiceThree, faHand } from "@fortawesome/free-solid-svg-icons";
 import { axiosPrivate } from "../../api/axios";
 import useAuth from '../../hooks/useAuth'
 import { useToast } from "@chakra-ui/react";
-import { motion } from "framer-motion"
 import { CircularProgress, Center, Button, Text, Stack, AlertDialogFooter, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent, Wrap, Grid, Divider, Heading, Badge, StackDivider, Box, GridItem } from "@chakra-ui/react";
 
 
@@ -20,7 +19,6 @@ const TicTacToe = () => {
     const navigate = useNavigate();
     const cancelRef = useRef();
     const toast = useToast();
-    const constraintsRef = useRef(null);
     const [roomCode, setRoomCode] = useState(auth?.idclasse);
     const [roomJoined, setRoomJoined] = useState(false);
     const [waitingText, setWaitingText] = useState("");
@@ -31,8 +29,6 @@ const TicTacToe = () => {
     const [UIboard, setUIboard] = useState([])
     const [canPlay, setCanPlay] = useState(false);
     const [score, setScore] = useState([0, 0])
-    const [clicked, setClicked] = useState(false)
-    let winner = false;
 
     useEffect(() => {
         if (!auth?.idclasse) {
@@ -73,10 +69,8 @@ const TicTacToe = () => {
 
         socket.on("victory", (mailOfTheWinner) => {
             if (auth?.user == mailOfTheWinner) {
-                winner = true
                 setWin(true)
             } else {
-                winner = false
                 setWin(false)
             }
             setGameEnded(true);
@@ -176,14 +170,7 @@ const TicTacToe = () => {
             </> :
                 (<div className="waitingRoom">
                     {roomJoined ? <><CircularProgress isIndeterminate color='green.300' /><p>{waitingText}</p></> :
-                        <motion.div className="container" ref={constraintsRef}>
-                            <motion.div className="item" drag dragConstraints={constraintsRef}>
-                                <Badge fontSize={'2xl'} colorScheme={'teal'} fontFamily={'mono'} onMouseDown={(e) => { setClicked(true) }} onMouseUp={(e) => {setClicked(false)}}>
-                                    {clicked ? "Texte amovible " : "Texte immobile... "} 
-                                    {clicked ? <FontAwesomeIcon icon={faEgg} /> : <FontAwesomeIcon icon={faHand} />  }
-                                </Badge>
-                            </motion.div>
-                        </motion.div>}
+                        <Text>{auth?.role == "eleve" ? "Il faut être membre d'une classe pour accéder aux jeux" : "Il faut avoir au moins 1 élève membre de la classe pour accéder aux jeux"}</Text>}
                 </div>)
             }
         </>

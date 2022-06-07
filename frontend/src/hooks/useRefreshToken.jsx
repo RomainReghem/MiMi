@@ -20,6 +20,7 @@ const useRefreshToken = () => {
                 accessToken: response.data.accessToken,
                 invitation: response.data.invitation,
                 idclasse: response.data.idclasse,
+                mailclasse: response.data.mailClasse,
                 preference:JSON.parse(localStorage.getItem("preference"+jwt_decode(response?.data?.accessToken).UserInfo.mail))
             }
         });
