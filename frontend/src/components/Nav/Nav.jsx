@@ -143,8 +143,9 @@ const DesktopNav = () => {
                     <Popover trigger={'hover'} placement={'bottom-start'}>
                         <PopoverTrigger>
                             <Link
+                            as={ReactRouterLink}
                                 p={2}
-                                href={navItem.href ?? '#'}
+                                to={navItem.href ?? '#'}
                                 fontSize={'sm'}
                                 fontFamily={'heading'}
                                 fontWeight={600}
@@ -182,7 +183,8 @@ const DesktopNav = () => {
 const DesktopSubNav = ({ label, href, subLabel }) => {
     return (
         <Link
-            href={href}
+        as={ReactRouterLink}
+            to={href}
             role={'group'}
             display={'block'}
             p={2}
@@ -234,8 +236,8 @@ const MobileNavItem = ({ label, children, href }) => {
         <Stack spacing={4} onClick={children && onToggle}>
             <Flex
                 py={2}
-                as={Link}
-                href={href ?? '#'}
+                as={ReactRouterLink}
+                to={href ?? '#'}
                 justify={'space-between'}
                 align={'center'}
                 _hover={{
@@ -268,7 +270,7 @@ const MobileNavItem = ({ label, children, href }) => {
                     align={'start'}>
                     {children &&
                         children.map((child) => (
-                            <Link key={child.label} py={2} href={child.href}>
+                            <Link key={child.label} py={2} to={child.href} as={ReactRouterLink}>
                                 {child.label}
                             </Link>
                         ))}
@@ -296,4 +298,8 @@ const NAV_ITEMS = [
         label: 'Jeux',
         href: '/games',
     },
+    {
+        label:'test',
+        href:'/test'
+    }
 ];
