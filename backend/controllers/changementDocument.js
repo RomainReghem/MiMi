@@ -153,6 +153,11 @@ function renameDoc(path, oldname, newname, callback) {
 }
 
 
+/**
+ * Renomme le cours d'un utilisateur avec le nouveau nom donné
+ * @param {*} req la requête du client, doit contenir l'email de l'élève, l'ancien nom du cours et le nouveau nom.
+ * @param {*} res la réponse du serveur
+ */
 const renameFile = (req, res) => {
     console.log("\n*** Changement de nom de fichier ***")
 
@@ -178,5 +183,6 @@ const renameFile = (req, res) => {
 
 module.exports = {
     renameCoursClasse,
-    renameCoursEleve, renameFile
+    renameCoursEleve, 
+    renameFile
 }

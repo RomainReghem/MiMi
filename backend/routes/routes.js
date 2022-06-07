@@ -7,7 +7,6 @@ const Connexion = require('../controllers/connexion.js')
 const Inscription = require('../controllers/inscription.js')
 const Deconnexion = require('../controllers/deconnexion.js')
 const refreshToken = require('../controllers/refreshToken.js')
-const Modification = require('../controllers/modificationInvitation.js')
 const Image = require('../controllers/image.js')
 // pour les documents
 const SuppressionDoc = require('../controllers/suppressionDocument.js')

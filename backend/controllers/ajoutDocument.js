@@ -106,8 +106,7 @@ const saveCoursClasse = (req, res) => {
     console.log(" nom fichier " + nom + ' type ' + file.mimetype)
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(407)
+        return res.status(400).send("L'adresse mail fournie n'est pas de la bonne foorme")
     }
 
     const role = req.role;
@@ -149,6 +148,13 @@ const saveCoursClasse = (req, res) => {
     }
 }
 
+
+/**
+ * Sauvegarde sur le serveur le document de l'utilisateur dans le dossier approprié.
+ * 
+ * @param {*} req la requête du client, contient le fichier à sauvegarder et le mail de l'utilisateur
+ * @param {*} res la réponse du serveur
+ */
 const saveFile = (req, res) => {
     const email = req.body.mail;
     const path = './Documents/' + email
@@ -179,7 +185,6 @@ const saveFile = (req, res) => {
         console.log("Le fichier a bien été sauvegardé");
         return res.status(201).send("Enregistrement effectué");
     });
-
 }
 
 

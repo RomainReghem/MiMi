@@ -405,6 +405,12 @@ const getFiles=(req, res)=>{
 }
 
 
+/**
+ * Permet de retourner le contenu d'un fichier dont on a le nom et l'utilisateur
+ * @param {*} req la requête du client,  contient le mail de l'utilisateur, le mail de la personne dont on veut accèder au document, le nom du document
+ * @param {*} res la réponse du serveur, contient un code HTTP (erreur ou succès) et un message à envoyer au client
+ * @returns la réponse du serveur : res
+ */
 const getFile=(req, res)=>{
     console.log("\n*** Récupération d'un document ***")
     const mailDossier = req.query.findMail;

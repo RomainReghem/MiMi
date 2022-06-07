@@ -114,6 +114,7 @@ function deleteCours(path) {
         if (fs.existsSync(path)) {
             // s'il existe alors on peut le supprimer
             try {
+                // suppression
                 fs.unlinkSync(path)
                 console.log("suppression de cours ok ")
                 return 201;
@@ -134,97 +135,105 @@ function deleteCours(path) {
 }
 
 
-const deleteAllCoursClasse = (req, res) => {
-    console.log("\n*** Suppression des cours de la classe ***")
-    const id = req.body.id;
-    const matiere = "maths"//req.body.matiere;
+// const deleteAllCoursClasse = (req, res) => {
+//     console.log("\n*** Suppression des cours de la classe ***")
+//     const id = req.body.id;
+//     const matiere = "maths"//req.body.matiere;
 
-    const role = req.role;
-    const emailToken = req.mail
-    // seule une classe peut supprimer un dossier ici, celle à qui appartient les cours
-    if (role == "classe") {
-        Classe.findOne({
-            attributes: ['idclasse', 'courriel'],
-            where: { idclasse: id }
-        })
-            .then(classe => {
-                if (!classe) {
-                    //console.log("Utilisateur pas trouvé");
-                    return res.status(404).send("classe inexistante");
-                }
-                if (emailToken != classe.courriel) {
-                    return res.status(403).send("Tentative de suppression de cours d'un autre utilisateur")
-                }
-                let path = "./Classes/classe" + id + "/depot/" + matiere;
+//     const role = req.role;
+//     const emailToken = req.mail
+//     // seule une classe peut supprimer un dossier ici, celle à qui appartient les cours
+//     if (role == "classe") {
+//         Classe.findOne({
+//             attributes: ['idclasse', 'courriel'],
+//             where: { idclasse: id }
+//         })
+//             .then(classe => {
+//                 if (!classe) {
+//                     //console.log("Utilisateur pas trouvé");
+//                     return res.status(404).send("classe inexistante");
+//                 }
+//                 if (emailToken != classe.courriel) {
+//                     return res.status(403).send("Tentative de suppression de cours d'un autre utilisateur")
+//                 }
+//                 let path = "./Classes/classe" + id + "/depot/" + matiere;
 
-                deleteMatiere(path, function (code) {
-                    if (code == 201) {
-                        return res.status(code).send("suppression réussie")
-                    }
-                    return res.status(code)
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                return res.send(err).status(520)
-            });
-    } else {
-        console.log('soit pas une classe, soit pas la bonne classe : accès interdit')
-        return res.status(403).send("Tentative de suppression de matiere d'un autre utilisateur")
-    }
-}
+//                 deleteMatiere(path, function (code) {
+//                     if (code == 201) {
+//                         return res.status(code).send("suppression réussie")
+//                     }
+//                     return res.status(code)
+//                 })
+//             })
+//             .catch(err => {
+//                 console.log(err)
+//                 return res.send(err).status(520)
+//             });
+//     } else {
+//         console.log('soit pas une classe, soit pas la bonne classe : accès interdit')
+//         return res.status(403).send("Tentative de suppression de matiere d'un autre utilisateur")
+//     }
+// }
+
+
+// /**
+//  * Supprime des dossiers de l'élève la matière donnée avec tous les cours contenus dedans
+//  * @param {*} req la requête du client, doit contenir l'email de l'élève et le nom de la matière à supprimer.
+//  * @param {*} res la réponse du serveur
+//  */
+// const deleteAllCoursEleve = (req, res) => {
+//     console.log("\n*** Suppression de tous les cours de l'eleve ***")
+//     const email = req.body.mail;
+//     const matiere = "maths"// req.body.matiere;
+
+//     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+//         console.log("forme mail incorrect")
+//         // erreur 400
+//         return res.sendStatus(400)
+//     }
+
+//     const role = req.role;
+//     const emailToken = req.mail
+//     // seul un eleve peut supprimer un dossier ici, celui à qui appartient les cours
+//     if (role == "eleve" && emailToken == email) {
+//         Eleve.findOne({
+//             attributes: ['ideleve'],
+//             where: { courriel: email }
+//         })
+//             .then(eleve => {
+//                 if (!eleve) {
+//                     console.log("Utilisateur pas trouvé");
+//                     return res.status(404).send("Élève inexistant");
+//                 }
+//                 const num = eleve.ideleve;
+//                 let path = "./Eleves/eleve" + num + "/depot/" + matiere;
+
+//                 deleteMatiere(path, function (code) {
+//                     if (code == 201) {
+//                         return res.status(code).send("suppression réussie")
+//                     }
+//                     return res.status(code)
+//                 })
+//             })
+//             .catch(err => {
+//                 console.log(err)
+//                 return res.send(err).status(520)
+//             });
+//     } else {
+//         console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
+//         return res.status(403).send("Tentative de suppression de matiere d'un autre utilisateur")
+//     }
+// }
 
 
 /**
- * Supprime des dossiers de l'élève la matière donnée avec tous les cours contenus dedans
- * @param {*} req la requête du client, doit contenir l'email de l'élève et le nom de la matière à supprimer.
+ * Supprime un fichier de l'utilisateur 
+ * @param {*} req la requête du client, contient :  
+ * • mail : le mail de l'utilisateur  
+ * • name : le nom du fichier à supprimer
  * @param {*} res la réponse du serveur
+ * @returns res, la réponse du serveur
  */
-const deleteAllCoursEleve = (req, res) => {
-    console.log("\n*** Suppression de tous les cours de l'eleve ***")
-    const email = req.body.mail;
-    const matiere = "maths"// req.body.matiere;
-
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(400)
-    }
-
-    const role = req.role;
-    const emailToken = req.mail
-    // seul un eleve peut supprimer un dossier ici, celui à qui appartient les cours
-    if (role == "eleve" && emailToken == email) {
-        Eleve.findOne({
-            attributes: ['ideleve'],
-            where: { courriel: email }
-        })
-            .then(eleve => {
-                if (!eleve) {
-                    console.log("Utilisateur pas trouvé");
-                    return res.status(404).send("Élève inexistant");
-                }
-                const num = eleve.ideleve;
-                let path = "./Eleves/eleve" + num + "/depot/" + matiere;
-
-                deleteMatiere(path, function (code) {
-                    if (code == 201) {
-                        return res.status(code).send("suppression réussie")
-                    }
-                    return res.status(code)
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                return res.send(err).status(520)
-            });
-    } else {
-        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
-        return res.status(403).send("Tentative de suppression de matiere d'un autre utilisateur")
-    }
-}
-
-
 const deleteFile=(req,res)=>{
     console.log("\n*** Suppression d'un cours ***")
     const email = req.body.mail;
@@ -271,4 +280,4 @@ function deleteMatiere(path, cb) {
 }
 
 
-module.exports = { deleteCoursEleve, deleteAllCoursEleve, deleteCoursClasse, deleteAllCoursClasse, deleteFile }
+module.exports = { deleteCoursEleve, deleteCoursClasse, deleteFile }

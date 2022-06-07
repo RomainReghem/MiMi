@@ -8,7 +8,7 @@ const storage = multer.memoryStorage();
 
 /**
  * Fonction de filtre pour multer, sert à valider le type du fichier, dans ce cas, un pdf.
- * @param {*} req 
+ * @param {*} req la requête du client
  * @param {*} file le fichier donné par multer
  * @param {*} cb la fonction callback
  * @returns 

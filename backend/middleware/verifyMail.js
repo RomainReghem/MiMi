@@ -2,9 +2,9 @@ const { Eleve, Classe } = require("../models/users");
 
 
 /**
- * Vérifie le mail, afin de determiner si l'utilisateur actuel a le droit d'y accèder, ainsi que son role
- * @param {*} req la requête
- * @param {*} res la réponse
+ * Vérifie le mail et le role, afin de determiner si l'utilisateur actuel a le droit d'accèder aux fichiers
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
  * @param {*} next ce qui suit
  * @returns une erreur, s'il y en a 
  */
@@ -74,7 +74,7 @@ const verifyAccesGet = (req, res, next) => {
                                     if (classe.courriel != mailDossier) {
                                         return res.status(403).send("Tentative d'accès aux fichiers d'une autre classe");
                                     }
-                                    console.log("tout est bon, la classe appartient à l'élève qui essaie d'y accèder")
+                                    // console.log("tout est bon, la classe appartient à l'élève qui essaie d'y accèder")
                                     next();
                                 })
                                 .catch(err => {
@@ -100,7 +100,7 @@ const verifyAccesGet = (req, res, next) => {
                                     if (!eleve) {
                                         return res.status(403).send("Tentative d'accès aux fichiers d'un élève pas dans la classe.")
                                     }
-                                    console.log("tout est bon, l'élève appartient à la classe qui essaie d'y accèder")
+                                    // console.log("tout est bon, l'élève appartient à la classe qui essaie d'y accèder")
                                     next();
                                 })
                                 .catch(err => {
@@ -117,6 +117,13 @@ const verifyAccesGet = (req, res, next) => {
 }
 
 
+/**
+ * Fonction middleware qui permet de vérifier si l'utilisateur peut sauvegarder/modifier/supprimer
+ * @param {*} req la requête du client, contient notamment le mail de l'utilisateur sur lequel on veut faire le changement de document
+ * @param {*} res la réponse du serveur
+ * @param {*} next la fonction qui suit
+ * @returns la réponse du serveur en cass d'erreur
+ */
 const verifyAccessSave = (req, res, next) => {
     // le mail de la personne qui est censée demander les accès
     const mail = req.body.mail;
@@ -136,7 +143,7 @@ const verifyAccessSave = (req, res, next) => {
         return res.status(400).send("L'adresse mail %s n'est pas de la bonne forme ! ", mail)
     }
 
-    // ON STOCKE EN PREMIER LES ROLES
+    // On veut le role de l'eleve qui veut sauvegarder
     determiningRole(mail, function (err, roleDetermined) {
         if (err) {
             return res.status(520).send(err);
@@ -148,7 +155,7 @@ const verifyAccessSave = (req, res, next) => {
         }
         // on regarde si les deux mails donnés par le client sont équivalent
         if (mailToken == mail) {
-            console.log('pas de problème d\'accès')
+            // console.log('pas de problème d\'accès')
             next()
         } else {
             console.log('Mail trouvé dans le token incorrect : %s et non %s', mailToken, mail)
@@ -157,17 +164,20 @@ const verifyAccessSave = (req, res, next) => {
     })
 }
 
-
-// fonction qui aide à déterminer le role (eleve ou classe) d'un utilisateur en fonction de son adresse mail
+ 
+/**
+ * fonction qui aide à déterminer le role (eleve ou classe) d'un utilisateur en fonction de son adresse mail
+ * @param {*} email le mail de l'utilisateur dont on veut connaître le rôle.
+ * @param {*} callback la fonction qui peut contenir deux variables, une variable d'erreur ou le role
+ */
 function determiningRole(email, callback) {
     // On va regarder si c'est un compte d'élève
     Eleve.findOne({
-        attributes: ["ideleve"]
-        , where: { courriel: email }
+        attributes: ["ideleve"], where: { courriel: email }
     })
         .then(eleve => {
             if (eleve) {
-                console.log("Félicitation ! C'est un élève !")
+                //console.log("Félicitation ! C'est un élève !")
                 return callback(null, "eleve");
             }
             // si ce n'est pas un élève,c'est probablement une classe
@@ -181,7 +191,7 @@ function determiningRole(email, callback) {
                         console.log("Aucun utilisateur avec l'adresse mail %s trouvée :( ", email);
                         return callback(new Error("Aucun utilisateur trouvé ayant cette adresse : %s", email))
                     }
-                    console.log("Oh... C'est une classe...")
+                    //console.log("Oh... C'est une classe...")
                     return callback(null, "classe")
                 })
         })
@@ -194,5 +204,6 @@ function determiningRole(email, callback) {
 
 module.exports = {
     verifyAccesGet,
-    determiningRole, verifyAccessSave
+    determiningRole,
+    verifyAccessSave
 }
