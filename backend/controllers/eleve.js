@@ -174,7 +174,7 @@ const deleteStudent = async (req, res) => {
 
 
 /**
- * Retourne l'invitation et l'id de la classe associée à l'invitation dans un format JSON
+ * Retourne l'invitation, l'id et l'email de la classe associée à l'invitation dans un format JSON
  * 
  * @param {String} emailEleve l'email de l'èleve dont on veut l'invitation
  */
@@ -196,12 +196,12 @@ function getInvitation(emailEleve, cb) {
             }
             const invitation = eleve.invitation;
             if (invitation != "aucune") {
-                Classe.findOne({ attributes: ["idclasse"], where: { idclasse: eleve.idclasse } })
+                Classe.findOne({ attributes: ["idclasse", "courriel"], where: { idclasse: eleve.idclasse } })
                     .then(classe => {
                         if (!classe) {
                             return cb(404);
                         }
-                        return cb({ invitation: invitation, idclasse: classe.idclasse })
+                        return cb({ invitation: invitation, idclasse: classe.idclasse, mailClasse:classe.courriel })
                     })
                     .catch(err => {
                         console.log(err)

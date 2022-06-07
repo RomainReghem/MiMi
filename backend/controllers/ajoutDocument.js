@@ -3,6 +3,7 @@ const Classe = require('../models/users').Classe
 
 const fs = require('fs');
 
+
 /**
  * Sauvegarde sur le serveur le document dont la matière est donné dans le dossier approprié.
  * 
@@ -80,6 +81,7 @@ const saveCoursEleve = (req, res, next) => {
     }
 }
 
+
 /**
  * Sauvegarde sur le serveur le document dont la matière est donné dans le dossier approprié.
  * 
@@ -146,85 +148,6 @@ const saveCoursClasse = (req, res) => {
         return res.status(403).send("Tentative de sauvegarde de cours d'un autre utilisateur")
     }
 }
-
-/**
- * Ajoute dans les dossiers de l'élève donné la matière précisée
- * @param {*} req la requête du client
- * @param {*} res la réponse du serveur
- */
-const addMatiereEleve = (req, res) => {
-    console.log("\n*** Ajout d'une matière ***")
-    const email = req.query.mail;
-    const matiere = "maths"//req.query.matiere;
-
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(407)
-    }
-
-    const role = req.role;
-    const emailToken = req.mail
-    if (role == "eleve" && emailToken == email) {
-        Eleve.findOne({
-            attributes: ['ideleve'],
-            where: { courriel: email }
-        })
-            .then(eleve => {
-                if (!eleve) {
-                    console.log("Utilisateur pas trouvé");
-                    return res.status(404).send("Élève inexistant");
-                }
-                const num = eleve.ideleve;
-                const path = "./Eleves/eleve" + num + "/depot/" + matiere;
-                verificationChemin(path)
-                return res.status(200);
-            });
-    } else {
-        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit')
-        return res.status(403).send("Tentative de sauvegarde de cours d'un autre utilisateur")
-    }
-}
-
-/**
- * Ajoute dans les dossiers de la classe donné la matière précisée
- * @param {*} req la requête du client
- * @param {*} res la réponse du serveur
- */
-const addMatiereClasse = (req, res) => {
-    console.log("\n*** Ajout d'une matière dans la classe***")
-    const email = req.query.mail;
-    const matiere = "maths"//req.query.matiere;
-
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(407)
-    }
-
-    const role = req.role;
-    const emailToken = req.mail
-    if (role == "classe" && emailToken == email) {
-        Classe.findOne({
-            attributes: ['idclasse'],
-            where: { courriel: email }
-        })
-            .then(classe => {
-                if (!classe) {
-                    console.log("Utilisateur pas trouvé");
-                    return res.status(404).send("Classe inexistante");
-                }
-                const num = classe.idclasse;
-                const path = "./Classes/classe" + num + "/depot/" + matiere;
-                verificationChemin(path)
-                return res.status(200);
-            });
-    } else {
-        console.log('soit pas une classe, soit pas la bonne classe : accès interdit')
-        return res.status(403).send("Tentative de sauvegarde de cours d'un autre utilisateur")
-    }
-}
-
 
 const saveFile = (req, res) => {
     const email = req.body.mail;
@@ -319,7 +242,5 @@ function verifNom(path, nom) {
 module.exports = {
     saveCoursEleve,
     saveCoursClasse,
-    addMatiereEleve,
-    addMatiereClasse, 
     saveFile
 }
