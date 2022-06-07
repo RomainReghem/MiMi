@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useRefreshToken from "../../hooks/useRefreshToken";
 import useAuth from "../../hooks/useAuth";
-import { CircularProgress, Progress, Stack, Center,useColorModeValue, Text } from "@chakra-ui/react"
+import { CircularProgress, Progress, Stack, Center,useColorModeValue, Text, Flex } from "@chakra-ui/react"
 import * as React from "react";
 import { motion } from 'framer-motion'
 
@@ -46,7 +46,7 @@ const PersistLogin = () => {
     return (
         <>
             {isLoading
-                ? <Center flexGrow={1}>    
+                ?<Flex direction={'column'} minH={'100%'}> <Center flexGrow={1}>    
                 <Stack>        
                 <motion.svg xmlns="http://www.w3.org/2000/svg" className={itemClass} width="117" height="41" viewBox="0 0 117 41">
                         <motion.path
@@ -62,7 +62,7 @@ const PersistLogin = () => {
                     </motion.svg>
                     <Progress colorScheme={'blue'} size='xs' isIndeterminate />
                     <Text align={'center'} fontSize={'xs'} >Chargement</Text></Stack>
-                </Center>
+                </Center></Flex>
                 : <Outlet />}
 
         </>

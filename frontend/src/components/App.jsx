@@ -17,6 +17,7 @@ import Documents from "./Documents/Documents"
 import Jitsi from "../components/jitsi";
 import TicTacToe from "./Games/TicTacToe";
 import Jeux from "./Games/Jeux"
+import Test from "./test";
 
 import Settings from "./Settings/Settings";
 
@@ -32,18 +33,18 @@ const theme = extendTheme({
     heading: `'Poppins', sans-serif`,
   },
   colors: {
-    space:
-
+    darkblue:
     {
-      900: '#03045e',
-      800: '#023e8a',
-      700: '#0077b6',
-      600: '#0096c7',
-      500: '#00b4d8',
-      400: '#48cae4',
-      300: '#90e0ef',
-      200: '#ade8f4',
-      100: '#caf0f8',
+      50: '#e3f3ff',
+      100: '#bdd9f5',
+      200: '#96bee9',
+      300: '#6ea5dd',
+      400: '#478bd2',
+      500: '#2d71b8',
+      600: '#205890',
+      700: '#143f68',
+      800: '#062641',
+      900: '#000e1b',
     }
   }
 })
@@ -60,8 +61,10 @@ export default function App() {
             <Route path="/register-student" element={<RegisterStudent />} />
             <Route path="/register-class" element={<RegisterClass />} />
             <Route path="/choice" element={<Choice />} />
+            </Route>
 
             <Route element={<PersistLogin />}>
+            <Route path="/" element={<Layout />}>
               <Route element={<RequireAuth />}>
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/documents" element={<Documents />} />
@@ -69,6 +72,7 @@ export default function App() {
                 <Route path="/games" element={<Jeux />} />
                 <Route path="/tictactoe" element={<TicTacToe />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/test" element={<Test />} />
               </Route>
             </Route>
           </Route>
