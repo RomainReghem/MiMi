@@ -18,3 +18,19 @@ body{
     align-items: center;
     height:100px;
 }
+
+.itemDark {
+    overflow: visible;
+    stroke: #90e0ef;
+    stroke-width: 1;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.itemLight {
+    overflow: visible;
+    stroke: #023e8a;
+    stroke-width: 1;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
