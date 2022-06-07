@@ -385,7 +385,7 @@ const getAllCoursClasse = (req, res) => {
 }
 
 
-const getCours=(req, res)=>{
+const getFiles=(req, res)=>{
     console.log("\n*** Récupération des documents ***")
     const mailDossier = req.query.findMail;
     const path='./Documents/'+mailDossier;
@@ -402,188 +402,36 @@ const getCours=(req, res)=>{
     })
 }
 
-// /**
-//  * Retourne le nom de toutes les matières d'un élève
-//  * @param {*} req la requête du client
-//  * @param {*} res la réponse du serveur
-//  */
-//  const getAllMatieresEleve = (req, res) => {
-//     console.log("\n*** Récupération des matières ***")
-//     const email = req.body.mail;
 
-//     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-//         console.log("forme mail incorrect")
-//         return res.status(400).send('Adresse courriel de forme incorrecte.')
-//     }
+const getFile=(req, res)=>{
+    console.log("\n*** Récupération d'un document ***")
+    const mailDossier = req.query.findMail;
+    const name = req.query.name;
 
-//     const emailToken = req.mail;
-//     const role = req.role;
+    let path='./Documents/'+mailDossier
 
-//     if (role == "eleve" && (emailToken != email)) {
-//         return res.status(403).send("Accès interdit")
-//     }
-
-//     Eleve.findOne({
-//         attributes: ['ideleve', 'invitation', 'idclasse'],
-//         where: { courriel: email }
-//     })
-//         .then(eleve => {
-//             if (!eleve) {
-//                 console.log("Utilisateur pas trouvé");
-//                 return res.status(404).send("Élève pas trouvé")
-//             }
-//             const num = eleve.ideleve;
-//             const path = "./Eleves/eleve" + num + "/depot";
-//             if (role == "classe") {
-//                 if (eleve.invitation == "acceptee") {
-//                     Classe.findOne({
-//                         attributes: ['idclasse'],
-//                         where: { courriel: emailToken }
-//                     })
-//                         .then(classe => {
-//                             if (!classe) {
-//                                 return res.status(403).send('pas de classe correspondante : accès interdit')
-//                             }
-//                             if (classe.idclasse != eleve.idclasse) {
-//                                 return res.status(403).send('Une autre classe essaie d\'accèder au fichier de l\'eleve : accès interdit')
-//                             }
-//                             if (fs.existsSync(path)) {
-//                                 fs.readdir(path, function (err, folders) {
-//                                     if (err) {
-//                                         console.log("erreur durant la récupération " + err)
-//                                         return res.status(520);
-//                                     } else {
-//                                         return res.send({ matieres: folders }).status(201)
-//                                     }
-//                                 })
-//                             } else {
-//                                 return res.status(404).send("Dossier inexistant")
-//                             }
-//                         })
-//                         .catch(err => {
-//                             console.log(err)
-//                             return res.send(err).status(520)
-//                         })
-//                 } else {
-//                     return res.status(403).send('Cet élève n\'a aucune classe : accès interdit')
-//                 }
-//             } else {
-//                 if (fs.existsSync(path)) {
-//                     fs.readdir(path, function (err, folders) {
-//                         if (err) {
-//                             console.log("erreur durant la récupération " + err)
-//                             return res.status(520);
-//                         } else {
-//                             return res.send({ matieres: folders }).status(201)
-//                         }
-//                     });
-//                 } else {
-//                     return res.status(404).send("Dossier inexistant")
-//                 }
-//             }
-//         })
-//         .catch(err => {
-//             console.log(err)
-//             return res.send(err).status(520)
-//         })
-// }
-
-
-// /**
-//  * Retourne le nom de toutes les matières d'un élève
-//  * @param {*} req la requête du client
-//  * @param {*} res la réponse du serveur
-//  */
-// const getAllMatieresClasse = (req, res) => {
-//     console.log("\n*** Récupération des matières de la classe ***")
-//     const id = req.query.id;
-
-//     if (id == null) {
-//         return res.status(403).send("Accès interdit")
-//     }
-//     const emailToken = req.mail;
-//     const role = req.role;
-
-//     const path = "./Classes/classe" + id + "/depot";
-
-//     if (role == "eleve") {
-//         // on cherche parmi les eleves de la classe, celui qui a le mail donné
-//         // on vérifie également que l'id existe bien dans la table de la classe
-//         Eleve.findOne({
-//             attributes: ['invitation'],
-//             where: { courriel: emailToken, idclasse: id },
-//             include: [{
-//                 model: Classe,
-//                 attributes: [],
-//                 where: {
-//                     idclasse: id
-//                 }
-//             }]
-//         })
-//             .then(eleve => {
-//                 if (!eleve) {
-//                     return res.status(404).send("Eleve inexistant");
-//                 }
-//                 if (eleve.invitation != "acceptee") {
-//                     return res.status(403).send("Accès interdit")
-//                 }
-//                 if (fs.existsSync(path)) {
-//                     fs.readdir(path, function (err, folders) {
-//                         if (err) {
-//                             console.log("erreur durant la récupération " + err)
-//                             return res.status(520);
-//                         } else {
-//                             return res.json({ matieres: folders })
-//                         }
-//                     })
-//                 } else {
-//                     return res.status(404).send("Dossier inexistant")
-//                 }
-//             })
-//             .catch(err => {
-//                 console.log(err)
-//                 return res.send(err).status(520)
-//             })
-//     } else if (role == "classe") {
-//         Classe.findOne({
-//             attributes: ['idclasse'],
-//             where: { idclasse: id }
-//         })
-//             .then(classe => {
-//                 if (!classe) {
-//                     console.log("Utilisateur pas trouvé");
-//                     return res.status(404).send("Classe pas trouvée")
-//                 }
-//                 if (fs.existsSync(path)) {
-//                     fs.readdir(path, function (err, folders) {
-//                         if (err) {
-//                             console.log("erreur durant la récupération " + err)
-//                             return res.status(520);
-//                         } else {
-//                             return res.json({ matieres: folders })
-//                         }
-//                     })
-//                 } else {
-//                     return res.status(404).send("Dossier inexistant")
-//                 }
-//             })
-//             .catch(err => {
-//                 console.log(err)
-//                 return res.send(err).status(520)
-//             })
-//     } else {
-//         console.log("Role %s inconnu ", role)
-//         return res.status(403).send("Accès interdit")
-//     }
-// }
+    verificationChemin(path);
+    
+    path += "/"+name;
+    if (fs.existsSync(path)) {
+        fs.readFile(path, function (err, fichier) {
+            if (err) {
+                console.log("erreur lors de la recup de fichier " + err)
+                return res.status(520).send(err)
+            }
+            console.log("Récupération ok")
+            return res.status(201).send({ file: fichier });
+        });
+    } else {
+        return res.status(404).send("Dossier inexistant")
+    }
+}
 
 
 module.exports = {
     getAllCoursEleve,
-    //getAllMatieresEleve,
     getCoursEleve,
     getAllCoursClasse,
-    //getAllMatieresClasse,
     getCoursClasse,
-    getCours
+    getFiles, getFile
 }

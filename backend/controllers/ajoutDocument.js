@@ -226,7 +226,7 @@ const addMatiereClasse = (req, res) => {
 }
 
 
-const saveCours = (req, res) => {
+const saveFile = (req, res) => {
     const email = req.body.mail;
     const path = './Documents/' + email
 
@@ -321,5 +321,5 @@ module.exports = {
     saveCoursClasse,
     addMatiereEleve,
     addMatiereClasse, 
-    saveCours
+    saveFile
 }

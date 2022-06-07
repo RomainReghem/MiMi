@@ -116,8 +116,9 @@ router.get('/score', verifyJWT, Score.getScoreTicTacToe)
 
 // test
 // route pour récupèrer les fichiers d'un utilisateur, en fonction de son adresse mail
-router.get('/cours', verifyJWT, verifyAccesGet, Document.getCours)
-router.post('/cours', verifyJWT, verifyAccessSave, AjoutDoc.saveCours)
+router.get('/files', verifyJWT, verifyAccesGet, Document.getFiles)
+router.get('/file', verifyJWT, verifyAccesGet, Document.getFile)
+router.post('/file', verifyJWT, verifyAccessSave, AjoutDoc.saveFile)
 
 // PAS IMPLEMENTE : MATIERES 
  /*PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
