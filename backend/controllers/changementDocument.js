@@ -65,7 +65,7 @@ const renameCoursEleve = (req, res) => {
                 return res.send(err).status(520)
             });
     } else {
-        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit.\nrole %s mail %s',req.role, req.mail)
+        console.log('soit pas un eleve, soit pas le bon eleve : accès interdit.\nrole %s mail %s', req.role, req.mail)
         return res.status(403).send("Tentative de renommage de cours d'un autre utilisateur")
     }
 }
@@ -83,8 +83,8 @@ const renameCoursClasse = (req, res) => {
     let nouvCours = req.body.newName;
     const ancienCours = req.body.currentName;
     const matiere = "maths"//req.body.matiere;
-    if(nouvCours==""){
-        nouvCours=ancienCours;
+    if (nouvCours == "") {
+        nouvCours = ancienCours;
     }
     // on va vérifier que le nom du fichier finisse bien par ".pdf", si ce n'est pas le cas, on l'ajoutera au nom
     if (!(nouvCours.match("(.pdf|.PDF)$"))) {
@@ -143,7 +143,7 @@ function renameDoc(path, oldname, newname, callback) {
             return callback(201);
             // sinon le document n'a pas été trouvé
         } else {
-            console.log("Pas de dossier/fichier portant le nom " + oldname + " trouvé dans le chemin %s.",path);
+            console.log("Pas de dossier/fichier portant le nom " + oldname + " trouvé dans le chemin %s.", path);
             return callback(404);
         }
     } catch (err) {
@@ -153,7 +153,30 @@ function renameDoc(path, oldname, newname, callback) {
 }
 
 
+const renameFile = (req, res) => {
+    console.log("\n*** Changement de nom de fichier ***")
+
+    let nouvCours = req.body.newName;
+    const ancienCours = req.body.currentName;
+    const email = req.body.mail
+
+    if (nouvCours == "") {
+        nouvCours = ancienCours;
+    }
+
+    // on va vérifier que le nom du fichier finisse bien par ".pdf", si ce n'est pas le cas, on l'ajoutera au nom
+    if (!(nouvCours.match("(.pdf|.PDF)$"))) {
+        nouvCours += '.pdf'
+    }
+
+    let path = "./Documents/" + email + "/";
+
+    renameDoc(path, ancienCours, nouvCours, function (code) {
+        return res.sendStatus(code)
+    })
+}
+
 module.exports = {
     renameCoursClasse,
-    renameCoursEleve
+    renameCoursEleve, renameFile
 }

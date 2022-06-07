@@ -191,7 +191,7 @@ const getAllCoursEleve = (req, res) => {
             }
         })
         .catch(err => {
-            console.log("Erreur Eleve.findOne " + err)
+            console.log("Erreur Eleve.findOne " + err);
             return res.status(520).send("Erreur lors de la vérification des données")
         })
 }
@@ -305,6 +305,7 @@ const getAllCoursClasse = (req, res) => {
     const matiere = "maths"//req.query.cours;
 
     if (id == null) {
+        console.log("accès interdit")
         return res.status(403).send("Accès interdit")
     }
     const emailToken = req.mail;
@@ -328,21 +329,25 @@ const getAllCoursClasse = (req, res) => {
         })
             .then(eleve => {
                 if (!eleve) {
+                    console.log("Eleve inexistant");
                     return res.status(404).send("Eleve inexistant");
                 }
                 if (eleve.invitation != "acceptee") {
+                    console.log("accès interdiiiit");
                     return res.status(403).send("Accès interdit")
                 }
                 if (fs.existsSync(path)) {
                     fs.readdir(path, function (err, files) {
                         if (err) {
-                            console.log("erreur durant la récupération " + err)
+                            console.log("erreur durant la récupération " + err);
                             return res.status(520).send("Erreur lors de la récupération des fichiers");
                         } else {
-                            return res.status(201).send({ files })
+                            console.log("recup reussieeeee");
+                            return res.status(201).send({ files });
                         }
                     })
                 } else {
+                    console.log('dossier inecistant');
                     return res.status(404).send("Dossier inexistant")
                 }
             })
@@ -350,7 +355,6 @@ const getAllCoursClasse = (req, res) => {
                 console.log("error ELEVE find one " + err)
                 return res.status(520).send("Erreur lors de la vérification des données.");
             })
-
     }
     if (role == "classe") {
         Classe.findOne({
@@ -380,8 +384,6 @@ const getAllCoursClasse = (req, res) => {
                 return res.status(520).send("Erreur lors de la récupération des cours.");
             })
     }
-    console.log("Role %s inconnu ", role)
-    return res.status(403).send("Accès interdit")
 }
 
 
@@ -407,6 +409,7 @@ const getFile=(req, res)=>{
     console.log("\n*** Récupération d'un document ***")
     const mailDossier = req.query.findMail;
     const name = req.query.name;
+    console.log("nom du mail : "+mailDossier)
 
     let path='./Documents/'+mailDossier
 

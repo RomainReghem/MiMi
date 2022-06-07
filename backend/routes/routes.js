@@ -114,11 +114,17 @@ router.post('/changeMailEleve',verifyJWT, ModificationEleve.ChangementMail)
 // route pour récupérer un score de jeu (appel à chaque fin de partie)
 router.get('/score', verifyJWT, Score.getScoreTicTacToe)
 
-// test
-// route pour récupèrer les fichiers d'un utilisateur, en fonction de son adresse mail
+// Modification des fichiers
+// route pour récupèrer le nom des fichiers d'un utilisateur, en fonction de son adresse mail
 router.get('/files', verifyJWT, verifyAccesGet, Document.getFiles)
+// route pour récupèrer un fichier particulier
 router.get('/file', verifyJWT, verifyAccesGet, Document.getFile)
+// route pour déposer un fichier
 router.post('/file', verifyJWT, verifyAccessSave, AjoutDoc.saveFile)
+// route pour supprimer un fichier
+router.delete('/file', verifyJWT, verifyAccessSave, SuppressionDoc.deleteFile)
+// route pour renommer un fichier
+router.put('/file', verifyJWT, verifyAccessSave, ChangeDoc.renameFile )
 
 // PAS IMPLEMENTE : MATIERES 
  /*PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS

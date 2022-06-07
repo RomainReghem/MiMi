@@ -224,6 +224,23 @@ const deleteAllCoursEleve = (req, res) => {
     }
 }
 
+
+const deleteFile=(req,res)=>{
+    console.log("\n*** Suppression d'un cours ***")
+    const email = req.body.mail;
+    const cours=req.body.name;
+
+    let path = "./Documents/" + email + "/" + cours;
+
+    const code = deleteCours(path)
+    console.log("code http : " + code)
+    if (code == 201) {
+        return res.status(code).send("suppression réussie")
+    }
+    return res.sendStatus(code);
+}
+
+
 /**
  * Supprimer un repértoire en fonction du chemin donné.
  * @param {String} path le chemin du dossier à supprimer
@@ -254,4 +271,4 @@ function deleteMatiere(path, cb) {
 }
 
 
-module.exports = { deleteCoursEleve, deleteAllCoursEleve, deleteCoursClasse, deleteAllCoursClasse }
+module.exports = { deleteCoursEleve, deleteAllCoursEleve, deleteCoursClasse, deleteAllCoursClasse, deleteFile }
