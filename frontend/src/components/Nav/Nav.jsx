@@ -135,6 +135,15 @@ const DesktopNav = () => {
     const linkColor = useColorModeValue('gray.600', 'gray.200');
     const linkHoverColor = useColorModeValue('gray.800', 'white');
     const popoverContentBgColor = useColorModeValue('white', 'gray.800');
+    const {auth} = useAuth();
+
+    const NAV_ITEMS = auth?.user ?  [
+        { label: 'Profil', href: '/profile', },
+        { label: 'Documents', href: '/documents', },
+        { label: 'Visioconférence', href: '/video', },
+        { label: 'Jeux', href: '/games', },
+        { label:'test', href:'/test' }
+    ] : [{label: 'Accueil', href:'/'}, { label: 'Tableau de bord', href: '/profile', }];
 
     return (
         <Stack direction={'row'} spacing={4}>
@@ -183,7 +192,7 @@ const DesktopNav = () => {
 const DesktopSubNav = ({ label, href, subLabel }) => {
     return (
         <Link
-        as={ReactRouterLink}
+            as={ReactRouterLink}
             to={href}
             role={'group'}
             display={'block'}
@@ -217,6 +226,16 @@ const DesktopSubNav = ({ label, href, subLabel }) => {
 };
 
 const MobileNav = () => {
+    const { auth } = useAuth();
+
+    const NAV_ITEMS = auth?.user ?  [
+        { label: 'Profil', href: '/profile', },
+        { label: 'Documents', href: '/documents', },
+        { label: 'Visioconférence', href: '/video', },
+        { label: 'Jeux', href: '/games', },
+        { label:'test', href:'/test' }
+    ] : [{label: 'Accueil', href:'/'}, { label: 'Tableau de bord', href: '/profile', }];
+
     return (
         <Stack
             bg={useColorModeValue('white', 'gray.800')}
@@ -279,27 +298,3 @@ const MobileNavItem = ({ label, children, href }) => {
         </Stack>
     );
 };
-
-
-const NAV_ITEMS = [
-    {
-        label: 'Profil',
-        href: '/profile',
-    },
-    {
-        label: 'Documents',
-        href: '/documents',
-    },
-    {
-        label: 'Visioconférence',
-        href: '/video',
-    },
-    {
-        label: 'Jeux',
-        href: '/games',
-    },
-    {
-        label:'test',
-        href:'/test'
-    }
-];
