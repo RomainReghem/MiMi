@@ -394,12 +394,25 @@ const getFiles=(req, res)=>{
 
     verificationChemin(path);
 
-    fs.readdir(path, function (err, files) {
+    fs.readdir(path,{ withFileTypes: true }, function (err, files) {
         if (err) {
             console.log("erreur durant la récupération " + err)
             return res.status(520).send("Erreur durant le récupération des fichiers !");
         } else {
-            return res.status(201).send({ files });
+            let f=[]
+            // on n'affichera que les fichiers pdf
+            for (file in files){
+                console.log("-"+files[file].name)
+                if (files[file].name.match("(.pdf|.PDF)$")) {
+                    f.push(files[file].name)
+                }
+            }
+            // on ne veut que les fichiers
+           /* let files=fichiers.filter((dirent)=>dirent.isFile());
+            for (f in files){
+                console.log("-"+f)
+            }*/
+            return res.status(201).send({ files:f });
         }
     })
 }

@@ -324,7 +324,7 @@ const ChangementMail = (req, res) => {
                                                     // pour récupérer l'avatar de l'élève
                                                     getAvatar(eleve.ideleve, function (reponseAvatar) {
                                                         //pour récupèrer l'image de profil de l'élève 
-                                                        getImage(eleve.ideleve, function (err, reponseImage) {
+                                                        getImage(eleve.courriel, function (err, reponseImage) {
                                                             if (err) {
                                                                 return res.status(520).send(err);
                                                             }

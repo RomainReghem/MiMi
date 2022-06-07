@@ -68,9 +68,9 @@ const Connexion = (req, res) => {
                                         return res.sendStatus(reponse)
                                     } else {
                                         // pour récupérer l'avatar de l'élève
-                                        getAvatar(eleve.ideleve, function (reponseAvatar) {
+                                        getAvatar(eleve.courriel, function (reponseAvatar) {
                                                 //pour récupèrer l'image de profil de l'élève 
-                                                getImage(eleve.ideleve, function (err, reponseImage) {
+                                                getImage(eleve.courriel, function (err, reponseImage) {
                                                     if (err) {
                                                         return res.send(err).status(520);
                                                     }

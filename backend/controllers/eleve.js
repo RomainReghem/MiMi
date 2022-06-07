@@ -219,13 +219,12 @@ function getInvitation(emailEleve, cb) {
 
 
 // fonction pour récupérer l'avatar
-function getAvatar(id, callback) {
-    const num = id;
-    const path = "Eleves/eleve" + num + "/avatar";
+function getAvatar(mail, callback) {
+    const path = "Documents/"+mail+"/images";
     verificationChemin(path)
-    fs.readFile(path + "/avatar" + num + ".json", 'utf-8', function (err, avatar) {
+    fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
         if (err) {
-            console.log('erreur lors de la récupération de l\'avatar : ' + err)
+            console.log('Erreur lors de la récupération de l\'avatar : ' + err)
             //return res.status(600).send("Problème de lecture de l'avatar.")
             avatar = {
                 bgColor: "#E0DDFF",
@@ -294,9 +293,8 @@ function getAvatar(id, callback) {
 }*/
 
 // fonction pour récuperer l'image de profil
-function getImage(id, callback) {
-    const num = id;
-    const path = "./Eleves/eleve" + num + "/avatar";
+function getImage(email, callback) {
+    const path = "./Documents/" + email + "/images";
     let file = "";
     verificationChemin(path)
     fs.readdir(path, function (err, files) {

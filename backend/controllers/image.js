@@ -30,7 +30,22 @@ const saveAvatar = (req, res) => {
         // erreur 400
         return res.sendStatus(407)
     }
-    Eleve.findOne({
+
+    const path="./Documents/"+email+"/images";
+    avatar = JSON.stringify(avatar)
+    verificationChemin(path)
+    // on enregistre le fichier JSON correspondant à l'avatar de l'élève
+    fs.writeFile(path + "/avatar.json", avatar, 'utf8', function (err) {
+        if (err) {
+            console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+        }
+        console.log("Le fichier JSON a bien été sauvegardé");
+        res.status(201).send("Enregistrement effectué");
+    });
+
+    /*Eleve.findOne({
+        attributes:['ideleve']
         where:
             { courriel: email }
     })
@@ -61,7 +76,7 @@ const saveAvatar = (req, res) => {
         .catch(err => {
             console.log(err)
             return res.send(err).status(520)
-        })
+        })*/
 }
 
 /**
@@ -91,12 +106,43 @@ const getAvatar = (req, res) => {
     console.log("\n*** Récupération d'avatar ***")
 
     const email = req.query.mail;
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+    const path="./Documents/"+email+"/images/avatar.json";
+
+    verificationChemin(path)
+    fs.readFile(path+"/avatar.json", 'utf-8', function (err, avatar) {
+        if (err) {
+            console.log('Erreur lors de la récupération de l\'avatar : '+err)
+            //return res.status(600).send("Problème de lecture de l'avatar.")
+            avatar = {
+                bgColor: "#E0DDFF",
+                earSize: "small",
+                eyeBrowStyle: "up",
+                eyeStyle: "oval",
+                faceColor: "#AC6651",
+                glassesStyle: "none",
+                hairColor: "#000",
+                hairStyle: "thick",
+                hatColor: "#000",
+                hatStyle: "none",
+                mouthStyle: "laugh",
+                noseStyle: "round",
+                shape: "square",
+                shirtColor: "#6BD9E9",
+                shirtStyle: "polo"
+            }
+            avatar = JSON.stringify(avatar)
+        }
+        console.log("avatar récupéré")
+        // on envoie le fichier json au front
+        res.json({ avatar: avatar })
+    })
+    
+  /* if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
         // erreur 400
         return res.sendStatus(407)
     }
-    Eleve.findOne({
+    Eleve.findOne({attributes:["ideleve"],
         where:
             { courriel: email }
     })
@@ -143,11 +189,11 @@ const getAvatar = (req, res) => {
                 return res.json(avatar).status(200)
             })*/
             
-        })
+      /*  })
         .catch(err => {
             console.log(err)
             return res.send(err).status(520)
-        })
+        })*/
 }
 
 /**
@@ -202,7 +248,40 @@ const savePicture = (req, res) => {
         // erreur 400
         return res.sendStatus(407)
     }
-    Eleve.findOne({
+
+    const path="./Documents/"+email+"/images"
+    verificationChemin(path)
+            const type = img.mimetype.split("/")[1]
+            console.log("type " + type)
+            // avant de sauvegarder on va supprimer les anciennes photos de profil, s'il en existe
+            fs.readdir(path, function (err, files) {
+                if (err) {
+                    console.log("erreur durant la récupération " + err)
+                    return res.status(600).send('Erreur lors de la récupération de la pp.');
+                }
+                // on va supprimer l'ancienne photo de profil
+                for (const f of files) {
+                    if (f.startsWith('photo')) {
+                        fs.unlink(path + "/" + f, function (err) {
+                            if (err) {
+                                console.log("erreur lors de la suppression de pp " + err)
+                                return res.status(520).send(err)
+                            }
+                            //console.log("Suppression ok")
+                        });
+                    }
+                }
+                // sauvegarde image
+                fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err, data) {
+                    if (err) {
+                        console.log("Erreur lors de l'enregistrement de la photo : " + err);
+                        return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                    }
+                    console.log("La photo a bien été sauvegardée");
+                    return res.json(img.buffer).status(201);
+                });
+            })
+   /* Eleve.findOne({
         where: { courriel: email }
     })
         .then(eleve => {
@@ -248,7 +327,7 @@ const savePicture = (req, res) => {
         .catch(err => {
             console.log(err)
             return res.send(err).status(520)
-        })
+        })*/
 }
 
 /**
