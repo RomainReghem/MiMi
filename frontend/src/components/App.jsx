@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Routes, Route, } from "react-router-dom";
+import { Routes, Route, Switch } from "react-router-dom";
 
 import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react';
 
@@ -18,6 +18,7 @@ import Jitsi from "../components/jitsi";
 import TicTacToe from "./Games/TicTacToe";
 import Jeux from "./Games/Jeux"
 import Test from "./test";
+import NotFound from "./NotFound"
 
 import Settings from "./Settings/Settings";
 
@@ -76,6 +77,7 @@ export default function App() {
               </Route>
             </Route>
           </Route>
+          <Route path='*' element={<NotFound/>}/>
         </Routes>
 
 

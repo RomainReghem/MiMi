@@ -11,6 +11,7 @@ body{
 }
 
 #jitsi-iframe{
+    z-index: 99;
     display: flex;
     flex-grow: 1;
     flex-shrink: 1;
