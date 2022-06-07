@@ -2,7 +2,7 @@ import React, { Component, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import { useState } from 'react';
-import {Center, Stack} from "@chakra-ui/react"
+import {Center, Spinner, Stack} from "@chakra-ui/react"
 
 const JitsiComponent = () => {
 
@@ -121,7 +121,7 @@ const JitsiComponent = () => {
         <> 
         {!auth?.idclasse
             ? <p> Rejoignez une classe pour accéder à la visioconférence </p>
-            : <div id="jitsi-iframe"></div>
+            : <><Spinner position={'absolute'} top='50%' left='50%' zIndex={1}/><div id="jitsi-iframe"></div></>
         }
         
 
