@@ -1,6 +1,6 @@
 import PDFSender from "../Documents/PDFSender"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useToast, Tooltip, Text, Button, Container, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls, Badge, Kbd } from "@chakra-ui/react";
+import { useToast, Tooltip, Text, Button, useDisclosure, ModalOverlay, Modal, ModalHeader, ModalCloseButton, ModalContent, ModalBody, ModalFooter, Input, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls, Badge, Kbd } from "@chakra-ui/react";
 import PDFViewer from "../Documents/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faXmark, faPencil, faEye } from "@fortawesome/free-solid-svg-icons";
@@ -14,6 +14,7 @@ const Documents = () => {
     const { auth } = useAuth();
     const toast = useToast();
     const axiosPrivate = useAxiosPrivate();
+    const { onOpen, onClose, isOpen } = useDisclosure()
 
     const getStudents = useGetStudents();
     const [students, setStudents] = useState([]);
@@ -29,6 +30,8 @@ const Documents = () => {
     const [file, setFile] = useState(null);
 
     const [loadingFiles, setLoadingFiles] = useState(false);
+    const [renaming, setRenaming] = useState('')
+    const [renamedName, setRenamedName] = useState('')
 
     let myFilesParams = (auth?.role == "classe" ? { mail: auth?.user, findMail: auth?.user } : { mail: auth?.user, findMail: auth?.user })
     let sharedFilesParams = (auth?.role == "classe" ? { mail: auth?.user, findMail: localStorage.getItem("mailEleve") } : { mail: auth?.user, findMail: auth?.mailclasse })
@@ -72,7 +75,7 @@ const Documents = () => {
     const deleteFile = async (fileName) => {
         try {
             const response = await axiosPrivate.delete('file', {
-                data: { mail:auth?.user, name:fileName },
+                data: { mail: auth?.user, name: fileName },
             });
             loadFiles()
             toast({ title: "Fichier supprimé", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
@@ -84,14 +87,18 @@ const Documents = () => {
     }
 
     const editFileName = async (newName, currentName) => {
+        if (!newName) {
+            return;
+        }
         try {
-            console.log(newName, currentName)
-            await axiosPrivate.put('file', JSON.stringify({ ...editFileParams, newName, currentName }),
+            await axiosPrivate.put('file', JSON.stringify({ mail: auth?.user, newName, currentName }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            toast({ title: "Fichier modifié", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
+            toast({ title: "Fichier renommé !", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
+            loadFiles()
+            setRenamedName('')
         }
         catch (err) {
             console.log(err)
@@ -103,7 +110,7 @@ const Documents = () => {
             <Wrap spacing={10} p={5} justify={'center'} align={'center'}>
                 <Stack spacing={4} w={useBreakpointValue({ base: "xs", md: "md" })}>
                     <Heading fontSize={'2xl'}>Gestion des documents</Heading>
-                    <Text fontSize={'xs'} fontFamily={'mono'}><Kbd colorScheme={'green'}>Clic</Kbd> sur le nom d'un document pour le renommer</Text>
+                    <Text fontSize={'xs'} fontFamily={'mono'}><Kbd colorScheme={'green'}>Clic</Kbd> sur le nom d'un document pour le visualiser</Text>
                     <Stack w={'100%'} direction={'row'}>
                         <Tooltip label="Charger les fichiers" fontSize='md' placement="top">
                             <Button onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></Button>
@@ -115,20 +122,14 @@ const Documents = () => {
                         {menuSelection?.length > 0 && Array.from(Array(menuSelection?.length), (e, i) => {
                             return <Stack key={i} direction={'row'} w={'100%'}>
 
-                                <Button w={'100%'} justifyContent={'flex-start'}>
-                                    <Text>{menuSelection[i]}</Text>
-                                    {/* <Editable defaultValue={menuSelection[i]} noOfLines={1} onSubmit={(e) => { editFileName(e, menuSelection[i]) }}>
-                                        <EditablePreview />
-                                        <EditableInput />
-                                    </Editable> */}
+                                <Button w={'100%'} onClick={() => setFile(menuSelection[i])} noOfLines={1}>
+                                    {menuSelection[i]}
                                 </Button>
-                                <Tooltip label="Voir le fichier" fontSize='md' placement="top">
-                                    <IconButton colorScheme={'gray'} onClick={() => setFile(menuSelection[i])} icon={<FontAwesomeIcon icon={faEye} />}></IconButton>
-                                </Tooltip>
-
                                 {selectedUI == "my" ? <>
-
-                                    <Tooltip bg={'red.400'} label="Supprimer le fichier" fontSize='md' placement="top">
+                                    <Tooltip label="Renommer" fontSize='md' placement="top">
+                                        <IconButton colorScheme={'gray'} onClick={() => { onOpen(); setRenaming(menuSelection[i]) }} icon={<FontAwesomeIcon icon={faPencil} />}></IconButton>
+                                    </Tooltip>
+                                    <Tooltip bg={'red.400'} label="Supprimer" fontSize='md' placement="top">
                                         <IconButton colorScheme={'red'} onClick={(e) => { deleteFile(menuSelection[i]) }} icon={<FontAwesomeIcon icon={faXmark} />}></IconButton>
                                     </Tooltip></> : <></>}</Stack>
                         })}
@@ -141,6 +142,22 @@ const Documents = () => {
                     <PDFViewer clickedFile={file} selected={selectedUI} />
                 </Stack>
             </Wrap>
+            <Modal isOpen={isOpen} onClose={() => {onClose(); setRenamedName('')}} isCentered>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader noOfLines={1}>Renommer {renaming}</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody pb={2}>
+                        <Input onChange={(e) => setRenamedName(e.target.value)} placeholder='Nouveau nom' />
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button onClick={() => {onClose(); setRenamedName('')}} mr={3}>Cancel</Button>
+                        <Button onClick={() => { editFileName(renamedName, renaming); onClose() }} colorScheme='green' >
+                            Save
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Center>
 
     )

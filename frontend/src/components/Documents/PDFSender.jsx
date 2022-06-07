@@ -31,7 +31,7 @@ const PDFSender = (props) => {
         formData.append("mail", auth?.user)
         console.log(selectedFile.name);
         try {
-            const response = await axiosPrivate.post(saveFileURL, formData,
+            const response = await axiosPrivate.post('file', {formData, mail:auth?.user},
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
