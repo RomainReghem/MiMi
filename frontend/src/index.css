@@ -21,7 +21,7 @@ body{
 
 .itemDark {
     overflow: visible;
-    stroke: #90e0ef;
+    stroke: #90CDF4;
     stroke-width: 1;
     stroke-linejoin: round;
     stroke-linecap: round;
@@ -29,7 +29,7 @@ body{
 
 .itemLight {
     overflow: visible;
-    stroke: #023e8a;
+    stroke: #3182ce;
     stroke-width: 1;
     stroke-linejoin: round;
     stroke-linecap: round;
