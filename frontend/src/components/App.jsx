@@ -1,8 +1,7 @@
 import * as React from "react";
 import { Routes, Route, } from "react-router-dom";
 
-import { ColorModeScript } from '@chakra-ui/react';
-import { ChakraProvider, theme, } from '@chakra-ui/react';
+import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react';
 
 import Layout from "./Layout"
 import Home from "./Home"
@@ -25,6 +24,29 @@ import Settings from "./Settings/Settings";
 import '../styles/tictactoe.css'
 import '../styles/documents.css'
 import '../styles/cell.css'
+import '@fontsource/poppins/700.css'
+import '@fontsource/poppins/600.css'
+
+const theme = extendTheme({
+  fonts: {
+    heading: `'Poppins', sans-serif`,
+  },
+  colors: {
+    space:
+
+    {
+      900: '#03045e',
+      800: '#023e8a',
+      700: '#0077b6',
+      600: '#0096c7',
+      500: '#00b4d8',
+      400: '#48cae4',
+      300: '#90e0ef',
+      200: '#ade8f4',
+      100: '#caf0f8',
+    }
+  }
+})
 
 export default function App() {
   return (
@@ -45,8 +67,8 @@ export default function App() {
                 <Route path="/documents" element={<Documents />} />
                 <Route path="/video" element={<Jitsi />} />
                 <Route path="/games" element={<Jeux />} />
-                <Route path="/tictactoe" element={<TicTacToe/>}/> 
-                <Route path="/settings" element={<Settings/>}/>
+                <Route path="/tictactoe" element={<TicTacToe />} />
+                <Route path="/settings" element={<Settings />} />
               </Route>
             </Route>
           </Route>

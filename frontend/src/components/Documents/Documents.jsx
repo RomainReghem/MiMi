@@ -115,24 +115,24 @@ const Documents = () => {
                         <Tooltip label="Charger les fichiers" fontSize='md' placement="top">
                             <Button onClick={loadFiles}><FontAwesomeIcon className="fileRefresh" icon={faRotate} spin={loadingFiles} /></Button>
                         </Tooltip>
-                        <Button colorScheme={'blue'} onClick={() => { setMenuSelection(myFiles); setSelectedUI("my") }} style={selectedUI == "my" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Mes documents partagés</Text></Button>
-                        <Button colorScheme={'blue'} onClick={() => { setMenuSelection(sharedFiles); setSelectedUI("shared") }} style={selectedUI == "shared" ? ({ textDecoration: "underline" }) : ({ textDecoration: "none" })}><Text noOfLines={1}>Partagés avec moi</Text></Button>
+                        <Button colorScheme={selectedUI == "my" ? 'blue' : 'gray'} onClick={() => { setMenuSelection(myFiles); setSelectedUI("my") }}><Text noOfLines={1} fontFamily='heading' fontWeight={'600'} fontSize={'sm'}>Mes documents partagés</Text></Button>
+                        <Button colorScheme={selectedUI == "shared" ? 'blue' : 'gray'} onClick={() => { setMenuSelection(sharedFiles); setSelectedUI("shared") }}><Text noOfLines={1} fontFamily='heading' fontWeight={'600'} fontSize={'sm'}>Partagés avec moi</Text></Button>
                     </Stack>
                     <Stack w={'100%'} h={'xs'} overflowY="auto" p={1}>
-                        {menuSelection?.length > 0 && Array.from(Array(menuSelection?.length), (e, i) => {
+                        {menuSelection?.length > 0 ? Array.from(Array(menuSelection?.length), (e, i) => {
                             return <Stack key={i} direction={'row'} w={'100%'}>
 
                                 <Button w={'100%'} onClick={() => setFile(menuSelection[i])} noOfLines={1}>
                                     {menuSelection[i]}
                                 </Button>
-                                {selectedUI == "my" ? <>
+                                {selectedUI == "my" && <>
                                     <Tooltip label="Renommer" fontSize='md' placement="top">
                                         <IconButton colorScheme={'gray'} onClick={() => { onOpen(); setRenaming(menuSelection[i]) }} icon={<FontAwesomeIcon icon={faPencil} />}></IconButton>
                                     </Tooltip>
                                     <Tooltip bg={'red.400'} label="Supprimer" fontSize='md' placement="top">
                                         <IconButton colorScheme={'red'} onClick={(e) => { deleteFile(menuSelection[i]) }} icon={<FontAwesomeIcon icon={faXmark} />}></IconButton>
-                                    </Tooltip></> : <></>}</Stack>
-                        })}
+                                    </Tooltip></>}</Stack>
+                        }) : <Text fontFamily={'mono'}>Aucun document à charger</Text>}
                     </Stack>
                     <Stack w={'100%'}>
                         <PDFSender reload={loadFiles} />

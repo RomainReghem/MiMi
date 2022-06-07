@@ -104,10 +104,10 @@ const AvatarComponent = () => {
                 </Stack>
                 <Stack direction={'row'} justify='center'>
                     <Tooltip label='Générer un avatar aléatoire' fontSize='md' placement="bottom">
-                    <Button onClick={RandomC}>Aléatoire</Button>
+                    <Button variant={'outline'} colorScheme={'blue'} onClick={RandomC}>Aléatoire</Button>
                     </Tooltip>
                     <Tooltip label="Sauvegarder l'avatar" fontSize='md' placement="bottom">
-                    <Button onClick={() => { Save(); SaveDB(); }}>Sauvegarder</Button>
+                    <Button variant={'outline'} colorScheme={'green'} onClick={() => { Save(); SaveDB(); }}>Sauvegarder</Button>
                     </Tooltip>
                 </Stack>
 

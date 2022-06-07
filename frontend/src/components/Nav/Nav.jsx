@@ -79,11 +79,11 @@ export default function Nav() {
                             (
                                 <Image h={'100%'} w={'100%'} objectFit={'cover'} src={imageURL}></Image>
                             )}</Box> : <></>}
-                        <Badge
-                            textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-                            colorScheme='gray'>
-                            {auth?.role == "eleve" ? userData?.pseudo : auth?.role == "classe" ? "classe #" + auth?.idclasse : <></>}
-                        </Badge>
+                    <Badge
+                        textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
+                        colorScheme='gray'>
+                        {auth?.role == "eleve" ? userData?.pseudo : auth?.role == "classe" ? "classe #" + auth?.idclasse : <></>}
+                    </Badge>
 
                     <Flex display={{ base: 'none', md: 'flex' }} ml={5}>
                         <DesktopNav />
@@ -102,22 +102,22 @@ export default function Nav() {
                                 variant={'unstyled'}
                                 fontSize={'sm'}
                                 fontWeight={400}
-                                _focus={{outline:'none'}}>
+                                _focus={{ outline: 'none' }}>
                                 S'inscrire
                             </Button>
                         </Link>
-                        
-                            <Button
-                            onClick={() => {navigate('/login')}}
-                                fontSize={'sm'}
-                                fontWeight={600}
-                                colorScheme={'blue'}
-                                >
-                                Se connecter
-                            </Button>
-                        </>}
+
+                        <Button
+                            onClick={() => { navigate('/login') }}
+                            fontSize={'sm'}
+                            fontWeight={600}
+                            colorScheme={'blue'}
+                        >
+                            Se connecter
+                        </Button>
+                    </>}
                     {auth?.user && <Link as={ReactRouterLink} to="/settings"><IconButton colorScheme={'teal'} icon={<FontAwesomeIcon icon={faGear} />}></IconButton></Link>}
-                    <ColorModeSwitcher display={{base:'none', md:'inline-flex'}} />
+                    <ColorModeSwitcher display={{ base: 'none', md: 'inline-flex' }} />
                     {auth?.user && <>
                         <Button display={{ base: 'none', md: 'inline-flex' }} onClick={signOut} colorScheme={'red'}>Déconnexion</Button>
                         <IconButton display={{ base: 'inline-flex', md: 'none' }} onClick={signOut} colorScheme={'red'} icon={<FontAwesomeIcon icon={faPowerOff} />}></IconButton></>}
@@ -146,7 +146,8 @@ const DesktopNav = () => {
                                 p={2}
                                 href={navItem.href ?? '#'}
                                 fontSize={'sm'}
-                                fontWeight={500}
+                                fontFamily={'heading'}
+                                fontWeight={600}
                                 color={linkColor}
                                 _hover={{
                                     textDecoration: 'none',
@@ -192,7 +193,8 @@ const DesktopSubNav = ({ label, href, subLabel }) => {
                     <Text
                         transition={'all .3s ease'}
                         _groupHover={{ color: 'pink.400' }}
-                        fontWeight={500}>
+                        fontFamily={'heading'}
+                        fontWeight={600}>
                         {label}
                     </Text>
                     <Text fontSize={'sm'}>{subLabel}</Text>
@@ -240,6 +242,7 @@ const MobileNavItem = ({ label, children, href }) => {
                     textDecoration: 'none',
                 }}>
                 <Text
+                    fontFamily={'heading'}
                     fontWeight={600}
                     color={useColorModeValue('gray.600', 'gray.200')}>
                     {label}
