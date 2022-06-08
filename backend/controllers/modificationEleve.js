@@ -3,7 +3,7 @@ const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
 const { getInvitation } = require('./eleve');
-const {getAvatar, getImage} = require('./image')
+const { getAvatar, getImage, getAvatarAsImage } = require('./image')
 
 const Modification = require('./modificationInvitation.js')
 const bcrypt = require('bcrypt');
@@ -319,7 +319,7 @@ const ChangementMail = (req, res) => {
                                             console.log("Changement de mail ok")
                                             // On récupère des informations sur l'élève pour les renvoyer au client
                                             getInvitation(newEmail, function (reponse) {
-                                                if (reponse == 404 || reponse == 400 || reponse==520) {
+                                                if (reponse == 404 || reponse == 400 || reponse == 520) {
                                                     return res.sendStatus(reponse)
                                                 } else {
                                                     // pour récupérer l'avatar de l'élève
@@ -330,8 +330,14 @@ const ChangementMail = (req, res) => {
                                                                 return res.status(520).send(err);
                                                             }
                                                             console.log('envoi des infos')
-                                                            res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                            return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
+                                                            getAvatarAsImage(eleve.courriel, function (err, reponseAvatarAsImage) {
+                                                                if (err) {
+                                                                    return res.status(520).send(err);
+                                                                }
+                                                                console.log('envoi des infos')
+                                                                res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                                return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseAvatarAsImage, reponseImage));
+                                                            })
                                                         })
                                                     })
                                                 }

@@ -2,19 +2,8 @@
 const fs = require('fs');
 const { Eleve, Classe } = require('../models/users');
 
-const { Storage } = require('@google-cloud/storage');
+//var generator = require('generate-password')
 
-const google_cloud_project_id = "oceanic-cacao-348707";
-const google_cloud_keyfile = "./oceanic-cacao-348707-bcb3c919f769.json";
-
-const storage = new Storage({
-    projectId: google_cloud_project_id,
-    keyFilename: google_cloud_keyfile,
-});
-
-const bucket = storage.bucket("bucket_projet_mimi");
-
-const { verificationChemin } = require('./image');
 
 /**
  * Renvoie au client le pseudo de l'élève en fonction de son adresse mail.
@@ -170,6 +159,21 @@ const deleteStudent = async (req, res) => {
         return res.send("Pas un élève / pas le bon élève").status(403)
     }
 }
+
+
+/*const resetPassword=(req, res)=>{
+    const email=req.body.email;
+    // on va génèrer un mot de passe temporaire
+    const pwd=generator.generate({
+        length:24,
+        numbers:true,
+        symbols:"!@#$%",
+        lowercase:true,
+        uppercase:true,
+        strict:true
+    })
+    // on insère dans la base de données ce mot de
+}*/
 
 
 /**

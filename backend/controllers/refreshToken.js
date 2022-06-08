@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { getInvitation } = require('./eleve');
-const { getAvatar, getImage } = require("./image")
+const { getAvatar, getImage, getAvatarAsImage } = require("./image")
 const Users = require('../models/users');
 const Classe = Users.Classe;
 const Eleve = Users.Eleve;
@@ -74,8 +74,13 @@ const refreshToken = (req, res) => {
                                                 return res.status(520).send(err);
                                             }
                                             console.log('envoi des infos')
-                                            return res.status(200).json(Object.assign({ role: role, accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
-                                        })
+                                            getAvatarAsImage(eleve.courriel, function(err, reponseAvatarAsImage){
+                                                if (err) {
+                                                    return res.status(520).send(err);
+                                                }
+                                                console.log('envoi des infos')
+                                                return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar,reponseAvatarAsImage, reponseImage));
+                                            })                                        })
                                     })
 
                                 }

@@ -3,8 +3,8 @@ const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken")
 
 const Users = require('../models/users');
-const {getAvatar, getImage} = require("./image")
-const { getInvitation} = require('./eleve');
+const { getAvatar, getImage, getAvatarAsImage } = require("./image")
+const { getInvitation } = require('./eleve');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
@@ -65,33 +65,39 @@ const Connexion = (req, res) => {
                                 console.log("** Connexion de l'élève effectuée **")
                                 // pour récupérer le statut de l'invitation de l'élève
                                 getInvitation(eleve.courriel, function (reponse) {
-                                    if (reponse == 404 || reponse == 400 || reponse==520) {
+                                    if (reponse == 404 || reponse == 400 || reponse == 520) {
                                         console.log("Erreur lors de la récupération de l'invitation " + reponse)
                                         return res.sendStatus(reponse)
                                     } else {
                                         // pour récupérer l'avatar de l'élève
                                         getAvatar(eleve.courriel, function (reponseAvatar) {
-                                                //pour récupèrer l'image de profil de l'élève 
-                                                getImage(eleve.courriel, function (err, reponseImage) {
+                                            //pour récupèrer l'image de profil de l'élève 
+                                            getImage(eleve.courriel, function (err, reponseImage) {
+                                                if (err) {
+                                                    return res.status(520).send(err);
+                                                }
+                                                getAvatarAsImage(eleve.courriel, function (err, reponseAvatarAsImage) {
                                                     if (err) {
-                                                        return res.send(err).status(520);
+                                                        return res.status(520).send(err);
                                                     }
                                                     console.log('envoi des infos')
                                                     res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                    return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseImage));
+                                                    return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseAvatarAsImage, reponseImage));
                                                 })
+
+                                            })
                                         })
                                     }
                                 })
                             })
                             .catch(err => {
                                 console.log("Erreur lors de l'ajout de Token" + err);
-                                return res.sendStatus(520)
+                                return res.status(520).send("Erreur lors de l'ajout de cookies.")
                             })
                     } else {
                         console.log("Mauvais mot de passe ELEVE" + err)
                         // sinon, si ce n'est pas le bon mdp mais le bon email
-                        return res.sendStatus(400)
+                        return res.status(400).send("Ce n'est pas le bon mot de passe.")
                     }
                 });
             } else {

@@ -1,18 +1,4 @@
-const Eleve = require('../models/users').Eleve
-
 const fs = require('fs');
-
-const { Storage } = require('@google-cloud/storage');
-
-const google_cloud_project_id = "oceanic-cacao-348707";
-const google_cloud_keyfile = "./oceanic-cacao-348707-bcb3c919f769.json";
-
-const storage = new Storage({
-    projectId: google_cloud_project_id,
-    keyFilename: google_cloud_keyfile,
-});
-
-const bucket = storage.bucket("bucket_projet_mimi");
 
 
 /**
@@ -29,10 +15,10 @@ const saveAvatar = (req, res) => {
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
         // erreur 400
-        return res.sendStatus(407)
+        return res.status(407).send("La forme du mail est incorrecte.")
     }
 
-    const path="./Documents/"+email+"/images";
+    const path = "./Documents/" + email + "/images";
     avatar = JSON.stringify(avatar)
     verificationChemin(path)
     // on enregistre le fichier JSON correspondant à l'avatar de l'élève
@@ -42,9 +28,51 @@ const saveAvatar = (req, res) => {
             return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
         }
         console.log("Le fichier JSON a bien été sauvegardé");
-        res.status(201).send("Enregistrement effectué");
+        return res.status(201).send("Enregistrement effectué");
     });
 
+}
+
+
+/**
+ * Sauvegarde l'avatar de l'élève dont le mail est donné.
+ * Crée les dossiers nécessaires s'ils n'existent pas.
+ * 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
+ */
+const saveAvatarAsImage = (req, res) => {
+    console.log("\n*** Sauvegarde de l'avatar en image ***");
+    const avatar = req.file
+    const email = req.body.mail;
+
+    if (avatar == null) {
+        console.log("Pas d'image")
+        return res.status(600).send("Erreur serveur : aucun avatar trouvé")
+    }
+    if (!(img.mimetype.startsWith("image/"))) {
+        console.log("Pas le bon type de fichier")
+        return res.status(403).send("Le fichier n'est pas une image.")
+    }
+
+    console.log(" nom fichier " + nom + ' type ' + avatar.mimetype)
+    if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
+        console.log("forme mail incorrect")
+        // erreur 400
+        return res.status(400).send("La forme du mail %s est incorrecte.", email)
+    }
+
+    const path = "./Documents/" + email + "/images"
+
+    // sauvegarde image
+    fs.writeFile(path + "/avatar.png", avatar.buffer, 'utf8', function (err, data) {
+        if (err) {
+            console.log("Erreur lors de l'enregistrement de la photo : " + err);
+            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+        }
+        console.log("La photo a bien été sauvegardée");
+        return res.status(201).json(avatar.buffer);
+    });
 }
 
 
@@ -53,8 +81,8 @@ const saveAvatar = (req, res) => {
  * @param {String} email l'email de l'élève dont on veut récupèrer l'avatar'
  * @param {*} callback la fonction callback qui renvoie l'avatar ou une erreur
  */
- function getAvatar(mail, callback) {
-    const path = "Documents/"+mail+"/images";
+function getAvatar(mail, callback) {
+    const path = "Documents/" + mail + "/images";
     verificationChemin(path)
     fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
         if (err) {
@@ -92,6 +120,29 @@ const saveAvatar = (req, res) => {
 
 
 /**
+ * Retourne l'avatar de l'élève sous forme d'image, s'il n'en a pas, retourne une photo par défaut (kiwi)
+ * @param {String} email l'email de l'élève dont on veut récupèrer l'avatar '
+ * @param {*} callback la fonction callback qui renvoie les informations de manière synchrone à qui fait appel de la fonction
+ */
+function getAvatarAsImage(email, callback) {
+    const path = "./Documents/" + email + "/images/avatar.png";
+
+    fs.readFile(path, function (err, avatar) {
+        if (err) {
+            fs.readFile("./Image/kiwi.jpg", function (error, avtr) {
+                if (err) {
+                    console.log("erreur lors de la recup de la photo par défeut " + error)
+                    return callback(new Error("L'élève n'a pas de photo de profil."));
+                }
+                return callback(null, { avatarAsImg: avtr });
+            })
+        }
+        return callback(null, { avatarAsImg: avatar });
+    });
+}
+
+
+/**
  * Sauvegarde localement l'image de profil d'un élève dans un dossier dédié, sous le nom "photo".
  * Vérifie aussi que le fichier passé est bien une image.  
  * Un middleware se charge de retrouver la photo.
@@ -120,38 +171,38 @@ const savePicture = (req, res) => {
         return res.sendStatus(407)
     }
 
-    const path="./Documents/"+email+"/images"
+    const path = "./Documents/" + email + "/images"
     verificationChemin(path)
-            const type = img.mimetype.split("/")[1]
-            console.log("type " + type)
-            // avant de sauvegarder on va supprimer les anciennes photos de profil, s'il en existe
-            fs.readdir(path, function (err, files) {
-                if (err) {
-                    console.log("erreur durant la récupération " + err)
-                    return res.status(600).send('Erreur lors de la récupération de la pp.');
-                }
-                // on va supprimer l'ancienne photo de profil
-                for (const f of files) {
-                    if (f.startsWith('photo')) {
-                        fs.unlink(path + "/" + f, function (err) {
-                            if (err) {
-                                console.log("erreur lors de la suppression de pp " + err)
-                                return res.status(520).send(err)
-                            }
-                            //console.log("Suppression ok")
-                        });
-                    }
-                }
-                // sauvegarde image
-                fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err, data) {
+    const type = img.mimetype.split("/")[1]
+    console.log("type " + type)
+    // avant de sauvegarder on va supprimer les anciennes photos de profil, s'il en existe
+    fs.readdir(path, function (err, files) {
+        if (err) {
+            console.log("erreur durant la récupération " + err)
+            return res.status(600).send('Erreur lors de la récupération de la pp.');
+        }
+        // on va supprimer l'ancienne photo de profil
+        for (const f of files) {
+            if (f.startsWith('photo')) {
+                fs.unlink(path + "/" + f, function (err) {
                     if (err) {
-                        console.log("Erreur lors de l'enregistrement de la photo : " + err);
-                        return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                        console.log("erreur lors de la suppression de pp " + err)
+                        return res.status(520).send(err)
                     }
-                    console.log("La photo a bien été sauvegardée");
-                    return res.json(img.buffer).status(201);
+                    //console.log("Suppression ok")
                 });
-            })
+            }
+        }
+        // sauvegarde image
+        fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err, data) {
+            if (err) {
+                console.log("Erreur lors de l'enregistrement de la photo : " + err);
+                return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+            }
+            console.log("La photo a bien été sauvegardée");
+            return res.status(201).json(img.buffer);
+        });
+    })
 }
 
 
@@ -160,7 +211,7 @@ const savePicture = (req, res) => {
  * @param {String} email l'email de l'élève dont on veut récupèrer la photo de profil
  * @param {*} callback la fonction callback qui renvoie les informations de manière synchrone à qui fait appel de la fonction
  */
- function getImage(email, callback) {
+function getImage(email, callback) {
     const path = "./Documents/" + email + "/images";
     let file = "";
     verificationChemin(path)
@@ -178,7 +229,7 @@ const savePicture = (req, res) => {
             if (file == "") {
                 console.log("pas d'image")
                 // on va retourner une image par défaut 
-                fs.readFile("./Image/grenouille.jpg", function (error, img) {
+                fs.readFile("./Image/chat.jpg", function (error, img) {
                     if (err) {
                         console.log("erreur lors de la recup de la photo par défeut " + error)
                         return callback(new Error("L'élève n'a pas de photo de profil."));
@@ -220,10 +271,12 @@ function verificationChemin(pathToVerify) {
 }
 
 
-module.exports = { 
-    saveAvatar, 
+module.exports = {
+    saveAvatar,
     getAvatar,
+    saveAvatarAsImage,
+    getAvatarAsImage,
     getImage,
-    savePicture, 
+    savePicture,
     verificationChemin
- }
+}
