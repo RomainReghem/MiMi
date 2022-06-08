@@ -73,12 +73,11 @@ const refreshToken = (req, res) => {
                                             if (err) {
                                                 return res.status(520).send(err);
                                             }
-                                            console.log('envoi des infos')
-                                            getAvatarAsImage(eleve.courriel, function(err, reponseAvatarAsImage){
+                                            getAvatarAsImage(mail, function(err, reponseAvatarAsImage){
                                                 if (err) {
                                                     return res.status(520).send(err);
                                                 }
-                                                console.log('envoi des infos')
+                                                //console.log('envoi des infos')
                                                 return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar,reponseAvatarAsImage, reponseImage));
                                             })                                        })
                                     })

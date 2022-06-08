@@ -106,11 +106,11 @@ const InscriptionEleve = (req, res) => {
                                      shape: "square",
                                      shirtColor: "#99ff99",
                                      shirtStyle: "polo"
-                                 }*/
+                                 }
+                                 avatar = JSON.stringify(avatar)*/
 
-                                const path = "./Documents/" + email
-                                avatar = JSON.stringify(avatar)
-                                verificationChemin(path + "/images")
+                               /* const path = "./Documents/" + email
+                                verificationChemin(path + "/images")*/
                                 // on enregistre le fichier JSON correspondant à l'avatar de l'élève
                                 /* fs.writeFile(path + "/images/avatar.json", avatar, 'utf8', function (err) {
                                      if (err) {

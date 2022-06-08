@@ -126,11 +126,12 @@ function getAvatarAsImage(email, callback) {
 
     fs.readFile(path, function (err, avatar) {
         if (err) {
-            fs.readFile("./Image/kiwi.png", function (error, avtr) {
+            fs.readFile("./Image/avatar.png", function (error, avtr) {
                 if (error) {
-                    console.log("erreur lors de la recup de la photo par défaut " + error)
-                    return callback(new Error("L'élève n'a pas de photo de profil."));
+                    console.log("Erreur lors de la recup de la photo par défaut " + error)
+                    return callback(new Error("Aucun avatar trouvé pour ce compte."));
                 } else {
+                    console.log("renvoi avatar par défaut "+err)
                     return callback(null, { avatarAsImg: avtr });
 
                 }
