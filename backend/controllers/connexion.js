@@ -65,7 +65,7 @@ const Connexion = (req, res) => {
                                 console.log("** Connexion de l'élève effectuée **")
                                 // pour récupérer le statut de l'invitation de l'élève
                                 getInvitation(eleve.courriel, function (reponse) {
-                                    if (reponse == 404 || reponse == 400) {
+                                    if (reponse == 404 || reponse == 400 || reponse==520) {
                                         console.log("Erreur lors de la récupération de l'invitation " + reponse)
                                         return res.sendStatus(reponse)
                                     } else {

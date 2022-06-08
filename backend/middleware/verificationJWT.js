@@ -21,7 +21,7 @@ const verifyJWT = (req, res, next) => {
     console.log("authHeader : " + authHeader)
     // le token est en deuxième position
     const token = authHeader.split(' ')[1]
-    console.log("token : "+token)
+    //console.log("token : "+token)
     // vérification du token
     jwt.verify(
         token,

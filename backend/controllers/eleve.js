@@ -147,8 +147,7 @@ const deleteStudent = async (req, res) => {
                     }
                 }).then(() => {
                     // maintenant on doit supprimer les dossiers et les documents de l'élève
-                    const num = eleve.ideleve;
-                    const path = "./Eleves/eleve" + num
+                    const path = "./Documents/" + email
                     // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
                     fs.rm(path, { recursive: true }, (err) => {
                         if (err) {
@@ -205,7 +204,7 @@ function getInvitation(emailEleve, cb) {
                     })
                     .catch(err => {
                         console.log(err)
-                        return cb({ erreur: err })
+                        return cb(520)
                     });
             } else {
                 return cb({ invitation: invitation })
@@ -213,7 +212,7 @@ function getInvitation(emailEleve, cb) {
         })
         .catch(err => {
             console.log(err)
-            return cb({ erreur: err })
+            return cb(520)
         });
 }
 

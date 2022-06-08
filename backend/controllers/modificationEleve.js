@@ -2,7 +2,8 @@ const Users = require('../models/users');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
-const { getInvitation, getAvatar, getImage } = require('./eleve');
+const { getInvitation } = require('./eleve');
+const {getAvatar, getImage} = require('./image')
 
 const Modification = require('./modificationInvitation.js')
 const bcrypt = require('bcrypt');
@@ -318,7 +319,7 @@ const ChangementMail = (req, res) => {
                                             console.log("Changement de mail ok")
                                             // On récupère des informations sur l'élève pour les renvoyer au client
                                             getInvitation(newEmail, function (reponse) {
-                                                if (reponse == 404 || reponse == 407) {
+                                                if (reponse == 404 || reponse == 400 || reponse==520) {
                                                     return res.sendStatus(reponse)
                                                 } else {
                                                     // pour récupérer l'avatar de l'élève

@@ -64,7 +64,7 @@ const refreshToken = (req, res) => {
                             }
                             // on doit récupèrer l'état de l'invitation pour le transmettre au serveur
                             getInvitation(mail, function (reponse) {
-                                if (reponse == 404 || reponse == 400) {
+                                if (reponse == 404 || reponse == 400 || 520==reponse) {
                                     console.log("Erreur lors de la récupération de l'invitation " + reponse)
                                     return res.sendStatus(reponse)
                                 } else {

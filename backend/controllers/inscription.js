@@ -7,18 +7,6 @@ const Users = require('../models/users');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
-const { Storage } = require('@google-cloud/storage');
-
-const google_cloud_project_id = "oceanic-cacao-348707";
-const google_cloud_keyfile = "./oceanic-cacao-348707-bcb3c919f769.json";
-
-const storage = new Storage({
-    projectId: google_cloud_project_id,
-    keyFilename: google_cloud_keyfile,
-});
-
-const bucket = storage.bucket("bucket_projet_mimi");
-
 
 /**
  * Crée un compte élève, avec les données transmises par le serveur.
@@ -149,6 +137,7 @@ const InscriptionEleve = (req, res) => {
             });
     })
 }
+
 
 /**
  * Enregistre dans la base de données les informations sur la nouvelle classe transmise par le client.
