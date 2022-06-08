@@ -55,7 +55,6 @@ const Identity = () => {
             for (let i = 0; i < bytes.byteLength; i++) {
                 binary += String.fromCharCode(bytes[i]);
             }
-
             if (data != undefined)
                 setPicture("data:image/png;base64," + window.btoa(binary))
         }

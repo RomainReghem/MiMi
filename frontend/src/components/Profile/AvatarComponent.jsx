@@ -12,9 +12,10 @@ import { Stack, Text, IconButton, Button, Tooltip } from "@chakra-ui/react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import useUserData from '../../hooks/useUserData';
-
+import useSaveAvatarAsImage from '../../hooks/useSaveAvatarAsImage';
 
 const AvatarComponent = () => {
+    const saveAvatarAsImage = useSaveAvatarAsImage();
     const toast = useToast();
     const { auth, setAuth } = useAuth();
     const { userData, setUserData } = useUserData();
@@ -72,10 +73,11 @@ const AvatarComponent = () => {
     const SaveDB = async (e) => {
         try {
             const response = await axiosPrivate.post("/avatar", JSON.stringify({ mail, avatar: config }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                });
+            {
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
+            });
+            saveAvatarAsImage('avatarToPrint');
             toast({ title: "Avatar sauvegardé !", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
         } catch (err) { console.log("couldnt save avatar"); }
     }
@@ -84,7 +86,7 @@ const AvatarComponent = () => {
         <>
             <Stack spacing={2}>
                 <Heading fontSize={'2xl'} >Créateur d'avatar</Heading>
-                <Avatar
+                <Avatar id='avatarToPrint'
                     {...config}
                     style={{ width: '15rem', height: '15rem', minWidth: '250px', minHeight: '250px'}}
                 />

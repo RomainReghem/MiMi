@@ -52,21 +52,21 @@ export default function Login() {
 
             setPwd('');
             setUser('');
-            toast({ title: "Bienvenue !", description: "Vous êtes connecté", status: "success", duration: 9000, isClosable: true, position: "top" })
+            toast({ title: "Bienvenue !", description: "Vous êtes connecté", status: "success", duration: 4000, isClosable: true, position: "top" })
             navigate("/profile");
 
 
         } catch (err) {
             if (!err?.response) {
-                toast({ title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 5000, isClosable: true, position: "top" })
+                toast({ title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 4000, isClosable: true, position: "top" })
             } else if (err.response?.status === 400) {
-                toast({ title: "Erreur", description: "Mot de passe erroné", status: "error", duration: 5000, isClosable: true, position: "top" })
+                toast({ title: "Erreur", description: "Mot de passe erroné", status: "error", duration: 4000, isClosable: true, position: "top" })
 
             } else if (err.response?.status === 401) {
-                toast({ title: "Erreur", description: "Adresse mail inconnue", status: "error", duration: 5000, isClosable: true, position: "top" })
+                toast({ title: "Erreur", description: "Adresse mail inconnue", status: "error", duration: 4000, isClosable: true, position: "top" })
             }
             else if (err.response?.status === 402) {
-                toast({ title: "Erreur", description: "Remplissez tous les champs", status: "error", duration: 5000, isClosable: true, position: "top" })
+                toast({ title: "Erreur", description: "Remplissez tous les champs", status: "error", duration: 4000, isClosable: true, position: "top" })
             } else {
                 toast({ title: "Erreur", description: "Erreur", status: "error", duration: 3000, isClosable: true, position: "top" })
 

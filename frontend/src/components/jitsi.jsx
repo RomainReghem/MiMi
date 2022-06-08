@@ -2,12 +2,16 @@ import React, { Component, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import { useState } from 'react';
-import {Center, Spinner, Stack} from "@chakra-ui/react"
+import { Center, Spinner, Stack } from "@chakra-ui/react"
+import useUserData from '../hooks/useUserData';
 
 const JitsiComponent = () => {
 
     const navigate = useNavigate();
+    const { userData } = useUserData();
     const { auth } = useAuth();
+    const [avatarURL, setAvatarURL] = useState('')
+    const [imageURL, setImageURL] = useState('')
 
     const domain = 'meet.jit.si';
     let api = {};
@@ -16,6 +20,28 @@ const JitsiComponent = () => {
     const [user, setUser] = useState(localStorage.getItem("pseudo") || "classe")
     const [isAudioMuted, setIsAudioMuted] = useState(false)
     const [isVideoMuted, setIsVideoMuted] = useState(false)
+
+    useEffect(() => {
+        bufferToUrl(userData?.image, 'image')
+    }, [userData?.image])
+
+    useEffect(() => {
+        bufferToUrl(userData?.avatarAsImage, 'avatar')
+    }, [userData?.avatarAsImage])
+
+    const bufferToUrl = async (theData, type) => {
+        let data = theData
+        let binary = '';
+        let bytes = new Uint8Array(data);
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        console.log(window.btoa(binary))
+        if (data != undefined) {
+            type === 'image' ? setImageURL("data:image/png;base64," + window.btoa(binary)) :
+                setAvatarURL("data:image/png;base64," + window.btoa(binary))
+        }
+    }
 
     let startMeet = () => {
         if (auth?.idclasse) {
@@ -62,6 +88,7 @@ const JitsiComponent = () => {
 
     const handleVideoConferenceJoined = async (participant) => {
         console.log("handleVideoConferenceJoined", participant); // { roomName: "bwb-bfqi-vmh", id: "8c35a951", displayName: "Akash Verma", formattedDisplayName: "Akash Verma (me)"}
+        api.executeCommand('avatarUrl', auth?.preference === 'avatar' ? avatarURL : imageURL);
         const data = await getParticipants();
     }
 
@@ -118,12 +145,12 @@ const JitsiComponent = () => {
 
 
     return (
-        <> 
-        {!auth?.idclasse
-            ? <p> Rejoignez une classe pour accéder à la visioconférence </p>
-            : <><Spinner position={'absolute'} top='50%' left='50%' zIndex={1}/><div id="jitsi-iframe"></div></>
-        }
-        
+        <>
+            {!auth?.idclasse
+                ? <p> Rejoignez une classe pour accéder à la visioconférence </p>
+                : <><Spinner position={'absolute'} top='50%' left='50%' zIndex={1} /><div id="jitsi-iframe"></div></>
+            }
+
 
             {/*<div className="item-center">
                 <span>Custom Controls</span>
