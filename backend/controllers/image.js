@@ -133,11 +133,14 @@ function getAvatarAsImage(email, callback) {
                 if (error) {
                     console.log("erreur lors de la recup de la photo par défaut " + error)
                     return callback(new Error("L'élève n'a pas de photo de profil."));
+                }else{
+                    return callback(null, { avatarAsImg: avtr });
+
                 }
-                return callback(null, { avatarAsImg: avtr });
             })
+        }else{
+            return callback(null, { avatarAsImg: avatar });
         }
-        return callback(null, { avatarAsImg: avatar });
     });
 }
 
