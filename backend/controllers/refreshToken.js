@@ -1,10 +1,12 @@
 const jwt = require('jsonwebtoken');
-const { getInvitation, getAvatar, getImage } = require('./eleve');
+const { getInvitation } = require('./eleve');
+const { getAvatar, getImage } = require("./image")
 const Users = require('../models/users');
 const Classe = Users.Classe;
 const Eleve = Users.Eleve;
 
 require('dotenv').config()
+
 
 /**
  * Si l'authentification et l'autorisation sont correctes, remets à jour le token d'accès.
@@ -30,7 +32,7 @@ const refreshToken = (req, res) => {
             if (err || decoded == undefined) {
                 console.log("probleme lors de la verification " + err);
                 // accès interdit
-                return res.sendStatus(403);
+                return res.status(403).send("Echec de la vérification des informations.");
             } else {
                 console.log("decodage des infos")
                 const mail = decoded.mail;
@@ -80,7 +82,7 @@ const refreshToken = (req, res) => {
                             })
                         }).catch(err => {
                             console.log("erreur lors de la recup de classe " + err)
-                            return res.status(520).send(err)
+                            return res.status(520).send("Erreur lors de la vérification des données.")
                         });
                 } else if (role == "classe") {
                     console.log("token classe")
@@ -89,7 +91,7 @@ const refreshToken = (req, res) => {
                             if (!classe) {
                                 console.log("pas de classe avec ce token ")
                                 // le mail ne correspond à aucune mail : accès interdit
-                                return res.sendStatus(403)
+                                return res.status(403).send("Validation échouée, compte invalide.")
                             }
                             if (classe.token != refreshToken) {
                                 console.log("token classe correspond pas")
@@ -111,5 +113,6 @@ const refreshToken = (req, res) => {
         }
     )
 }
+
 
 module.exports = { refreshToken };

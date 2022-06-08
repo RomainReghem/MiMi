@@ -19,6 +19,7 @@ const storage = new Storage({
 
 const bucket = storage.bucket("bucket_projet_mimi");
 
+
 /**
  * Crée un compte élève, avec les données transmises par le serveur.
  * Crée aussi des dossiers pour stocker les futurs documents de l'élève.
@@ -46,25 +47,25 @@ const InscriptionEleve = (req, res) => {
     // Prenom doit etre compris entre 2 et 24 caractères de l'alphabet, y compris les accents minuscules 
     if (!(prenom.match("^[A-z-àâçéèêëîïôûùüÿñ]{2,24}$"))) {
         console.log("taille prenom pas bonne")
-        return res.sendStatus(403)
+        return res.status(403).send("Le prénom n'est pas de la bonne taille (entre 2 et 24 lettres)")
     }
     //console.log("prenom ok")
     // Nom doit être compris entre 2 et 24 inclus et doit être composé uniquement de lettres
     if (!(nom.match("^[A-z-àâçéèêëîïôûùüÿñ]{2,24}$"))) {
         console.log("nom incorrect")
-        return res.sendStatus(404)
+        return res.status(404).send("Le nom de famille n'est pas de la bonne taille !")
     }
     if (!(pseudo.match("^[A-z0-9-_]{3,24}$"))) {
         console.log("pseudo pas ok")
-        return res.sendStatus(405)
+        return res.status(405).send("Le pseudo n'est pas valide.")
     }
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
-        return res.sendStatus(406)
+        return res.status(406).send('Le mot de passe ne respecte pas les conditions !')
     }
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
-        return res.sendStatus(407)
+        return res.status(407).send("La forme du mail n'est pas correcte !")
     }
 
     // Hashage du mot de passe
@@ -79,14 +80,14 @@ const InscriptionEleve = (req, res) => {
             .then(searchEleve => {
                 if (searchEleve) {
                     console.log("Mail pas unique");
-                    return res.sendStatus(409)
+                    return res.status(409).send("Le mail n'est pas unique, un autre élève est déjà enregistré avec ce mail.")
                 }
                 console.log("mail unique pour eleves");
                 Classe.findOne({ attributes: ['idclasse'], where: { courriel: email } })
                     .then(classe => {
                         if (classe) {
                             console.log("Mail existant pour la classe");
-                            return res.sendStatus(410)
+                            return res.status(410).send("Cette adresse mail est déjà utilisée par un compte classe.")
                         }
                         console.log("inscription ok")
                         console.log("mdp" + hash)
@@ -97,59 +98,54 @@ const InscriptionEleve = (req, res) => {
                             nom: nom,
                             prenom: prenom
                         }))
-                            .then((eleve) => {
+                            .then(() => {
                                 console.log("Création de compte élève réussie")
-                                const num = eleve.ideleve
-                                //const path = "./Eleves/eleve" + num + "/avatar"
                                 // console.log("*** Création d'un dossier ***")
-
                                 // enregistrement de l'avatar par défaut
-                                let avatar = {
-                                    bgColor: "#E0DDFF",
-                                    earSize: "small",
-                                    eyeBrowStyle: "up",
-                                    eyeStyle: "oval",
-                                    faceColor: "#AC6651",
-                                    glassesStyle: "none",
-                                    hairColor: "#000",
-                                    hairStyle: "thick",
-                                    hatColor: "#000",
-                                    hatStyle: "none",
-                                    mouthStyle: "laugh",
-                                    noseStyle: "round",
-                                    shape: "square",
-                                    shirtColor: "#99ff99",
-                                    shirtStyle: "polo"
-                                }
+                                /* let avatar = {
+                                     bgColor: "#E0DDFF",
+                                     earSize: "small",
+                                     eyeBrowStyle: "up",
+                                     eyeStyle: "oval",
+                                     faceColor: "#AC6651",
+                                     glassesStyle: "none",
+                                     hairColor: "#000",
+                                     hairStyle: "thick",
+                                     hatColor: "#000",
+                                     hatStyle: "none",
+                                     mouthStyle: "laugh",
+                                     noseStyle: "round",
+                                     shape: "square",
+                                     shirtColor: "#99ff99",
+                                     shirtStyle: "polo"
+                                 }*/
 
-                                const path = "Eleves/eleve" + num
+                                const path = "./Documents/" + email
                                 avatar = JSON.stringify(avatar)
-                                verificationChemin(path + "/avatar")
-                                verificationChemin(path + "/depot")
+                                verificationChemin(path + "/images")
                                 // on enregistre le fichier JSON correspondant à l'avatar de l'élève
-                                fs.writeFile(path + "/avatar/avatar" + num + ".json", avatar, 'utf8', function (err) {
-                                    if (err) {
-                                        console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
-                                        return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-                                    }
-                                    console.log("Le fichier JSON a bien été sauvegardé");
-                                    return res.status(201).send("Enregistrement effectué");
-                                });
-
-                                //return res.send(neweleve);
+                                /* fs.writeFile(path + "/images/avatar.json", avatar, 'utf8', function (err) {
+                                     if (err) {
+                                         console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+                                         return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                                     }
+                                     console.log("Le fichier JSON a bien été sauvegardé");
+                                     return res.status(201).send("Enregistrement effectué");
+                                 });*/
+                                return res.status(201).send("Vous êtes bien inscrit !")
                             })
                             .catch(err => {
                                 console.log("erreur inscription eleve : " + err)
-                                return res.send(err).status(520)
+                                return res.status(520).send("Erreur lors de l'enregistrement du compte élève.")
                             })
                     })
                     .catch(err => {
                         console.log("Erreur lors de la recherche de classe \n" + err)
-                        return res.send("Erreur serveur sur la vérification de la validité de l'adresse mail.").status(520)
+                        return res.status(520).send("Erreur serveur sur la vérification de la validité de l'adresse mail.")
                     });
             }).catch(err => {
                 console.log("Erreur lors de la recherche d'eleve avec la meme adresse \n" + err)
-                return res.send("Erreur serveur sur la vérification de la validité de l'adresse mail.").status(520)
+                return res.status(520).send("Erreur serveur sur la vérification de la validité de l'adresse mail.")
             });
     })
 }
@@ -174,15 +170,13 @@ const InscriptionClasse = (req, res) => {
 
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
-        return res.sendStatus(406)
+        return res.status(406).send('Le mot de passe ne respecte pas les conditions !')
     }
-    //console.log("mdp ok")
 
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
         console.log("forme mail incorrect")
-        return res.sendStatus(407)
+        return res.status(407).send("La forme du mail n'est pas correcte !")
     }
-    //console.log("email ok")
 
     // On fait des vérifications sur les insertions avant d'insérer dans BD
     // La base de données a déjà des contraintes mais il faut éviter d'insérer et de causer une erreur SQL
@@ -192,35 +186,34 @@ const InscriptionClasse = (req, res) => {
         .then(searchClass => {
             if (searchClass) {
                 console.log("Mail existant pour la classe");
-                return res.sendStatus(409)
+                return res.status(409).send("Le mail n'est pas unique, une autre classe est déjà enregistrée avec ce mail.")
             } else {
                 Eleve.findOne({ attributes: ['ideleve'], where: { courriel: email } })
                     .then(eleve => {
                         if (eleve) {
                             console.log("Mail existant pour un eleve");
-                            return res.sendStatus(411)
+                            return res.status(411).send("Ce mail n'est pas unique, un élève est enregistré avec ce mail.")
                         } else {
                             // Hashage du mot de passe
                             bcrypt.hash(mdp, 10, (err, hash) => {
                                 if (err) {
                                     console.log("erreur hashage mdp classe" + err)
-                                    return res.sendStatus(600)
+                                    return res.status(600).send("Erreur lors de la sauvegarde du mot de passe.")
                                 } else {
-                                    const newclasse = Classe.create(({
+                                    Classe.create(({
                                         courriel: email,
                                         motdepasse: hash
                                     }))
-                                        .then((classe) => {
-                                            const num = classe.idclasse;
-                                            const path = "Classes/classe" + num + "/depot"
+                                        .then(() => {
+                                            const path = "./Documents/" + email
                                             verificationChemin(path)
-                                            console.log("Création de compte classe réussie, idclasse : " + num)
+                                            console.log("Création de compte classe réussie")
 
-                                            return res.send(newclasse);
+                                            return res.status(201).send("Inscription réussie !");
                                         })
                                         .catch(err => {
                                             console.log("erreur inscription classe : " + err)
-                                            return res.send("Erreur survenue lors de l'enregistrement du compte classe.").status(520)
+                                            return res.status(520).send("Erreur survenue lors de l'enregistrement du compte classe.");
                                         })
                                 }
 
@@ -228,14 +221,14 @@ const InscriptionClasse = (req, res) => {
                         }
                     })
                     .catch(err => {
-                        console.log("erreur inscription classe eleve.findone "+err)
-                        return res.send("Erreur lors de la vérification de l'unicité de l'adresse mail fournie.").status(520)
+                        console.log("erreur inscription classe eleve.findone " + err)
+                        return res.status(520).send("Erreur lors de la vérification de l'unicité de l'adresse mail fournie.")
                     });
             }
         })
         .catch(err => {
-            console.log("erreur inscription classe classe.findone "+err);
-            return res.send("Erreur lors de la vérification de l'unicité de l'adresse mail fournie.").status(520)
+            console.log("erreur inscription classe classe.findone " + err);
+            return res.status(520).send("Erreur lors de la vérification de l'unicité de l'adresse mail fournie.")
         });
 }
 

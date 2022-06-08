@@ -3,11 +3,13 @@ const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken")
 
 const Users = require('../models/users');
-const { getInvitation, getAvatar, getImage } = require('./eleve');
+const {getAvatar, getImage} = require("./image")
+const { getInvitation} = require('./eleve');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
 require('dotenv').config()
+
 
 /**
  * Permet de valider ou non la connexion d'un utilisateur (élève ou classe.)
@@ -15,7 +17,7 @@ require('dotenv').config()
  * 
  * @param {*} req la requête du client, doit contenir :  
  * • user : l'adresse mail utilisée pour se connecter
- * • mdp : le mot de passe en clair utilisé pour se connecter
+ * • pwd : le mot de passe en clair utilisé pour se connecter
  * @param {*} res la réponse du serveur
  */
 const Connexion = (req, res) => {

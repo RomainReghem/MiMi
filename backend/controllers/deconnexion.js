@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken")
 
 require("dotenv").config();
 
+
 /**
  * Permet de déconnecter un utilisateur en supprimant ses tokens.
  * 
@@ -16,7 +17,7 @@ const Deconnexion = async (req, res) => {
     if (!cookies?.jwt) {
         console.log("pas de cookies")
         // Ne retourne pas d'erreur, il n'y avait pas de cookies
-        return res.sendStatus(204);
+        return res.status(204).send("Déconnexion sans cookies");
     }
 
     const refreshToken = cookies.jwt;
@@ -28,7 +29,7 @@ const Deconnexion = async (req, res) => {
             if (err || decoded == undefined) {
                 console.log("probleme lors de la verification " + err);
                 // accès interdit
-                return res.sendStatus(403);
+                return res.status(204).send("Déconnexion : aucune informations trouvées.");
             } else {
                 const role = decoded.role
                 const mail = decoded.mail
@@ -38,30 +39,31 @@ const Deconnexion = async (req, res) => {
                     Eleve.update({ token: "" }, { where: { courriel: mail } })
                         .then(() => {
                             console.log("Déconnexion de l'élève effectuée ! ")
-                            return res.sendStatus(204);
+                            return res.status(204).send("Déconnexion de l'élève.");
                         })
                         .catch(err => {
                             console.log("erreur lors de la deconnexion " + err)
-                            return res.send("Erreur survenue lors de la déconnexion !").status(520)
+                            return res.status(204).send("Erreur survenue lors de la déconnexion !")
                         })
                 } else if (role == "classe") {
                     console.log("token classe")
                     Classe.update({ token: "" }, { where: { courriel: mail } })
                         .then(() => {
-                            console.log("Déconnexion de l'élève effectuée ! ")
-                            return res.sendStatus(204);
+                            console.log("Déconnexion de la classe effectuée ! ")
+                            return res.status(204).send("Déconnexion de la classe.");
                         })
                         .catch(err => {
                             console.log("erreur lors de la deconnexion : " + err)
-                            return res.send("Erreur survenue lors de la suppression des cookies.").status(520)
+                            return res.status(204).send("Erreur du serveur survenue lors de la suppression des cookies.")
                         })
                 } else {
                     console.log("what is this role? " + role)
-                    return res.send("Role inexistant : accès interdit").status(403)
+                    return res.status(204).send("Role inexistant : accès interdit")
                 }
             }
         }
     )
 }
+
 
 module.exports = Deconnexion

@@ -75,7 +75,7 @@ const getCoursEleve = (req, res) => {
                         })
                         .catch(err => {
                             console.log(err)
-                            return res.status(520).send(err)
+                            return res.status(520).send("Erreur lors de la recherche ")
                         })
                 } else {
                     return res.status(403).send('Aucune classe enregistree pour cet eleve : accès interdit')
@@ -96,8 +96,8 @@ const getCoursEleve = (req, res) => {
             }
         })
         .catch(err => {
-            console.log(err)
-            return res.status(520).send(err)
+            console.log("Erreur eleve findOne "+err)
+            return res.status(520).send('Erreur lors de la récupération des données de l\'eleve.')
         })
 }
 
@@ -242,7 +242,7 @@ const getCoursClasse = (req, res) => {
                     fs.readFile(path, function (err, fichier) {
                         if (err) {
                             console.log("erreur lors de la recup de fichier " + err)
-                            return res.status(520).send(err)
+                            return res.status(520).send("Erreur survenue lors de la lecture du fichier.")
                         }
                         console.log("Récupération ok")
                         return res.status(201).send({ file: fichier });

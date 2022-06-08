@@ -250,34 +250,34 @@ const deleteFile=(req,res)=>{
 }
 
 
-/**
- * Supprimer un repértoire en fonction du chemin donné.
- * @param {String} path le chemin du dossier à supprimer
- * @returns un code http associé à une erreur ou un succès
- */
-function deleteMatiere(path, cb) {
-    try {
-        // on vérifie que la matière existe bien 
-        if (fs.existsSync(path)) {
-            try {
-                fs.rmdirSync(path, { recursive: true });
-                console.log("suprresion de la matière " + path + " ok ")
-                return cb(201);
-            } catch (err) {
-                console.error(err)
-                return cb(520);
-            }
-            // sinon la matière n'a pas été trouvée
-        } else {
-            console.log("Pas de matière dans le chemin " + path + ".");
-            return cb(404);
-        }
+// /**
+//  * Supprimer un repértoire en fonction du chemin donné.
+//  * @param {String} path le chemin du dossier à supprimer
+//  * @returns un code http associé à une erreur ou un succès
+//  */
+// function deleteMatiere(path, cb) {
+//     try {
+//         // on vérifie que la matière existe bien 
+//         if (fs.existsSync(path)) {
+//             try {
+//                 fs.rmdirSync(path, { recursive: true });
+//                 console.log("suprresion de la matière " + path + " ok ")
+//                 return cb(201);
+//             } catch (err) {
+//                 console.error(err)
+//                 return cb(520);
+//             }
+//             // sinon la matière n'a pas été trouvée
+//         } else {
+//             console.log("Pas de matière dans le chemin " + path + ".");
+//             return cb(404);
+//         }
 
-    } catch (err) {
-        console.error("Erreur lors de la vérification des dossiers" + err)
-        return cb(520);
-    }
-}
+//     } catch (err) {
+//         console.error("Erreur lors de la vérification des dossiers" + err)
+//         return cb(520);
+//     }
+// }
 
 
 module.exports = { deleteCoursEleve, deleteCoursClasse, deleteFile }
