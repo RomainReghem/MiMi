@@ -10,8 +10,8 @@ const JitsiComponent = () => {
     const navigate = useNavigate();
     const { userData } = useUserData();
     const { auth } = useAuth();
-    const [avatarURL, setAvatarURL] = useState('oe')
-    const [imageURL, setImageURL] = useState('oe')
+    console.log(userData?.imageURL)
+    console.log(auth?.user)
 
     const domain = 'meet.jit.si';
     let api = {};
@@ -21,27 +21,19 @@ const JitsiComponent = () => {
     const [isAudioMuted, setIsAudioMuted] = useState(false)
     const [isVideoMuted, setIsVideoMuted] = useState(false)
 
-    useEffect(() => {
-        bufferToUrl(userData?.image, 'image')
-    }, [userData?.image])
+    // useEffect(() => {
+    //     let bytes = new Uint8Array(userData?.image);
+    //     let blob = new Blob([bytes], {type: 'image/jpg'});
+    //     console.log(URL.createObjectURL(blob));
+    //     setImageURL(blob)
+    // }, [userData?.image])
 
-    useEffect(() => {
-        bufferToUrl(userData?.avatarAsImage, 'avatar')
-    }, [userData?.avatarAsImage])
-
-    const bufferToUrl = async (theData, type) => {
-        let data = theData
-        let binary = '';
-        let bytes = new Uint8Array(data);
-        for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
-        if (data != undefined) {
-            console.log('*****setting data******')
-            let url = "data:image/png;base64," + window.btoa(binary)
-            setImageURL(url)
-        }
-    }
+    // useEffect(() => {
+    //     let bytes = new Uint8Array(userData?.avatarAsImage.data);
+    //     let blob = new Blob([bytes], {type: 'image/png'});
+    //     console.log(URL.createObjectURL(blob));
+    //     setAvatarURL(blob)
+    // }, [userData?.avatarAsImage])
 
     let startMeet = () => {
         if (auth?.idclasse) {
@@ -89,8 +81,8 @@ const JitsiComponent = () => {
     const handleVideoConferenceJoined = async (participant) => {
         console.log("handleVideoConferenceJoined", participant); // { roomName: "bwb-bfqi-vmh", id: "8c35a951", displayName: "Akash Verma", formattedDisplayName: "Akash Verma (me)"}
         console.log('*********************EXECTURING THE COMMAND************************')
-        console.log(imageURL)
-        api.executeCommand('avatarUrl', imageURL);
+        console.log(userData?.imageURL)
+        api.executeCommand('avatarUrl', userData?.avatarURL);
         const data = await getParticipants();
     }
 

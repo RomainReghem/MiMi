@@ -47,7 +47,9 @@ export default function Login() {
                 const image = response?.data?.image?.data;
                 const avatar = response?.data?.avatar;
                 const pseudo = response?.data?.pseudo;
-                setUserData({ image, avatar, pseudo })
+                const avatarAsImage = response?.data?.avatarAsImg?.data;
+
+                setUserData({ image, avatar, pseudo, avatarAsImage })
             }
 
             setPwd('');
@@ -121,7 +123,7 @@ export default function Login() {
                                     bg: 'cyan.700',
                                 }} onClick={handleSubmit}>
                                 Connexion
-                            </Button>                            
+                            </Button>
                         </Stack>
                         <Text align={'center'} >Pas encore de compte ? <Link to="/choice" as={ReactRouterLink} color={'cyan.600'}>S'inscrire</Link></Text>
                     </Stack>
