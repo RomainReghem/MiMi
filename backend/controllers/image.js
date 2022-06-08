@@ -43,15 +43,11 @@ const saveAvatar = (req, res) => {
  */
 const saveAvatarAsImage = (req, res) => {
     console.log("\n*** Sauvegarde de l'avatar en image ***");
-    const avatar = req.body.file;
+    const avatar = req.file;
     const email = req.body.mail;
-    console.log(avatar.buffer)
 
-    if (typeof avatar == undefined ||  avatar.buffer ==undefined) {
+   if ( avatar == undefined || avatar.buffer == null) {
         console.log("Pas d'image d'avatar")
-        for (f in req.body){
-            console.log("-"+f)
-        }
         console.log(req.body.file)
         console.log(req.body.filename)
         return res.status(404).send("Erreur : aucun avatar trouvé")
@@ -63,8 +59,8 @@ const saveAvatarAsImage = (req, res) => {
         return res.status(400).send("La forme du mail %s est incorrecte.", email)
     }
 
-    const path = "./Documents/" + email + "/images" 
-    
+    const path = "./Documents/" + email + "/images"
+
     // sauvegarde image
     fs.writeFile(path + "/avatar.png", avatar.buffer, 'utf8', function (err, data) {
         if (err) {
@@ -134,12 +130,12 @@ function getAvatarAsImage(email, callback) {
                 if (error) {
                     console.log("erreur lors de la recup de la photo par défaut " + error)
                     return callback(new Error("L'élève n'a pas de photo de profil."));
-                }else{
+                } else {
                     return callback(null, { avatarAsImg: avtr });
 
                 }
             })
-        }else{
+        } else {
             return callback(null, { avatarAsImg: avatar });
         }
     });

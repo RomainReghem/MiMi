@@ -33,5 +33,9 @@ function fileFilter(req, file, cb) {
 }
 
 const upload = multer({ storage: storage, limits: maxSize, fileFilter: fileFilter })
+const uploadAvatar =multer({ storage: storage, limits: maxSize})
 
-module.exports = upload;
+module.exports ={
+  upload,
+  uploadAvatar
+} ;
