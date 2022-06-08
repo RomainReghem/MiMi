@@ -10,8 +10,8 @@ const JitsiComponent = () => {
     const navigate = useNavigate();
     const { userData } = useUserData();
     const { auth } = useAuth();
-    const [avatarURL, setAvatarURL] = useState('')
-    const [imageURL, setImageURL] = useState('')
+    const [avatarURL, setAvatarURL] = useState('oe')
+    const [imageURL, setImageURL] = useState('oe')
 
     const domain = 'meet.jit.si';
     let api = {};
@@ -36,10 +36,10 @@ const JitsiComponent = () => {
         for (let i = 0; i < bytes.byteLength; i++) {
             binary += String.fromCharCode(bytes[i]);
         }
-        console.log(window.btoa(binary))
         if (data != undefined) {
-            type === 'image' ? setImageURL("data:image/png;base64," + window.btoa(binary)) :
-                setAvatarURL("data:image/png;base64," + window.btoa(binary))
+            console.log('*****setting data******')
+            let url = "data:image/png;base64," + window.btoa(binary)
+            setImageURL(url)
         }
     }
 
@@ -88,7 +88,9 @@ const JitsiComponent = () => {
 
     const handleVideoConferenceJoined = async (participant) => {
         console.log("handleVideoConferenceJoined", participant); // { roomName: "bwb-bfqi-vmh", id: "8c35a951", displayName: "Akash Verma", formattedDisplayName: "Akash Verma (me)"}
-        api.executeCommand('avatarUrl', auth?.preference === 'avatar' ? avatarURL : imageURL);
+        console.log('*********************EXECTURING THE COMMAND************************')
+        console.log(imageURL)
+        api.executeCommand('avatarUrl', imageURL);
         const data = await getParticipants();
     }
 

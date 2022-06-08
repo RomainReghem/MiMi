@@ -8,29 +8,36 @@ const useSaveAvatarAsImage = () => {
     const { userData, setUserData } = useUserData();
     let file;
 
-    const saveAvatarAsImage = async (id) => {
+    const saveAvatarAsImage = (id) => {
         try {
             htmlToImage.toBlob(document.getElementById(id))
                 .then(function (blob) {
                     file = new File([blob], "avatar.png");
-                });
+                    send(file).then(
+                        console.log(URL.createObjectURL(blob))
+                    )
 
-                let formData = new FormData()
-                formData.append('file', file);
-                formData.append("filename", "avatar.png");
-                formData.append("mail", auth?.user);
-                const response = await axiosPrivate.post("/avatarAsImage", formData,
-                    {
-                        headers: { "Content-Type": "image/png" },
-                    });
-                setUserData({
-                    ...userData,
-                    avatarImage: response.data.data
-                })
+                });
         }
         catch (err) {
             console.log(err)
         }
+    }
+
+    const send = async (file) => {
+        let formData = new FormData()
+        formData.append('file', file);
+        console.log(file)
+        formData.append("filename", "avatar.png");
+        formData.append("mail", auth?.user);
+        const response = await axiosPrivate.post("/avatarAsImage", formData,
+            {
+                headers: { "Content-Type": "image/png" },
+            });
+        // setUserData({
+        //     ...userData,
+        //     avatarImage: response.data.data
+        // })
     }
     return saveAvatarAsImage;
 }
