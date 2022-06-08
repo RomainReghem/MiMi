@@ -48,90 +48,47 @@ const saveAvatar = (req, res) => {
 }
 
 
-// /**
-//  * Sauvegarde le fichier JSON de l'avatar dans le dossier dédié
-//  * @param {String} path le chemin où le fichier doit être sauvegardé
-//  * @param {Object} json l'avatar en JSON
-//  * @param {Number} num l'id de l'élève de qui on sauvegarde l'avatar
-//  * @param {*} res la réponse
-//  */
-// async function saveJSON(path, json, num, res) {
-//     await bucket.file(path + "/avatar" + num + ".json").save(json, function (err) {
-//         if (err) {
-//             return res.status(600).send("Erreur lors de la sauvegarde de l'avatar.")
-//         }
-//         console.log("Le fichier JSON a bien été sauvegardé");
-//         return res.status(201).send("Enregistrement effectué");
-//     })
-// }
+/**
+ * Retourne l'avatar' de l'élève, s'il n'en a pas, retourne un avatar par défaut
+ * @param {String} email l'email de l'élève dont on veut récupèrer l'avatar'
+ * @param {*} callback la fonction callback qui renvoie l'avatar ou une erreur
+ */
+ function getAvatar(mail, callback) {
+    const path = "Documents/"+mail+"/images";
+    verificationChemin(path)
+    fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
+        if (err) {
+            console.log('Erreur lors de la récupération de l\'avatar : ' + err)
+            //return res.status(600).send("Problème de lecture de l'avatar.")
+            avatar = {
+                bgColor: "#E0DDFF",
+                earSize: "small",
+                eyeBrowStyle: "up",
+                eyeStyle: "oval",
+                faceColor: "#AC6651",
+                glassesStyle: "none",
+                hairColor: "#000",
+                hairStyle: "thick",
+                hatColor: "#000",
+                hatStyle: "none",
+                mouthStyle: "laugh",
+                noseStyle: "round",
+                shape: "square",
+                shirtColor: "#000",
+                shirtStyle: "polo"
+            }
+            //avatar = JSON.stringify(avatar)
+            console.log("avatar crée")
+            // on envoie le fichier json au front
+            return callback({ avatar: avatar });
+        }
+        avatar = JSON.parse(avatar)
 
-
-// /**
-//  * Retourne l'avatar de l'élève dont le mail est donné.
-//  * 
-//  * @param {*} req la requête du client
-//  * @param {*} res la réponse du serveur
-//  */
-// const getAvatar = (req, res) => {
-//     console.log("\n*** Récupération d'avatar ***")
-
-//     const email = req.query.mail;
-//     const path="./Documents/"+email+"/images/avatar.json";
-
-//     verificationChemin(path)
-//     fs.readFile(path+"/avatar.json", 'utf-8', function (err, avatar) {
-//         if (err) {
-//             console.log('Erreur lors de la récupération de l\'avatar : '+err)
-//             //return res.status(600).send("Problème de lecture de l'avatar.")
-//             avatar = {
-//                 bgColor: "#E0DDFF",
-//                 earSize: "small",
-//                 eyeBrowStyle: "up",
-//                 eyeStyle: "oval",
-//                 faceColor: "#AC6651",
-//                 glassesStyle: "none",
-//                 hairColor: "#000",
-//                 hairStyle: "thick",
-//                 hatColor: "#000",
-//                 hatStyle: "none",
-//                 mouthStyle: "laugh",
-//                 noseStyle: "round",
-//                 shape: "square",
-//                 shirtColor: "#6BD9E9",
-//                 shirtStyle: "polo"
-//             }
-//             avatar = JSON.stringify(avatar)
-//         }
-//         console.log("avatar récupéré")
-//         // on envoie le fichier json au front
-//         return res.json({ avatar: avatar })
-//     })
-// }
-
-
-// /**
-//  * Permet de retourner l'avatar au format json, au chemin passé, avec l'identifiant de l'élève donné.
-//  * @param {String} path le chemin vers l'avatar
-//  * @param {Number} num le numéro de l'élève
-//  * @param {*} res la réponse à renvoyer au client
-//  */
-// async function getJSON(path, num, res, callback) {
-//     let avatar = "";
-//     await bucket.file(path + "/avatar" + num + ".json").createReadStream()
-//         .on('error', function (err) {
-//             console.log(err);
-//             callback(err);
-//         })
-//         .on('data', function (response) {
-//             avatar += response;
-//         })
-//         .on('end', function () {
-//             //console.log("AVATAR : " + avatar)
-//             console.log("avatar récupéré");
-//             // on envoie le fichier json au front
-//             callback({ avatar: avatar });
-//         })
-// }
+        console.log("avatar récupéré")
+        // on envoie le fichier json au front
+        return callback({ avatar: avatar });
+    })
+}
 
 
 /**
@@ -195,120 +152,6 @@ const savePicture = (req, res) => {
                     return res.json(img.buffer).status(201);
                 });
             })
-}
-
-
-// /**
-//  * Renvoie au client la photo de profil de l'utilisateur dont le mail est donné
-//  * @param {*} req la requête du client 
-//  * @param {*} res la réponse du serveur
-//  * @returns la réponse du serveur
-//  */
-// const getPicture = (req, res) => {
-//     console.log("\n*** Récupération de l'image de profil de l'élève ***")
-//     const email = req.query.mail;
-//     if (email == undefined) {
-//         console.log("récupération d'image impossible sans mail!")
-//         return res.sendStatus(400)
-//     }
-
-//     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-//         console.log("forme mail incorrect")
-//         // erreur 400
-//         return res.sendStatus(407)
-//     }
-//     Eleve.findOne({
-//         where: { courriel: email }
-//     })
-//         .then(eleve => {
-//             if (!eleve) {
-//                 console.log("Utilisateur pas trouvé");
-//                 return res.status(404).send("Élève pas trouvé")
-//             }
-//             const num = eleve.ideleve;
-//             const path = "./Eleves/eleve" + num + "/avatar";
-//             let file = "";
-//             verificationChemin(path)
-//             fs.readdir(path, function (err, files) {
-//                 if (err) {
-//                     console.log("erreur durant la récupération " + err)
-//                     return res.status(600).send('Erreur lors de la récupèration de la pp.');
-//                 } else {
-//                     for (const f of files) {
-//                         // les images de profils sont stockées sous le nom de photo
-//                         if (f.startsWith('photo')) {
-//                             file = f;
-//                         }
-//                     }
-//                     if (file == "") {
-//                         console.log("pas d'image")
-//                         // on va retourner une image par défaut 
-//                         fs.readFile("./Image/chat.jpg", function (error, img) {
-//                             if (err) {
-//                                 console.log("erreur lors de la recup de la photo par défeut " + error)
-//                                 return res.send("L'élève n'a pas de photo de profil.").status(204)
-//                             }
-//                             return res.send({ image: img });
-//                         })
-//                     }else{
-//                         fs.readFile(path + "/" + file, function (err, image) {
-//                             if (err) {
-//                                 console.log("erreur lors de la recup de pp " + err)
-//                                 return res.status(520).send(err)
-//                             }
-//                             return res.send({ image: image });
-//                         });
-//                     }
-//                 }
-//             })
-//         })
-//         .catch(err => {
-//             console.log(err)
-//             return res.send(err).status(520)
-//         })
-// }
-
-
-/**
- * Retourne l'avatar' de l'élève, s'il n'en a pas, retourne un avatar par défaut
- * @param {String} email l'email de l'élève dont on veut récupèrer l'avatar'
- * @param {*} callback la fonction callback qui renvoie l'avatar ou une erreur
- */
- function getAvatar(mail, callback) {
-    const path = "Documents/"+mail+"/images";
-    verificationChemin(path)
-    fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
-        if (err) {
-            console.log('Erreur lors de la récupération de l\'avatar : ' + err)
-            //return res.status(600).send("Problème de lecture de l'avatar.")
-            avatar = {
-                bgColor: "#E0DDFF",
-                earSize: "small",
-                eyeBrowStyle: "up",
-                eyeStyle: "oval",
-                faceColor: "#AC6651",
-                glassesStyle: "none",
-                hairColor: "#000",
-                hairStyle: "thick",
-                hatColor: "#000",
-                hatStyle: "none",
-                mouthStyle: "laugh",
-                noseStyle: "round",
-                shape: "square",
-                shirtColor: "#000",
-                shirtStyle: "polo"
-            }
-            //avatar = JSON.stringify(avatar)
-            console.log("avatar crée")
-            // on envoie le fichier json au front
-            return callback({ avatar: avatar });
-        }
-        avatar = JSON.parse(avatar)
-
-        console.log("avatar récupéré")
-        // on envoie le fichier json au front
-        return callback({ avatar: avatar });
-    })
 }
 
 
@@ -379,9 +222,8 @@ function verificationChemin(pathToVerify) {
 
 module.exports = { 
     saveAvatar, 
-    //getAvatar, 
     getAvatar,
     getImage,
     savePicture, 
-    //getPicture, 
-    verificationChemin }
+    verificationChemin
+ }

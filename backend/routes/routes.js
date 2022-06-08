@@ -61,37 +61,8 @@ router.post('/deleteEleve', verifyJWT, ModificationClasse.suppressionEleve)
 
 // route pour sauvegarder l'avatar d'un élève
 router.post('/avatar', verifyJWT, Image.saveAvatar)
-// route pour récupèrer l'avatar
-//router.get('/avatar', verifyJWT, Image.getAvatar)
 // route pour sauvegarder l'image de profil d'un élève
 router.post('/saveImage', verifyJWT, verifyImg.single("file"), Image.savePicture)
-// route pour récupèrer l'image de profil d'un élève
-//router.get('/getImage', verifyJWT, Image.getPicture)
-
-// route pour sauvegarder un document d'un élève
-router.post('/saveFile', verifyJWT, verifyDoc.single("file"), AjoutDoc.saveCoursEleve)
-// route pour sauvegarder un document d'une classe
-router.post('/saveFileClass', verifyJWT, verifyDoc.single("file"), AjoutDoc.saveCoursClasse)
-// route pour récupèrer un document d'un élève
-router.get('/getFile', verifyJWT, Document.getCoursEleve)
-// route pour récupèrer le nom de tous les cours qu'un élève possède dans une matière donnée
-router.get('/getCours', verifyJWT, Document.getAllCoursEleve)
-// route pour accèder à un fichier précis de la classe, dans une matière donnée
-router.get('/getFileClass', verifyJWT, Document.getCoursClasse)
-// route pour récupérer le nom de tous les fichiers présents pour une matière
-router.get('/getCoursClass', verifyJWT, Document.getAllCoursClasse)
-
-// Supprimer les cours
-// route pour supprimer un cours à l'élève
-router.delete('/coursEleve', verifyJWT, SuppressionDoc.deleteCoursEleve)
-// route pour supprimer un cours à la classe
-router.delete('/coursClasse', verifyJWT, SuppressionDoc.deleteCoursClasse)
-
-// Renommer les cours
-// route pour renommer le nom d'un cours(fichier) d'une classe
-router.post("/editFileClasse", verifyJWT, ChangeDoc.renameCoursClasse)
-// route pour renommer le nom d'un cours(fichier) d'un élève
-router.post("/editFileEleve", verifyJWT, ChangeDoc.renameCoursEleve)
 
 // PAS IMPLEMENTE : SUPPRESSION
 // route pour supprimer l'élève
@@ -125,26 +96,5 @@ router.delete('/file', verifyJWT, verifyAccessSave, SuppressionDoc.deleteFile)
 // route pour renommer un fichier
 router.put('/file', verifyJWT, verifyAccessSave, ChangeDoc.renameFile)
 
-// PAS IMPLEMENTE : MATIERES 
-/*PAS IMPLEMENTE : CHANGEMENT DE NOM DES FICHIERS
-// route pour renommer la matière d'une classe
-router.put("matiereClass", ChangeDoc.renameMatiereClasse)
-// route pour renommer la matière d'une classe
-router.put("coursClass", ChangeDoc.renameMatiereClasse)*/
-// PAS IMPLEMENTE : ajout de matiere
-// route pour ajouter une matiere à l'élève
-// router.post('matiereEleve', AjoutDoc.addMatiereEleve)
-// route pour ajouter une matiere à la classe
-// router.post('matiereClasse', AjoutDoc.addMatiereClasse)
-// PAS IMPLEMENTE : suppression de matiere/cours
-// route pour supprimer une matiere à l'élève
-//router.delete('matiereEleve', SuppressionDoc.deleteMatiereEleve)
-// PAS IMPLEMENTE
-// route pour supprimer une matiere à la classe
-//router.delete('matiereClasse', SuppressionDoc.deleteMatiereClasse)
-/*// route pour récupèrer le nom de toutes les matières qu'une classe a
-router.get('/getMatiereClass', verifyJWT, Document.getAllMatieresClasse)
-// route pour récupèrer le nom de toutes les matières qu'un élève possède
-router.get('/getMatieres', verifyJWT, Document.getAllMatieresEleve)*/
 
 module.exports = router;
