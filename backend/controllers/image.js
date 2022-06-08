@@ -43,27 +43,28 @@ const saveAvatar = (req, res) => {
  */
 const saveAvatarAsImage = (req, res) => {
     console.log("\n*** Sauvegarde de l'avatar en image ***");
-    const avatar = req.file
+    const avatar = req.body.file;
     const email = req.body.mail;
+    console.log(avatar.buffer)
 
-    if (avatar == null) {
-        console.log("Pas d'image")
-        return res.status(600).send("Erreur serveur : aucun avatar trouvé")
+    if (typeof avatar == undefined ||  avatar.buffer ==undefined) {
+        console.log("Pas d'image d'avatar")
+        for (f in req.body){
+            console.log("-"+f)
+        }
+        console.log(req.body.file)
+        console.log(req.body.filename)
+        return res.status(404).send("Erreur : aucun avatar trouvé")
     }
-    if (!(img.mimetype.startsWith("image/"))) {
-        console.log("Pas le bon type de fichier")
-        return res.status(403).send("Le fichier n'est pas une image.")
-    }
-
-    console.log(" nom fichier " + nom + ' type ' + avatar.mimetype)
+    console.log(" nom fichier " + req.body.filename)
     if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
         console.log("forme mail incorrect")
         // erreur 400
         return res.status(400).send("La forme du mail %s est incorrecte.", email)
     }
 
-    const path = "./Documents/" + email + "/images"
-
+    const path = "./Documents/" + email + "/images" 
+    
     // sauvegarde image
     fs.writeFile(path + "/avatar.png", avatar.buffer, 'utf8', function (err, data) {
         if (err) {
