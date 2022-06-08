@@ -129,7 +129,7 @@ function getAvatarAsImage(email, callback) {
 
     fs.readFile(path, function (err, avatar) {
         if (err) {
-            fs.readFile("./Image/kiwi.jpg", function (error, avtr) {
+            fs.readFile("./Image/kiwi.png", function (error, avtr) {
                 if (err) {
                     console.log("erreur lors de la recup de la photo par défeut " + error)
                     return callback(new Error("L'élève n'a pas de photo de profil."));
@@ -229,7 +229,7 @@ function getImage(email, callback) {
             if (file == "") {
                 console.log("pas d'image")
                 // on va retourner une image par défaut 
-                fs.readFile("./Image/chat.png", function (error, img) {
+                fs.readFile("./Image/chat.jpg", function (error, img) {
                     if (err) {
                         console.log("erreur lors de la recup de la photo par défeut " + error)
                         return callback(new Error("L'élève n'a pas de photo de profil."));
