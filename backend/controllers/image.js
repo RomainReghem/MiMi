@@ -67,10 +67,10 @@ const saveAvatarAsImage = (req, res) => {
     // sauvegarde image
     fs.writeFile(path + "/avatar.png", avatar.buffer, 'utf8', function (err, data) {
         if (err) {
-            console.log("Erreur lors de l'enregistrement de la photo : " + err);
-            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+            console.log("Erreur lors de l'enregistrement de l'avatar en image : " + err);
+            return res.status(600).send("Erreur lors de l'enregistrement de l'avatar, réesayez.")
         }
-        console.log("La photo a bien été sauvegardée");
+        console.log("L'avatar a bien été sauvegardé");
         return res.status(201).json(avatar.buffer);
     });
 }

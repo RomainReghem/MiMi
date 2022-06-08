@@ -62,7 +62,7 @@ router.post('/deleteEleve', verifyJWT, ModificationClasse.suppressionEleve)
 // route pour sauvegarder l'avatar d'un élève
 router.post('/avatar', verifyJWT, Image.saveAvatar)
 // route pour sauvegarder l'avatar d'un élève au format image
-router.post('/avatarAsImage', verifyJWT, Image.saveAvatarAsImage)
+router.post('/avatarAsImage', verifyJWT, verifyImg.single("file"),Image.saveAvatarAsImage)
 // route pour sauvegarder l'image de profil d'un élève
 router.post('/saveImage', verifyJWT, verifyImg.single("file"), Image.savePicture)
 
