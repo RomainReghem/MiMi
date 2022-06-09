@@ -15,10 +15,10 @@ const saveFile = (req, res) => {
     const file = req.file
 
     if (file == null) {
-        for(r in req.body.formData){
-            console.log("-"+r)
+        for (r in req.body.formData) {
+            console.log("-" + r)
         }
-        console.log("Pas de fichier "+file+" maybe "+req.files)
+        console.log("Pas de fichier " + file + " maybe " + req.files)
         return res.status(600).send("Erreur : aucun fichier n'a été trouvé")
     }
     if (file.mimetype != "application/pdf") {
@@ -27,11 +27,18 @@ const saveFile = (req, res) => {
     }
     const nom = file.originalname;
 
-    verificationChemin(path);
-
+    try {
+        verificationChemin(path)
+    } catch (err) {
+        console.log("erreur verifchemin")
+        return res.status(520).send(err);
+    }
     // Vérification de si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
     let name = verifNom(path, nom);
-
+    if (name == "") {
+        console.log("erreur verif nom pas double")
+        return res.status(520).send("Erreur lors de la vérification du nom du document.")
+    }
     // Enregistrement du fichier en local sur le serveur
     fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
         if (err) {
@@ -64,11 +71,13 @@ function verificationChemin(pathToVerify) {
                 fs.mkdirSync(path);
             }
         } catch (err) {
-            console.error(err);
+            console.error("erreur lors de verification chemin " + err);
+            throw new Error("Erreur lors de la création de dossier pour le chemin" + path)
             //return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
         }
     }
 }
+
 
 /**
  * Retourne le nom, changé si besoin pour qu'il soit unique lors de sa sauvegarde
@@ -94,7 +103,8 @@ function verifNom(path, nom) {
                 isNotUnique = false
             }
         } catch (err) {
-            console.log("Erreur verification nom " + err)
+            console.log("Erreur verification nom " + err);
+            return "";
         }
     }
     return name;
@@ -102,5 +112,7 @@ function verifNom(path, nom) {
 
 
 module.exports = {
-    saveFile
+    saveFile,
+    verificationChemin, 
+    verifNom
 }

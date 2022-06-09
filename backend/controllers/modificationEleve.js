@@ -318,7 +318,10 @@ const ChangementMail = (req, res) => {
                                                     return res.sendStatus(reponse)
                                                 } else {
                                                     // pour récupérer l'avatar de l'élève
-                                                    getAvatar(eleve.ideleve, function (reponseAvatar) {
+                                                    getAvatar(eleve.ideleve, function (err, reponseAvatar) {
+                                                        if (err) {
+                                                            return res.status(520).send(err);
+                                                        }
                                                         //pour récupèrer l'image de profil de l'élève 
                                                         getImage(eleve.courriel, function (err, reponseImage) {
                                                             if (err) {

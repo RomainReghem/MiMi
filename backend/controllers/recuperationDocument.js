@@ -1,35 +1,44 @@
 const fs = require('fs');
-const { verificationChemin } = require('./image');
+const { verificationChemin } = require('./ajoutDocument');
 
 
-const getFiles=(req, res)=>{
+/**
+ * Renvoie au format json la liste des fichiers pdf de l'utilisateur spécifié
+ * La vérification des droits d'accès se fait avant 
+ * @param {*} req la requête du client, on se sert de 'findMail', qui est le mail de l'utilisateur dont on veut avoir la liste de fichiers
+ * @param {*} res la réponse du serveur, composé d'un code http (erreur ou succès),et soit d'un message d'erreur, soit la liste des noms des fichiers
+ */
+const getFiles = (req, res) => {
     console.log("\n*** Récupération des documents ***")
+    //console.log("recuperationDocument.js => getFiles")
     const mailDossier = req.query.findMail;
-    const path='./Documents/'+mailDossier;
+    const path = './Documents/' + mailDossier;
 
-    verificationChemin(path);
+    try {
+        verificationChemin(path);
 
-    fs.readdir(path,{ withFileTypes: true }, function (err, files) {
+    } catch (err) {
+        console.log("Erreur verifchemin " + err)
+        return res.status(520).send(err);
+
+    }
+    fs.readdir(path, { withFileTypes: true }, function (err, files) {
         if (err) {
             console.log("erreur durant la récupération " + err)
             return res.status(520).send("Erreur durant le récupération des fichiers !");
         } else {
-            let f=[]
+            let f = []
             // on n'affichera que les fichiers pdf
-            for (file in files){
-                console.log("-"+files[file].name)
+            for (file in files) {
+                console.log("-" + files[file].name)
                 if (files[file].name.match("(.pdf|.PDF)$")) {
                     f.push(files[file].name)
                 }
             }
-            // on ne veut que les fichiers
-           /* let files=fichiers.filter((dirent)=>dirent.isFile());
-            for (f in files){
-                console.log("-"+f)
-            }*/
-            return res.status(201).send({ files:f });
+
+            return res.status(201).send({ files: f });
         }
-    })
+    });
 }
 
 
@@ -39,17 +48,22 @@ const getFiles=(req, res)=>{
  * @param {*} res la réponse du serveur, contient un code HTTP (erreur ou succès) et un message à envoyer au client
  * @returns la réponse du serveur : res
  */
-const getFile=(req, res)=>{
+const getFile = (req, res) => {
     console.log("\n*** Récupération d'un document ***")
+    //console.log("recuperationDocument.js => getFile")
     const mailDossier = req.query.findMail;
     const name = req.query.name;
-    console.log("nom du mail : "+mailDossier)
+    console.log("nom du mail : " + mailDossier)
 
-    let path='./Documents/'+mailDossier
+    let path = './Documents/' + mailDossier
 
-    verificationChemin(path);
-    
-    path += "/"+name;
+    try {
+        verificationChemin(path);
+    } catch (err) {
+        console.log("Erreur verif chemin : " + err)
+        return res.status(520).send(err);
+    }
+    path += "/" + name;
     if (fs.existsSync(path)) {
         fs.readFile(path, function (err, fichier) {
             if (err) {
@@ -60,6 +74,7 @@ const getFile=(req, res)=>{
             return res.status(201).send({ file: fichier });
         });
     } else {
+        console.log("Erreur : rien trouvé au chemin %s", path)
         return res.status(404).send("Dossier inexistant")
     }
 }

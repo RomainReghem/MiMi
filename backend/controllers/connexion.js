@@ -32,7 +32,7 @@ const Connexion = (req, res) => {
     }
     // on regarde si le mail correspond à un élève
     Eleve.findOne({
-        attributes: ['motdepasse', 'courriel', 'ideleve', 'pseudo'],
+        attributes: ['motdepasse', 'courriel', 'pseudo'],
         where:
             { courriel: email }
     })
@@ -70,7 +70,10 @@ const Connexion = (req, res) => {
                                         return res.sendStatus(reponse)
                                     } else {
                                         // pour récupérer l'avatar de l'élève
-                                        getAvatar(eleve.courriel, function (reponseAvatar) {
+                                        getAvatar(eleve.courriel, function (err, reponseAvatar) {
+                                            if (err) {
+                                                return res.status(520).send(err);
+                                            }
                                             //pour récupèrer l'image de profil de l'élève 
                                             getImage(eleve.courriel, function (err, reponseImage) {
                                                 if (err) {

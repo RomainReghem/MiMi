@@ -47,7 +47,11 @@ function setInvitation(invitation, emailEleve, emailClass, callback) {
                 ).then(newEleve => {
                     console.log("Modification de l'invitation effectuée !")
                     return callback(201);
-                });
+                })
+                .catch(err=>{
+                    console.log("Erreur eleve update : "+err)
+                    return callback(520)
+                })
             } else {
                 console.log("invitation : changement/ajout de l'id de la classe")
                 if (eleve.invitation != "aucune" && invitation == "en attente") {
@@ -61,6 +65,7 @@ function setInvitation(invitation, emailEleve, emailClass, callback) {
                 Classe.findOne({ where: { courriel: emailClasse } })
                     .then(classe => {
                         if (!classe) {
+                            console.log("Erreur : aucune classe trouvée avec l'adresse mail %s",emailClasse)
                             return callback(404);
                         }
                         Eleve.update(
@@ -76,7 +81,15 @@ function setInvitation(invitation, emailEleve, emailClass, callback) {
                             return callback(201);
                         });
                     })
+                    .catch(err=>{
+                        console.log("Erreur : classe findone "+err)
+                        return callback(520)
+                    })
             }
+        })
+        .catch(err=>{
+            console.log("Erreur : eleve findone "+err)
+            return callback(520)
         })
 }
 

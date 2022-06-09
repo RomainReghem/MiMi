@@ -1,4 +1,6 @@
+const res = require('express/lib/response');
 const fs = require('fs');
+const { verificationChemin } = require("./ajoutDocument")
 
 
 /**
@@ -15,7 +17,12 @@ const saveAvatar = (req, res) => {
 
     const path = "./Documents/" + email + "/images";
     avatar = JSON.stringify(avatar)
-    verificationChemin(path)
+    try {
+        verificationChemin(path);
+    } catch (err) {
+        console.log("Erreur images.js=>saveAvatar : " + err)
+        return res.status(520).send("Erreur lors de la vérification des dossiers de sauvegarde.")
+    }
     // on enregistre le fichier JSON correspondant à l'avatar de l'élève
     fs.writeFile(path + "/avatar.json", avatar, 'utf8', function (err) {
         if (err) {
@@ -25,7 +32,6 @@ const saveAvatar = (req, res) => {
         console.log("Le fichier JSON a bien été sauvegardé");
         return res.status(201).send("Enregistrement effectué");
     });
-
 }
 
 
@@ -41,7 +47,7 @@ const saveAvatarAsImage = (req, res) => {
     const avatar = req.file;
     const email = req.body.mail;
 
-   if ( avatar == undefined || avatar.buffer == null) {
+    if (avatar == undefined || avatar.buffer == null) {
         console.log("Pas d'image d'avatar")
         console.log(req.body.file)
         console.log(req.body.filename)
@@ -65,12 +71,17 @@ const saveAvatarAsImage = (req, res) => {
 
 /**
  * Retourne l'avatar' de l'élève, s'il n'en a pas, retourne un avatar par défaut
- * @param {String} email l'email de l'élève dont on veut récupèrer l'avatar'
+ * @param {String} mail l'email de l'élève dont on veut récupèrer l'avatar'
  * @param {*} callback la fonction callback qui renvoie l'avatar ou une erreur
  */
 function getAvatar(mail, callback) {
     const path = "Documents/" + mail + "/images";
-    verificationChemin(path)
+    try {
+        verificationChemin(path);
+    } catch (err) {
+        console.log("Erreur controllers/images.js/getAvatar " + err)
+        return callback(err)
+    }
     fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
         if (err) {
             console.log('Erreur lors de la récupération de l\'avatar : ' + err)
@@ -95,13 +106,13 @@ function getAvatar(mail, callback) {
             //avatar = JSON.stringify(avatar)
             console.log("avatar crée")
             // on envoie le fichier json au front
-            return callback({ avatar: avatar });
+            return callback(null, { avatar: avatar });
         }
-        avatar = JSON.parse(avatar)
 
-        console.log("avatar récupéré")
+        avatar = JSON.parse(avatar)
+        console.log("avatar récupéré !")
         // on envoie le fichier json au front
-        return callback({ avatar: avatar });
+        return callback(null, { avatar: avatar });
     })
 }
 
@@ -119,9 +130,9 @@ function getAvatarAsImage(email, callback) {
             fs.readFile("./Image/avatar.png", function (error, avtr) {
                 if (error) {
                     console.log("Erreur lors de la recup de la photo par défaut " + error)
-                    return callback(new Error("Aucun avatar trouvé pour ce compte."));
+                    return callback("Aucun avatar trouvé pour ce compte.");
                 } else {
-                    console.log("renvoi avatar par défaut "+err)
+                    console.log("renvoi avatar par défaut " + err)
                     return callback(null, { avatarAsImg: avtr });
 
                 }
@@ -150,22 +161,17 @@ const savePicture = (req, res) => {
         console.log("Pas de fichier")
         return res.status(600).send("Erreur serveur")
     }
-   /* if (!(img.mimetype.startsWith("image/"))) {
-        console.log("Pas le bon type de fichier")
-        return res.status(403).send("Le fichier n'est pas une image.")
-    }*/
-    const nom = img.originalname;
-    console.log(" nom fichier " + nom + ' type ' + img.mimetype)
-    if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.sendStatus(407)
-    }
 
     const path = "./Documents/" + email + "/images"
-    verificationChemin(path)
-   // const type = img.mimetype.split("/")[1]
-   const type=req.fileextname;
+
+    try {
+        verificationChemin(path)
+    } catch (error) {
+        console.log("Erreur verif chemin dans savePicture");
+        return res.status(520).send("Erreur lors de la récupération du dossier où se situe l'image.")
+    }
+    // const type = img.mimetype.split("/")[1]
+    const type = req.fileextname;
     console.log("type " + type)
     // avant de sauvegarder on va supprimer les anciennes photos de profil, s'il en existe
     fs.readdir(path, function (err, files) {
@@ -206,11 +212,17 @@ const savePicture = (req, res) => {
 function getImage(email, callback) {
     const path = "./Documents/" + email + "/images";
     let file = "";
-    verificationChemin(path)
+    try {
+        verificationChemin(path);
+    } catch (error) {
+        console.log("Erreur controllers/image.js/getImage : " + err);
+        return res.status(520).send("Erreur lors de la récupération de l'image.")
+    }
+
     fs.readdir(path, function (err, files) {
         if (err) {
             console.log("erreur durant la récupération " + err)
-            return callback(new Error('Erreur lors de la récupération de la photo de profil.'));
+            return callback('Erreur lors de la récupération de la photo de profil.');
         } else {
             for (const f of files) {
                 // les images de profils sont stockées sous le nom de photo
@@ -224,7 +236,7 @@ function getImage(email, callback) {
                 fs.readFile("./Image/chat.jpg", function (error, img) {
                     if (err) {
                         console.log("erreur lors de la recup de la photo par défaut " + error)
-                        return callback(new Error("L'élève n'a pas de photo de profil."));
+                        return callback("L'élève n'a pas de photo de profil.");
                     }
                     return callback(null, { image: img });
                 })
@@ -232,34 +244,13 @@ function getImage(email, callback) {
                 fs.readFile(path + "/" + file, function (err, image) {
                     if (err) {
                         console.log("Erreur lors de la recup de pp " + err)
-                        return callback(err)
+                        return callback("Erreur lors de la récupération de l'image de profil")
                     }
                     return callback(null, { image: image });
                 });
             }
         }
     })
-}
-
-
-/**
- * Cette fonction permet de vérifier si le chemin passé en paramètre existe, et si ce n'est pas le cas, il le crée
- * @param {String} pathToVerify le chemin dont l'existence doit être vérifiée
- */
-function verificationChemin(pathToVerify) {
-    let dossiers = pathToVerify.split('/')
-    let path = dossiers[0]
-    for (var i = 1; i < dossiers.length; i++) {
-        try {
-            path += "/" + dossiers[i]
-            if (!fs.existsSync(path)) {
-                fs.mkdirSync(path);
-            }
-        } catch (err) {
-            console.error(err);
-            // return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
-        }
-    }
 }
 
 
@@ -270,5 +261,4 @@ module.exports = {
     getAvatarAsImage,
     getImage,
     savePicture,
-    verificationChemin
 }

@@ -1,5 +1,5 @@
 const fs = require('fs');
-
+const {verifNom} = require("./ajoutDocument")
 
 /**
  * Renomme le cours d'un utilisateur avec le nouveau nom donné
@@ -24,7 +24,12 @@ const fs = require('fs');
 
     let path = "./Documents/" + email + "/";
 
-    renameDoc(path, ancienCours, nouvCours, function (code) {
+    if(nouvCours==ancienCours){
+        return res.status(204).send("Même nom : aucun changement")
+    }
+    // avant de renommer on vérifie que le nouveau nom soit bien unique
+    let name = verifNom(path, nouvCours);
+    renameDoc(path, ancienCours, name, function (code) {
         return res.sendStatus(code)
     })
 }

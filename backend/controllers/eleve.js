@@ -166,6 +166,7 @@ const deleteStudent = (req, res) => {
  */
 function getInvitation(emailEleve, cb) {
     console.log("\n***Récupération d'invitation.***")
+    // console.log("eleve.js => getInvitation")
      // on vérifie que le mail soit bien présent
      if (!emailEleve) {
         console.log("Adresse mail manquante pour la recuperation d'invitation ")
@@ -183,6 +184,7 @@ function getInvitation(emailEleve, cb) {
         .then(eleve => {
             // si aucun élève n'a été trouvé
             if (!eleve) {
+                console.log("Erreur eleve.js/getInvitation : aucun eleve trouvé avec l'adresse %s", emailEleve)
                 return cb(404)
             }
             const invitation = eleve.invitation;
@@ -190,20 +192,23 @@ function getInvitation(emailEleve, cb) {
                 Classe.findOne({ attributes: ["idclasse", "courriel"], where: { idclasse: eleve.idclasse } })
                     .then(classe => {
                         if (!classe) {
+                            console.log(`Erreur eleve.js/getInvitation : aucun eleve trouvé avec l'id ${eleve.idclasse}`)
                             return cb(404);
                         }
+                        console.log("invitation envoyée avec l'id de la classe, ainsi que le mail de la classe")
                         return cb({ invitation: invitation, idclasse: classe.idclasse, mailClasse:classe.courriel })
                     })
                     .catch(err => {
-                        console.log(err)
+                        console.log(`erreur classe findone ${err}`)
                         return cb(520)
                     });
             } else {
+                console.log("aucune invitation en attente ou acceptee")
                 return cb({ invitation: invitation })
             }
         })
         .catch(err => {
-            console.log(err)
+            console.log(`erreur eleve findone ${err}`)
             return cb(520)
         });
 }

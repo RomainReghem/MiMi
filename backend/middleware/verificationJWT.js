@@ -18,7 +18,7 @@ const verifyJWT = (req, res, next) => {
         console.log("pas de header")
         return res.statut(401).send("aucun en-tête spécifié")
     }
-    console.log("authHeader : " + authHeader)
+    //console.log("authHeader : " + authHeader)
     // le token est en deuxième position
     const token = authHeader.split(' ')[1]
     //console.log("token : "+token)

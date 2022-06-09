@@ -68,7 +68,10 @@ const refreshToken = (req, res) => {
                                     console.log("Erreur lors de la récupération de l'invitation " + reponse)
                                     return res.sendStatus(reponse)
                                 } else {
-                                    getAvatar(mail, function (reponseAvatar) {
+                                    getAvatar(mail, function (err, reponseAvatar) {
+                                        if (err) {
+                                            return res.status(520).send(err);
+                                        }
                                         getImage(mail, function (err, reponseImage) {
                                             if (err) {
                                                 return res.status(520).send(err);

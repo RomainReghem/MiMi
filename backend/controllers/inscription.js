@@ -1,7 +1,7 @@
 //const db = require('../utils/database');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
-const { verificationChemin } = require("./image")
+const { verificationChemin } = require("./ajoutDocument")
 
 const Users = require('../models/users');
 const Eleve = Users.Eleve;
@@ -109,8 +109,8 @@ const InscriptionEleve = (req, res) => {
                                  }
                                  avatar = JSON.stringify(avatar)*/
 
-                               /* const path = "./Documents/" + email
-                                verificationChemin(path + "/images")*/
+                                /* const path = "./Documents/" + email
+                                 verificationChemin(path + "/images")*/
                                 // on enregistre le fichier JSON correspondant à l'avatar de l'élève
                                 /* fs.writeFile(path + "/images/avatar.json", avatar, 'utf8', function (err) {
                                      if (err) {
@@ -188,11 +188,16 @@ const InscriptionClasse = (req, res) => {
                                         motdepasse: hash
                                     }))
                                         .then(() => {
-                                            const path = "./Documents/" + email
-                                            verificationChemin(path)
-                                            console.log("Création de compte classe réussie")
+                                            const path = "./Documents/" + email;
+                                            try {
+                                                verificationChemin(path);
+                                                console.log("Création de compte classe réussie")
+                                                return res.status(201).send("Inscription réussie !");
+                                            } catch (error) {
+                                                console.log("Erreur verif chemin")
+                                                return res.status(520).send(error);
 
-                                            return res.status(201).send("Inscription réussie !");
+                                            }
                                         })
                                         .catch(err => {
                                             console.log("erreur inscription classe : " + err)
