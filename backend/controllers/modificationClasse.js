@@ -55,13 +55,14 @@ const suppressionEleve = (req, res) => {
             if (code == 201) {
                 return res.status(201).send("Suppression de l'élève réussi !")
             }
-            return res.status(code).send("Erreur")
+            return res.status(code).send("Erreur lors de la suppression de l'élève de la classe.")
         })
     } else {
         console.log("Role %s inconnu ", role)
         return res.status(403).send("Accès interdit")
     }
 }
+
 
 /**
  * Change dans la bd le mot de passe de la classe.
@@ -79,15 +80,11 @@ const changementMdpClasse = (req, res) => {
     console.log("** Vérification des données **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
-        return res.status(406).send("Le mot de passe actuel n'est pas de la bonne forme ! ")
+        return res.status(400).send("Le mot de passe actuel n'est pas de la bonne forme ! ")
     }
     if (!(newMdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
-        return res.status(406).send("Le nouveau mot de passe n'est pas de la bonne forme !")
-    }
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        return res.status(407).send("L'adresse mail fournie n'est pas de la bonne forme !")
+        return res.status(400).send("Le nouveau mot de passe n'est pas de la bonne forme !")
     }
 
     const role = req.role;
@@ -145,6 +142,7 @@ const changementMdpClasse = (req, res) => {
     }
 }
 
+
 /**
  * Change dans la base de données l'adresse mail de la classe, et les tokens associés
  * @param {*} req la requête du client, contient l'ancien et le nouveau mail de la classe, ainsi que le mot de passe de la classe
@@ -157,14 +155,14 @@ const changementMailClasse = (req, res) => {
     const mdp = req.body.pwd;
     console.log("email " + email + " new " + newEmail + " mdp " + mdp)
 
-    console.log("** Vérification mail **")
+    console.log("** Vérification mdp et mails **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
-        return res.status(406).send("Le mot de passe n'est pas de la bonne forme ! ")
+        return res.status(400).send("Le mot de passe n'est pas de la bonne forme ! ")
     }
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length || !(newEmail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= newEmail.length) {
+    if (!(newEmail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= newEmail.length) {
         console.log("forme mail incorrect")
-        return res.status(407).send("L'adresse mail fournie n'est pas de la bonne forme !")
+        return res.status(400).send("L'adresse mail fournie n'est pas de la bonne forme !")
     }
     if (newEmail == email) {
         console.log("mails identiques")

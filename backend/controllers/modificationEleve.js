@@ -9,6 +9,7 @@ const Modification = require('./modificationInvitation.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
 /**
  * Change le pseudo de l'élève dans la base de données.
  * Utilise l'email, l'ancien pseudo et le mot de passe donnés par le client.
@@ -23,10 +24,6 @@ const ChangementPseudo = (req, res) => {
     const pseudo = req.body.newPseudo;
     //console.log("email " + email + " new " + pseudo)
 
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        return res.status(407).send("La forme de l'adresse mail est incorrecte.")
-    }
     if (!(pseudo.match("^[A-z0-9-_]{3,24}$"))) {
         console.log("forme pseudo incorrect")
         return res.status(405).send("Le pseudo ne respecte pas les règles.")
@@ -84,12 +81,13 @@ const SuppressionClasse = (req, res) => {
             if (code == 201) {
                 return res.status(201).send("Suppression de classe réussie !")
             }
-            return res.status(code).send("Erreur")
+            return res.status(code).send("Erreur lorsque l'éleve a essayé de quitter la classe.")
         })
     } else {
         return res.status(403).send("Pas un élève / pas le bon élève : accès interdit")
     }
 }
+
 
 /**
  * Change la valeur d'invitation à acceptee et l'id de classe à l'id de la classe dont on reçoit le mail
@@ -98,6 +96,7 @@ const SuppressionClasse = (req, res) => {
  */
 const AcceptationInvitation = (req, res) => {
     console.log("\n*** Acceptation de l'invitation d'une classe ***")
+    //console.log("modificationEleve.js => AcceptationInvitation")
     const email = req.body.user;
     const role = req.role;
     const emailToken = req.mail
@@ -121,17 +120,17 @@ const AcceptationInvitation = (req, res) => {
                             if (code == 201) {
                                 return res.status(201).send("Acceptation de la classe réussie !")
                             }
-                            return res.status(code).send("Erreur")
+                            return res.status(code).send("Erreur lorque l'invitation a été acceptée")
                         })
                     })
                     .catch(err => {
-                        console.log(err)
-                        return res.status(520).send(err)
+                        console.log("erreur classe findone "+err)
+                        return res.status(520).send("Erreur lors de la récupération des informations de la classe.")
                     });
             })
             .catch(err => {
-                console.log(err)
-                return res.status(520).send(err)
+                console.log("erreur eleve findone "+err)
+                return res.status(520).send("Erreur lors de la récupération des informations du compte utilisateur.")
             });
     } else {
         return res.status(403).send("Pas un élève / pas le bon élève")
@@ -164,10 +163,6 @@ const ChangementMdp = (req, res) => {
     if (!(newMdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
         console.log("taille mdp pas ok")
         return res.status(406).send("Le nouveau mot de passe n'est pas de la bonne forme !")
-    }
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        return res.status(407).send("L'adresse mail fournie n'est pas de la bonne forme !")
     }
 
     const role = req.role;
@@ -245,7 +240,7 @@ const ChangementMail = (req, res) => {
         console.log("taille mdp pas ok")
         return res.status(406).send("Le mot de passe n'est pas de la bonne forme ! ")
     }
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length || !(newEmail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= newEmail.length) {
+    if ( !(newEmail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= newEmail.length) {
         console.log("forme mail incorrect")
         return res.status(407).send("L'adresse mail fournie n'est pas de la bonne forme !")
     }

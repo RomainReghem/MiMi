@@ -28,7 +28,7 @@ const Connexion = (req, res) => {
     const mdp = req.body.pwd;
     //console.log("connexion " + mdp + " " + email)
     if (mdp == "" || email == "") {
-        return res.sendStatus(402);
+        return res.status(402).send("Mot de passe ou mail vide");
     }
     // on regarde si le mail correspond à un élève
     Eleve.findOne({

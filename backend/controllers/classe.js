@@ -1,5 +1,9 @@
+const fs = require('fs');
+
 const Classe = require('../models/users').Classe
 const Eleve = require('../models/users').Eleve
+const Score = require('../models/users').Score
+
 
 /**
  * Renvoie l'adresse mail et le nom de tous les élèves qui appartenant à la classe donnée (mail)
@@ -87,7 +91,7 @@ const deleteClasse = (req, res) => {
             // on va changer toutes les invitations des élèves de la classe
             // on cherche tous les élèves qui appartiennent à la classe dont l'id est donné
             // on fait cela pour éviter les contraintes de clé étrangère, et qu'un élève peut exister sans classe
-            Eleve.update({ idclass: null, invitation: "aucune" }, { where: { idclasse: num } })
+            Eleve.update({ idclasse: '', invitation: "aucune" }, { where: { idclasse: num } })
                 .then(() => {
                     // on supprime maintenant les scores pour respecter les contraintes de clé étrangère
                     Score.destroy({
@@ -102,13 +106,10 @@ const deleteClasse = (req, res) => {
                                 where: {
                                     idclasse: num
                                 }
-                            }).then(result => {
-                                if (!result) {
-                                    console.log("erreur non déf")
-                                    return res.status(520);
-                                }
+                            }).then(() => {
+                                console.log("ok")
                                 // maintenant on doit supprimer les dossiers et les documents de la classe
-                                const path = "./Classes/eleve" + num
+                                const path = "./Documents/" + mail
                                 // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
                                 fs.rmdir(path, { recursive: true }, (err) => {
                                     if (err) {
@@ -116,30 +117,31 @@ const deleteClasse = (req, res) => {
                                         return res.status(500).send("Erreur lors de la suppression de documents.")
                                     }
                                     console.log("Suppression effectuée !")
-                                    return res.send("Suppression effectuée").status(201)
+                                    return res.status(201).send("Suppression effectuée")
                                 });
                             }).catch(err => {
-                                console.log(err)
+                                console.log("erreur Classe destroy "+err)
                                 return res.status(500).send("Erreur survenue lors de la suppression de la classe.")
                             })
                         })
                         .catch(err => {
-                            console.log(err)
+                            console.log("erreur score destroy"+err)
                             return res.status(500).send("Erreur survenue lors de la suppression du score.")
                         })
                 })
                 .catch(err => {
                     console.log("Erreur eleve update" + err)
-                    return res.send("Erreur lors du retrait des invitations des élèves").status(520)
+                    return res.status(520).send("Erreur lors du retrait des invitations des élèves")
                 });
         }).catch(err => {
-            console.log(err)
-            return res.status(404).send("Serveur injoignable.")
+            console.log("erreur classe findone "+err)
+            return res.status(520).send("Serveur injoignable.")
         })
 }
 
 
 module.exports = {
     getAllStudents,
+    getAllStudentsInvited,
     deleteClasse
 }

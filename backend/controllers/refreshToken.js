@@ -64,7 +64,7 @@ const refreshToken = (req, res) => {
                             }
                             // on doit récupèrer l'état de l'invitation pour le transmettre au serveur
                             getInvitation(mail, function (reponse) {
-                                if (reponse == 404 || reponse == 400 || 520==reponse) {
+                                if (reponse == 404 || reponse == 400 || 520 == reponse) {
                                     console.log("Erreur lors de la récupération de l'invitation " + reponse)
                                     return res.sendStatus(reponse)
                                 } else {
@@ -73,13 +73,14 @@ const refreshToken = (req, res) => {
                                             if (err) {
                                                 return res.status(520).send(err);
                                             }
-                                            getAvatarAsImage(mail, function(err, reponseAvatarAsImage){
+                                            getAvatarAsImage(mail, function (err, reponseAvatarAsImage) {
                                                 if (err) {
                                                     return res.status(520).send(err);
                                                 }
                                                 //console.log('envoi des infos')
-                                                return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar,reponseAvatarAsImage, reponseImage));
-                                            })                                        })
+                                                return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseAvatarAsImage, reponseImage));
+                                            })
+                                        })
                                     })
 
                                 }

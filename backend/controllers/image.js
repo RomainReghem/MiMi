@@ -12,11 +12,6 @@ const saveAvatar = (req, res) => {
     console.log("\n*** Sauvegarde d'avatar ***")
     let avatar = req.body.avatar;
     const email = req.body.mail;
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.status(407).send("La forme du mail est incorrecte.")
-    }
 
     const path = "./Documents/" + email + "/images";
     avatar = JSON.stringify(avatar)
@@ -53,11 +48,6 @@ const saveAvatarAsImage = (req, res) => {
         return res.status(404).send("Erreur : aucun avatar trouvé")
     }
     console.log(" nom fichier " + req.body.filename)
-    if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
-        console.log("forme mail incorrect")
-        // erreur 400
-        return res.status(400).send("La forme du mail %s est incorrecte.", email)
-    }
 
     const path = "./Documents/" + email + "/images"
 
@@ -160,10 +150,10 @@ const savePicture = (req, res) => {
         console.log("Pas de fichier")
         return res.status(600).send("Erreur serveur")
     }
-    if (!(img.mimetype.startsWith("image/"))) {
+   /* if (!(img.mimetype.startsWith("image/"))) {
         console.log("Pas le bon type de fichier")
         return res.status(403).send("Le fichier n'est pas une image.")
-    }
+    }*/
     const nom = img.originalname;
     console.log(" nom fichier " + nom + ' type ' + img.mimetype)
     if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
@@ -174,7 +164,8 @@ const savePicture = (req, res) => {
 
     const path = "./Documents/" + email + "/images"
     verificationChemin(path)
-    const type = img.mimetype.split("/")[1]
+   // const type = img.mimetype.split("/")[1]
+   const type=req.fileextname;
     console.log("type " + type)
     // avant de sauvegarder on va supprimer les anciennes photos de profil, s'il en existe
     fs.readdir(path, function (err, files) {
@@ -187,15 +178,15 @@ const savePicture = (req, res) => {
             if (f.startsWith('photo')) {
                 fs.unlink(path + "/" + f, function (err) {
                     if (err) {
-                        console.log("erreur lors de la suppression de pp " + err)
-                        return res.status(520).send(err)
+                        console.log("erreur lors de la suppression de l'ancienne pp " + err)
+                        return res.status(520).send("Erreur lors de la suppression de l'ancienne image de profil.")
                     }
                     //console.log("Suppression ok")
                 });
             }
         }
         // sauvegarde image
-        fs.writeFile(path + "/photo." + type, img.buffer, 'utf8', function (err, data) {
+        fs.writeFile(path + "/photo" + type, img.buffer, 'utf8', function (err, data) {
             if (err) {
                 console.log("Erreur lors de l'enregistrement de la photo : " + err);
                 return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")

@@ -15,13 +15,6 @@ const getUsernameStudent = (req, res) => {
     console.log("\n*** Récupération du pseudo ***")
     const email = req.query.mail
 
-    if (email == undefined) {
-        return res.status(404).send("Pas de mail")
-    }
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        return res.status(400).send("Mail incorrect")
-    }
-
     const role = req.role;
     const emailToken = req.mail
     // pas d'autre utilisateur que l'élève ne peut récupèrer son propre pseudo
@@ -34,14 +27,14 @@ const getUsernameStudent = (req, res) => {
         }).then(eleve => {
             if (eleve) {
                 console.log('pseudo ' + eleve.pseudo)
-                return res.json({ pseudo: eleve.pseudo })
+                return res.status(201).json({ pseudo: eleve.pseudo })
             } else {
                 return res.status(409).send("Aucun élève avec cette adresse")
             }
         })
             .catch(err => {
                 console.log(err)
-                return res.send(err).status(520)
+                return res.status(520).send("Erreur lors de la récupération du pseudo")
             });
     } else {
         return res.send("Pas un élève / pas le bon élève").status(403)
@@ -49,48 +42,48 @@ const getUsernameStudent = (req, res) => {
 }
 
 
-/**
- * Renvoie au client le nom et prénom de l'élève en fonction de son adresse mail.
- * 
- * @param {*} req la requête du client, contient le mail de l'élève
- * @param {*} res la réponse du serveur
- */
-const getNameStudent = (req, res) => {
-    console.log("\n*** Récupération du nom et du prénom de l'élève ***")
-    const email = req.query.mail
+// /**
+//  * Renvoie au client le nom et prénom de l'élève en fonction de son adresse mail.
+//  * 
+//  * @param {*} req la requête du client, contient le mail de l'élève
+//  * @param {*} res la réponse du serveur
+//  */
+// const getNameStudent = (req, res) => {
+//     console.log("\n*** Récupération du nom et du prénom de l'élève ***")
+//     const email = req.query.mail
 
-    if (email == undefined) {
-        return res.status(404).send("Pas de mail")
-    }
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        return res.status(400).send("Mail incorrect")
-    }
+//     if (email == undefined) {
+//         return res.status(404).send("Pas de mail")
+//     }
+//     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
+//         return res.status(400).send("Mail incorrect")
+//     }
 
-    const role = req.role;
-    const emailToken = req.mail
-    // pas d'autre utilisateur que l'élève ne peut récupèrer son propre pseudo
-    if (role == "eleve" && emailToken == email) {
-        Eleve.findOne({
-            attributes: ['prenom', 'nom'],
-            where: {
-                courriel: email
-            }
-        }).then(eleve => {
-            if (eleve) {
-                console.log('prenom %s et nom %s ', eleve.prenom, eleve.nom)
-                return res.json({ nom: eleve.nom, prenom: eleve.prenom })
-            } else {
-                return res.status(409).send("Aucun élève avec cette adresse")
-            }
-        })
-            .catch(err => {
-                console.log(err)
-                return res.send(err).status(520)
-            });
-    } else {
-        return res.send("Pas un élève / pas le bon élève").status(403)
-    }
-}
+//     const role = req.role;
+//     const emailToken = req.mail
+//     // pas d'autre utilisateur que l'élève ne peut récupèrer son propre pseudo
+//     if (role == "eleve" && emailToken == email) {
+//         Eleve.findOne({
+//             attributes: ['prenom', 'nom'],
+//             where: {
+//                 courriel: email
+//             }
+//         }).then(eleve => {
+//             if (eleve) {
+//                 console.log('prenom %s et nom %s ', eleve.prenom, eleve.nom)
+//                 return res.status(200).json({ nom: eleve.nom, prenom: eleve.prenom })
+//             } else {
+//                 return res.status(409).send("Aucun élève avec cette adresse")
+//             }
+//         })
+//             .catch(err => {
+//                 console.log(err)
+//                 return res.status(520).send(err)
+//             });
+//     } else {
+//         return res.status(403).send("Pas un élève / pas le bon élève")
+//     }
+// }
 
 
 /**
@@ -101,19 +94,9 @@ const getNameStudent = (req, res) => {
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
  */
-const deleteStudent = async (req, res) => {
+const deleteStudent = (req, res) => {
     console.log('\n*** Suppression de compte élève ***')
-    // on vérifie que le mail soit bien présent
-    if (!req?.body?.mail) {
-        console.log("Adresse mail manquante pour la suppression ")
-        return res.status(400).send('Email manquant');
-    }
     const email = req.body.mail
-    // vérification du mail
-    if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
-        return res.status(407).send("Mail incorrect")
-    }
 
     const role = req.role;
     const emailToken = req.mail
@@ -127,7 +110,7 @@ const deleteStudent = async (req, res) => {
             .then(eleve => {
                 // si aucun élève n'a été trouvé
                 if (!eleve) {
-                    return res.status(401).send("Pas d'élève trouvé avec cet adresse mail.");
+                    return res.status(404).send("Pas d'élève trouvé avec cet adresse mail.");
                 }
                 // sinon on supprime l'élève
                 Eleve.destroy({
@@ -141,22 +124,22 @@ const deleteStudent = async (req, res) => {
                     fs.rm(path, { recursive: true }, (err) => {
                         if (err) {
                             console.log("erreur suppression dossiers : " + err)
-                            return res.status(500).send("Erreur lors de la suppression de documents.")
+                            return res.status(500).send("Erreur lors de la suppression des documents.")
                         }
                         console.log("Suppression effectuée !")
-                        return res.sendStatus(205);
+                        return res.status(205).send("Suppression de l'élève effectuée !");
                     })
                 }).catch(err => {
-                    console.log(err)
-                    return res.send(err).status(520)
+                    console.log("erreur eleve destroy "+err)
+                    return res.status(520).send("Erreur survenue lors de la suppression du compte.");
                 });
             })
             .catch(err => {
                 console.log(err)
-                return res.send(err).status(520)
+                return res.status(520).send("Erreur lors de la récupération des données du compte à supprimer.")
             });
     } else {
-        return res.send("Pas un élève / pas le bon élève").status(403)
+        return res.status(403).send("Pas un élève / pas le bon élève")
     }
 }
 
@@ -183,6 +166,11 @@ const deleteStudent = async (req, res) => {
  */
 function getInvitation(emailEleve, cb) {
     console.log("\n***Récupération d'invitation.***")
+     // on vérifie que le mail soit bien présent
+     if (!emailEleve) {
+        console.log("Adresse mail manquante pour la recuperation d'invitation ")
+        return cb(400);
+    }
     if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
         console.log("forme mail incorrect")
         return cb(400)

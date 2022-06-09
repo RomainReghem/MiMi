@@ -9,9 +9,9 @@ const Classe = Users.Classe;
  * @param {*} emailClass le mail de la classe qui a donné l'invitation (s'il y en a une)
  * @returns un nombre correspond au code http à renvoyer 
  */
-function setInvitation (invitation, emailEleve, emailClass,callback){
+function setInvitation(invitation, emailEleve, emailClass, callback) {
     console.log("\n*** Changement d'invitation ***")
-    console.log("invitation "+invitation+ " eleve "+emailEleve+" classe "+emailClass)
+    console.log("invitation " + invitation + " eleve " + emailEleve + " classe " + emailClass)
     // vérification du mail
     if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
         console.log("forme mail incorrecte")
@@ -22,24 +22,24 @@ function setInvitation (invitation, emailEleve, emailClass,callback){
         console.log("forme invitation incorrecte")
         return callback(400)
     }
-    let emailClasse="";
+    let emailClasse = "";
     // if invitation isn't set to aucune, then the request body has to contain the mail of the class
-    if (invitation!="aucune"){
-        emailClasse=emailClass
+    if (invitation != "aucune") {
+        emailClasse = emailClass
     }
     // on cherche dans la bd l'eleve qui correspond au mail fourni
-    Eleve.findOne({where : { courriel: emailEleve }})
+    Eleve.findOne({ where: { courriel: emailEleve } })
         .then(eleve => {
             if (!eleve) {
                 console.log("Aucun élève trouvé avec cette adresse.");
                 return callback(404);
             }
-            if(emailClasse==""){
+            if (emailClasse == "") {
                 console.log("pas d'invitation : suppression des valeurs antérieures")
                 Eleve.update(
                     {
                         idclasse: null,
-                        invitation:"aucune"
+                        invitation: "aucune"
                     },
                     {
                         where: { ideleve: eleve.ideleve },
@@ -48,36 +48,36 @@ function setInvitation (invitation, emailEleve, emailClass,callback){
                     console.log("Modification de l'invitation effectuée !")
                     return callback(201);
                 });
-            }else{
+            } else {
                 console.log("invitation : changement/ajout de l'id de la classe")
-                if(eleve.invitation!="aucune" && invitation=="en attente"){
+                if (eleve.invitation != "aucune" && invitation == "en attente") {
                     console.log("Erreur : l'élève est dans une classe ou a une demande en attente")
                     return callback(403)
                 }
-                if ((invitation=="acceptee" && eleve.invitation!="en attente")){
+                if ((invitation == "acceptee" && eleve.invitation != "en attente")) {
                     console.log("Invitation impossible : l'élève n'a pas de demande en attente")
                     return callback(409)
                 }
-                Classe.findOne({where:{courriel:emailClasse}})
-                .then(classe=>{
-                    if(!classe){
-                        return callback(404);
-                    }
-                    Eleve.update(
-                        {
-                            idclasse: classe.idclasse,
-                            invitation:invitation
-                        },
-                        {
-                            where: { ideleve: eleve.ideleve },
+                Classe.findOne({ where: { courriel: emailClasse } })
+                    .then(classe => {
+                        if (!classe) {
+                            return callback(404);
                         }
-                    ).then(newEleve => {
-                        console.log("Modification de l'invitation effectuée !")
-                        return callback(201);
-                    });     
-                })
+                        Eleve.update(
+                            {
+                                idclasse: classe.idclasse,
+                                invitation: invitation
+                            },
+                            {
+                                where: { ideleve: eleve.ideleve },
+                            }
+                        ).then(newEleve => {
+                            console.log("Modification de l'invitation effectuée !")
+                            return callback(201);
+                        });
+                    })
             }
         })
 }
 
-module.exports = {setInvitation}
+module.exports = { setInvitation }

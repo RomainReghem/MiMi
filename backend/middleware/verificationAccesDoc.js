@@ -190,7 +190,7 @@ function determiningRole(email, callback) {
                     // pas de classe, pas de chocolat !
                     if (!classe) {
                         console.log("Aucun utilisateur avec l'adresse mail %s trouvée :( ", email);
-                        return callback(new Error("Aucun utilisateur trouvé ayant cette adresse : %s", email))
+                        return callback("Aucun utilisateur trouvé ayant cette adresse : "+email)
                     }
                     //console.log("Oh... C'est une classe...")
                     return callback(null, "classe")
@@ -198,7 +198,7 @@ function determiningRole(email, callback) {
         })
         .catch(err => {
             console.log("Erreur lors de verif si eleve : " + err)
-            return callback(new Error("Problème lors de la vérification d'identité de compte"));
+            return callback("Problème lors de la vérification d'identité de compte");
         })
 }
 

@@ -1,6 +1,3 @@
-const Eleve = require('../models/users').Eleve
-const Classe = require('../models/users').Classe
-
 const fs = require('fs');
 
 

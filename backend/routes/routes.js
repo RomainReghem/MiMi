@@ -1,7 +1,9 @@
 // MIDDLEWARES
 const verifyJWT = require('../middleware/verificationJWT.js').verifyJWT
-const verifyDoc = require('../middleware/verificationSauvegardeDoc.js')
+const verifyDoc = require('../middleware/verificationDoc.js')
 const verifyImg = require('../middleware/verificationImage.js')
+const { verifyMailBody, verifyMailQuery } = require('../middleware/verificationMail.js')
+const { verifyAccesGet, verifyAccessSave } = require('../middleware/verificationAccesDoc.js')
 // CONTROLLERS
 const Connexion = require('../controllers/connexion.js')
 const Inscription = require('../controllers/inscription.js')
@@ -11,7 +13,7 @@ const Image = require('../controllers/image.js')
 // pour les documents
 const SuppressionDoc = require('../controllers/suppressionDocument.js')
 const AjoutDoc = require('../controllers/ajoutDocument.js')
-const Document = require('../controllers/recuperationDocument.js')
+const RecupDoc = require('../controllers/recuperationDocument.js')
 const ChangeDoc = require('../controllers/changementDocument.js')
 // controlleurs spécifiques en fonction du type d'utilisateur
 const Eleve = require('../controllers/eleve.js')
@@ -23,9 +25,9 @@ const Score = require('../controllers/score.js')
 
 // LIBRAIRIES
 const express = require('express')
-const { verifyAccesGet, verifyAccessSave } = require('../middleware/verifyMail.js')
 const router = express.Router();
 
+// Inscription & connexion
 // route de la connexion d'un utilisateur
 router.post('/login', Connexion.Connexion);
 // route de l'inscription d'un eleve
@@ -40,57 +42,68 @@ router.get('/refresh', refreshToken.refreshToken);
 // pour toutes les routes qui ont besoin d'une authentification : on fait appel au middleware qui vérifie la validité du token
 //router.use(verifyJWT)
 
-// route qui permet de retourner un pseudo à partir du mail
-router.get('/pseudo', verifyJWT, Eleve.getUsernameStudent)
+// Gestion par l'élève des invitations à rejoindre une classse
 // route qui permet de refuser l'invitation de la classe (et donc supprime la classe et l'invitation de la bd)
 router.post('/refuseInvite', verifyJWT, ModificationEleve.SuppressionClasse)
 // route qui permet de supprimer la classe d'un eleve (cad on retire l'invitation)
 router.post('/quitClass', verifyJWT, ModificationEleve.SuppressionClasse)
-
-// route pour changer le pseudo : seulement pour l'élève
-router.post('/changePseudo', verifyJWT, ModificationEleve.ChangementPseudo)
 // route qui permet d'accepter l'invitation d'une classe
 router.post('/acceptInvite', verifyJWT, ModificationEleve.AcceptationInvitation)
 
-// route qui permet de retourner la liste d'emails des eleves d'une classe
-router.get('/eleves', verifyJWT, Classe.getAllStudents)
+// Gestion du pseudo de l'élève
+// route pour changer le pseudo : seulement pour l'élève
+router.post('/changePseudo', verifyJWT, verifyMailBody, ModificationEleve.ChangementPseudo)
+// route qui permet de retourner un pseudo à partir du mail
+router.get('/pseudo', verifyJWT, verifyMailQuery, Eleve.getUsernameStudent)
+
+// Gestion des élèves invités par la classe
+// route qui permet de retourner la liste d'emails, ainsi que le noms des eleves d'une classe
+router.get('/eleves', verifyJWT, verifyMailQuery, Classe.getAllStudents)
+// PAS IMPLEMENTE : liste des eleves invites
+// route qui permet de retourner la liste d'emails des élèves invités dans une classe
+// router.get('/elevesInvited', verifyJWT, verifyMailQuery, Classe.getAllStudentsInvited)
 // route qui permet d'envoyer une invitation à un élève
 router.post('/inviteEleve', verifyJWT, ModificationClasse.ajoutInvitation)
 // route permettant de supprimer un élève de la classe
 router.post('/deleteEleve', verifyJWT, ModificationClasse.suppressionEleve)
 
+// Sauvegarde de la photo de profil et de l'avatar
 // route pour sauvegarder l'avatar d'un élève
-router.post('/avatar', verifyJWT, Image.saveAvatar)
+router.post('/avatar', verifyJWT, verifyMailBody, Image.saveAvatar)
 // route pour sauvegarder l'avatar d'un élève au format image
-router.post('/avatarAsImage', verifyJWT, verifyImg.uploadAvatar.single("file"),Image.saveAvatarAsImage)
+router.post('/avatarAsImage', verifyJWT, verifyImg.uploadAvatar.single("file"), verifyMailBody, Image.saveAvatarAsImage)
 // route pour sauvegarder l'image de profil d'un élève
-router.post('/saveImage', verifyJWT, verifyImg.upload.single("file"), Image.savePicture)
+router.post('/saveImage', verifyJWT, verifyImg.upload.single("file"), verifyMailBody, Image.savePicture)
 
 // PAS IMPLEMENTE : SUPPRESSION
 // route pour supprimer l'élève
-// router.delete("/eleve", Eleve.deleteStudent)
+// router.delete("/eleve", verifyJWT, verifyMailBody, Eleve.deleteStudent)
 // PAS IMPLEMENTE
 // route pour supprimer la classe
-// router.delete("/classe", Classe.deleteClass)
+// router.delete("/classe", verifyJWT, verifyMailBody, Classe.deleteClasse)
 
+// Changement de mot de passe et de mail
 // route pour changer le mot de passe de la classe
-router.post('/changePwdClasse', verifyJWT, ModificationClasse.changementMdpClasse)
+router.post('/changePwdClasse', verifyJWT, verifyMailBody, ModificationClasse.changementMdpClasse)
 // route pour changer l'adresse mail de la classe
-router.post('/changeMailClasse', verifyJWT, ModificationClasse.changementMailClasse)
+router.post('/changeMailClasse', verifyJWT, verifyMailBody, ModificationClasse.changementMailClasse)
 // route pour changer le mot de passe de l'élève
-router.post('/changePwdEleve', verifyJWT, ModificationEleve.ChangementMdp)
+router.post('/changePwdEleve', verifyJWT, verifyMailBody, ModificationEleve.ChangementMdp)
 // route pour changer l'adresse mail de l'élève
-router.post('/changeMailEleve', verifyJWT, ModificationEleve.ChangementMail)
+router.post('/changeMailEleve', verifyJWT, verifyMailBody, ModificationEleve.ChangementMail)
 
-// score de jeu
+// Score de jeu
 // route pour récupérer un score de jeu (appel à chaque fin de partie)
-router.get('/score', verifyJWT, Score.getScoreTicTacToe)
+router.get('/score', verifyJWT, verifyMailQuery, Score.getScoreTicTacToe)
+// PAS IMPLEMENTE : remise à zéro du score
+// route pour remettre à zéro le score (le réinitialiser) d'une classe et de ses eleves
+// router.delete('/score', verifyJWT, Score.resetScore)
 
 // Modification des fichiers
 // route pour récupèrer le nom des fichiers d'un utilisateur, en fonction de son adresse mail
-router.get('/files', verifyJWT, verifyAccesGet, Document.getFiles)
+router.get('/files', verifyJWT, verifyAccesGet, RecupDoc.getFiles)
 // route pour récupèrer un fichier particulier
-router.get('/file', verifyJWT, verifyAccesGet, Document.getFile)
+router.get('/file', verifyJWT, verifyAccesGet, RecupDoc.getFile)
 // route pour déposer un fichier
 router.post('/file', verifyJWT, verifyDoc.single("file"), verifyAccessSave, AjoutDoc.saveFile)
 // route pour supprimer un fichier

@@ -211,14 +211,14 @@ function getScore(id, jeu, callback) {
                 })
                 .catch(err => {
                     console.log("Erreur serveur creation des données pour le jeu \n" + err)
-                    return callback(new Error("Erreur serveur creation des données pour le jeu"));
+                    return callback("Erreur du serveur lors de la creation des données pour le jeu");
                 });
         }
         // on renvoie le score
         return callback(null, score)
     }).catch(err => {
         console.log("Erreur récuperation score \n" + err)
-        return callback(new Error("Erreur lors de la récupération du score."));
+        return callback("Erreur lors de la récupération du score.");
     });
 }
 
@@ -247,7 +247,7 @@ async function addVictory(email) {
             }
         } catch (error) {
             console.log("erreur lors des requetes " + error)
-            throw error
+            throw new Error("Erreur lors du changement du score.")
         }
     }
 }
@@ -277,8 +277,8 @@ async function addPartie(email) {
                 console.log("ajout de partie pour l'élève ok")
             }
         } catch (err) {
-            console.log("Erreur : %", err)
-            throw err;
+            console.log("Erreur : " + err)
+            throw new Error("Erreur durant l'ajout du nombre de partie");
         }
     }
 }
@@ -287,5 +287,6 @@ async function addPartie(email) {
 module.exports = {
     getScoreTicTacToe,
     addVictory,
+    //resetScore,
     addPartie
 }
