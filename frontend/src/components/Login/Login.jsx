@@ -7,6 +7,7 @@ import { useToast } from '@chakra-ui/react';
 import axios from '../../api/axios'
 import useAuth from '../../hooks/useAuth'
 import useUserData from '../../hooks/useUserData';
+import useSetURL from '../../hooks/useSetURL';
 
 
 const LOGIN_URL = '/login';
@@ -15,6 +16,7 @@ export default function Login() {
     const toast = useToast();
     const { setAuth } = useAuth();
     const { setUserData } = useUserData();
+    const setURL = useSetURL();
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
@@ -53,6 +55,9 @@ export default function Login() {
                 const avatarAsImage = response?.data?.avatarAsImg?.data;
 
                 setUserData({ image, avatar, pseudo, avatarAsImage })
+
+                // On appelle le hook qui permet de transformer les images en URL pour la visioconférence. 
+                setURL(response.data.image.data, response?.data?.avatarAsImg.data)
             }
 
             setPwd('');

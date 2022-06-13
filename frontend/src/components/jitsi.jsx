@@ -2,8 +2,10 @@ import React, { Component, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import { useState } from 'react';
-import { Button, Center, Spinner, Stack } from "@chakra-ui/react"
+import { Button, Alert, AlertIcon, AlertTitle, AlertDescription, Icon, Center, Text, Box, Spinner, Stack, Progress } from "@chakra-ui/react"
 import useUserData from '../hooks/useUserData';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHand } from "@fortawesome/free-solid-svg-icons";
 
 const JitsiComponent = () => {
 
@@ -19,6 +21,7 @@ const JitsiComponent = () => {
     const [user, setUser] = useState(userData?.pseudo || "classe")
     const [isAudioMuted, setIsAudioMuted] = useState(false)
     const [isVideoMuted, setIsVideoMuted] = useState(false)
+    const [handRaised, setHandRaised] = useState(false);
 
     // useEffect(() => {
     //     let bytes = new Uint8Array(userData?.image);
@@ -39,6 +42,8 @@ const JitsiComponent = () => {
         if (auth?.idclasse) {
             const options = {
                 roomName: room,
+                lang: 'fr',
+                avatarURL: userData?.avatarURL,
                 configOverwrite: { prejoinPageEnabled: true },
                 interfaceConfigOverwrite: {
                     // overwrite interface properties
@@ -46,7 +51,7 @@ const JitsiComponent = () => {
                 parentNode: document.querySelector('#jitsi-iframe'),
                 userInfo: {
                     displayName: user
-                }
+                },
 
             }
             api = new window.JitsiMeetExternalAPI(domain, options);
@@ -58,8 +63,8 @@ const JitsiComponent = () => {
                 videoConferenceJoined: handleVideoConferenceJoined,
                 videoConferenceLeft: handleVideoConferenceLeft,
                 audioMuteStatusChanged: handleMuteStatus,
-                videoMuteStatusChanged: handleVideoStatus
-
+                videoMuteStatusChanged: handleVideoStatus,
+                raiseHandUpdated: handleRaiseHandStatus,
             });
         }
     }
@@ -99,6 +104,11 @@ const JitsiComponent = () => {
         console.log("handleVideoStatus", video); // { muted: true }
     }
 
+    const handleRaiseHandStatus = (e) => {
+        console.log(e)
+        e.handRaised === 0 ? setHandRaised(false) : setHandRaised(true)
+    }
+
     const getParticipants = () => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
@@ -125,12 +135,12 @@ const JitsiComponent = () => {
         }
     }
 
-    
+
     const chooseImage = () => {
-        api.executeCommand('avatarUrl', userData?.imageURL);
+        //api.executeCommand('avatarUrl', userData?.imageURL);
     }
     const chooseAvatar = () => {
-        api.executeCommand('avatarUrl', userData?.avatarURL);
+        // api.executeCommand('avatarUrl', userData?.avatarURL);
     }
 
     useEffect(() => {
@@ -147,21 +157,37 @@ const JitsiComponent = () => {
     return (
         <>
             {!auth?.idclasse
-                ? <p> Rejoignez une classe pour accéder à la visioconférence </p>
+                ? <Center flexGrow={1}><Text>{auth?.role == "eleve" ? "Il faut être membre d'une classe pour accéder à la visioconférence" : "Il faut avoir au moins 1 élève membre de la classe pour accéder à la visioconférence"}</Text></Center>
                 : <><Spinner position={'absolute'} top='50%' left='50%' zIndex={1} /><div id="jitsi-iframe"></div></>
             }
 
+            {
+                auth?.role == 'classe' && handRaised &&
+                <Alert onClick={() => setHandRaised(false)} p={10} status='success' variant='subtle' flexDirection='column' alignItems='center' justifyContent='space-between' textAlign='center' zIndex={99} >
+                    <AlertIcon mr={0} />
+                    <AlertTitle mt={4} fontSize='lg'>
+                        Un élève souhaite prendre la parole
+                    </AlertTitle>
+                    <AlertDescription mb={'36'}>Cliquer pour fermer</AlertDescription>
+                    <FontAwesomeIcon icon={faHand} size='10x' color='#F8AE1A' bounce />
+                </Alert>
+            }
 
-            <Stack direction={'row'} align='center' justify={'center'}>
-                <Button colorScheme={'blue'} onClick={() => chooseImage()}>Choisir l'image</Button>
-                <Button colorScheme={'blue'} onClick={() => chooseAvatar()}>Choisir l'avatar</Button>
-            </Stack>
-                
-                {/* <i onClick={ () => executeCommand('toggleAudio') } className={`fas fa-2x grey-color ${isAudioMuted ? 'fa-microphone-slash' : 'fa-microphone'}`} aria-hidden="true" title="Mute / Unmute"></i>
+
+            {
+                auth?.idclasse && auth?.role == "eleve" &&
+
+                <Stack direction={'row'} align='center' justify={'center'} p={5}>
+                    <Button colorScheme={'blue'} onClick={() => chooseImage()}>Choisir l'image</Button>
+                    <Button colorScheme={'blue'} onClick={() => chooseAvatar()}>Choisir l'avatar</Button>
+                </Stack>
+            }
+
+            {/* <i onClick={ () => executeCommand('toggleAudio') } className={`fas fa-2x grey-color ${isAudioMuted ? 'fa-microphone-slash' : 'fa-microphone'}`} aria-hidden="true" title="Mute / Unmute"></i>
                 <i onClick={ () => executeCommand('hangup') } className="fas fa-phone-slash fa-2x red-color" aria-hidden="true" title="Leave"></i>
                 <i onClick={ () => executeCommand('toggleVideo') } className={`fas fa-2x grey-color ${isVideoMuted ? 'fa-video-slash' : 'fa-video'}`} aria-hidden="true" title="Start / Stop camera"></i>
                 <i onClick={ () => executeCommand('toggleShareScreen') } className="fas fa-film fa-2x grey-color" aria-hidden="true" title="Share your screen"></i> */}
-            
+
 
         </>
     );
