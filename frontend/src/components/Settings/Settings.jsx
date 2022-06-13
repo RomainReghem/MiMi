@@ -11,7 +11,6 @@ const Settings = () => {
                 <Divider />
                 <ChangePwd />
             </Stack>
-            
         </Center>
         </>
     );

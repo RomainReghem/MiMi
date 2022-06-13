@@ -1,6 +1,6 @@
 const credential = require('./config/credential')
 const router = require('./routes/routes.js')
-
+const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const cors = require("cors");
@@ -12,7 +12,7 @@ app.use(credential)
 
 app.use(
     cors({
-        origin: ["http://localhost:3000", "http://localhost:3500", "35.187.74.158"],
+        origin: ["http://localhost:3000", "http://localhost:3500", "35.187.74.158", "51.210.140.225"],
         //methods: ["GET", "POST"],
         //credentials: true,
     })

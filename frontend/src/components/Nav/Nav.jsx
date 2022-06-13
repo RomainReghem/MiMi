@@ -35,13 +35,9 @@ export default function Nav() {
 
     useEffect(() => {
         async function image() {
-            let data = userData?.image
-            let binary = '';
-            let bytes = new Uint8Array(data);
-            for (let i = 0; i < bytes.byteLength; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            setImageURL("data:image/png;base64," + window.btoa(binary))
+            let blob = new Blob([new Uint8Array(userData?.image)], {type : 'image/jpg'});
+            let url = URL.createObjectURL(blob)
+                setImageURL(url)
         }
         image();
     }, [userData?.image])

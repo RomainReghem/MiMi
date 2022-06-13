@@ -11,6 +11,9 @@ const Invitations = () => {
     const classe = auth?.idclasse;
     const user = auth?.user;
 
+    // Les invitations correspondent simplement à un état : 'acceptée', 'en attente', ou 'aucune'.
+    // Lorsque l'état est 'acceptée' ou 'en attente', le serveur nous envoie au Login et au Refresh l'id de la classe.
+    // Ce composant est uniquement visible du coté élève. La classe peut inviter les élèves dans le composant 'Students'
     const acceptInvite = async () => {
         try {
             await axiosPrivate.post("/acceptInvite", JSON.stringify({ user }),

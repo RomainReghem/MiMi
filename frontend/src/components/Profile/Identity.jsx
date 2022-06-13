@@ -22,41 +22,18 @@ const Identity = () => {
     const [newPseudo, setNewPseudo] = useState('');
     const [selectedPicture, setSelectedPicture] = useState(null);
 
-    let avatar_base = {
-        bgColor: "#E0DDFF",
-        earSize: "small",
-        eyeBrowStyle: "up",
-        eyeStyle: "oval",
-        faceColor: "#AC6651",
-        glassesStyle: "none",
-        hairColor: "#000",
-        hairStyle: "thick",
-        hatColor: "#000",
-        hatStyle: "none",
-        mouthStyle: "laugh",
-        noseStyle: "round",
-        shirtColor: "#6BD9E9",
-        shirtStyle: "polo",
-        shape: "square"
-    };
-
     const [pictureWaitingToBeSent, setPictureWaitingToBeSent] = useState(false);
 
     const [picture, setPicture] = useState("");
 
-    // On ne récupère l'image que si une image a été envoyée
     useEffect(() => {
+        // On reçoit la réponse en Buffer, on le converti en Blob puis en en crée une blob URL pour l'afficher
+        // Les URL de blob ne fonctionnent que sur le navigateur du client ou il a été créé. C'est pourquoi on le recrée à chaque fois.
+        // Les dataURL en base 64 étaient parfois trop lourdes pour les passer entre composants.
         async function image() {
-            // On reçoit la réponse en Buffer.
-            // Il faut la convertir en base64 pour pouvoir l'afficher.
-            let data = userData?.image
-            let binary = '';
-            let bytes = new Uint8Array(data);
-            for (let i = 0; i < bytes.byteLength; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            if (data != undefined)
-                setPicture("data:image/png;base64," + window.btoa(binary))
+            let blob = new Blob([new Uint8Array(userData?.image)], {type : 'image/jpg'});
+            let url = URL.createObjectURL(blob)
+                setPicture(url)
         }
         image();
     }, [userData?.image])
@@ -78,6 +55,7 @@ const Identity = () => {
                 }
             );
             toast({ title: "Pseudo modifié", description: "Votre nouveau pseudo est : " + newPseudo, status: "success", duration: 5000, isClosable: true, position: "top" })
+            // On update directement les userData, afin de ne pas avoir à refresh la page pour constater les changements
             setUserData({
                 ...userData,
                 pseudo: newPseudo
@@ -105,12 +83,12 @@ const Identity = () => {
             preview: URL.createObjectURL(event.target.files[0]),
             data: event.target.files[0],
         }
-        // PNG / JPEG only
+        // PNG / JPEG / GIF only
         if (img.data.type != "image/png" && img.data.type != "image/jpeg" && img.data.type != "image/jpg" && img.data.type != "image/gif") {
             toast({ title: "Erreur type de fichier", description: "Les seules images acceptées sont les PNG, JPEG et GIF", status: "error", duration: 5000, isClosable: true, position: "top" })
             return;
         }
-        // Fichiers < 10 Mo
+        // Fichiers < 10 Mo only
         if (img.data.size > 10_000_000) {
             toast({ title: "Erreur taille de fichier", description: "L'image séléctionnée doit faire moins de 10Mo", status: "error", duration: 5000, isClosable: true, position: "top" })
             return;
@@ -130,6 +108,7 @@ const Identity = () => {
                     headers: { "Content-Type": "image/*" },
                 });
             setPictureWaitingToBeSent(false);
+            // On update directement les userData, afin de ne pas avoir à refresh la page pour constater les changements
             setUserData({
                 ...userData,
                 image: response.data.data
@@ -141,6 +120,20 @@ const Identity = () => {
             toast({ title: "Erreur", description: "Vérifiez le fichier", status: "error", duration: 5000, isClosable: true, position: "top" })
 
         }
+    }
+
+    // On pourrait ici sauvegarder les préférences sur le serveur.
+    // Cependant , la solution simple et rapide du LocalStorage convient bien pour cette option peu importante
+    const chooseImage = () => {
+        setAuth({ ...auth, preference: "image" });
+        localStorage.setItem("preference" + auth?.user, JSON.stringify("image"));
+        toast({ title: "Profil changé !", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
+    }
+
+    const chooseAvatar = () => {
+        setAuth({ ...auth, preference: "avatar" }); 
+        localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar"));
+        toast({ title: "Profil changé !", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
     }
 
     return (
@@ -160,11 +153,11 @@ const Identity = () => {
                 <Stack direction={'row'} justify={'space-between'}>
                     <Stack align={'center'}>
                         <Image boxSize={'8.5rem'} objectFit={'cover'} src={picture}></Image>
-                        <Button onClick={(e) => { setAuth({ ...auth, preference: "image" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("image")) }}>Choisir l'image</Button>
+                        <Button onClick={chooseImage} w="16ch" disabled={auth?.preference == 'image'} noOfLines='1'>Choisir l'image</Button>
                     </Stack>
                     <Stack align={'center'}>
                         <Avatar style={{ width: '8.5rem', height: '8.5rem' }}  {...userData?.avatar} />
-                        <Button onClick={(e) => { setAuth({ ...auth, preference: "avatar" }); e.currentTarget.blur(); localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar")) }}>Choisir l'avatar</Button>
+                        <Button onClick={chooseAvatar} disabled={auth?.preference == 'avatar'}>Choisir l'avatar</Button>
                     </Stack>
                 </Stack>
 

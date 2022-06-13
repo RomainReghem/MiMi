@@ -2,6 +2,7 @@ import { Button, Center, Heading, Stack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {
+    // Page d'erreur 404.
     const navigate = useNavigate();
     return (
         <Center height={'100%'}>

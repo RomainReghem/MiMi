@@ -12,9 +12,9 @@ import { useToast } from "@chakra-ui/react";
 import { CircularProgress, Center, Button, Text, Stack, AlertDialogFooter, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent, Wrap, Grid, Divider, Heading, Badge, StackDivider, Box, GridItem } from "@chakra-ui/react";
 
 
-const socket = io.connect("http://localhost:5000");
 
 const TicTacToe = () => {
+    const socket = io.connect("https://mimi.connected-health.fr/api-games");
     const { auth } = useAuth();
     const navigate = useNavigate();
     const cancelRef = useRef();

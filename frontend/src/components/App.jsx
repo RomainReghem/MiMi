@@ -29,6 +29,8 @@ import '../styles/cell.css'
 import '@fontsource/poppins/700.css'
 import '@fontsource/poppins/600.css'
 
+// Chakra UI (https://chakra-ui.com/) est la librairie d'UI components qui sera utilisée dans ce projet
+// On étend le thème pour rajouter entre autres des polices et des couleurs.
 const theme = extendTheme({
   fonts: {
     heading: `'Poppins', sans-serif`,

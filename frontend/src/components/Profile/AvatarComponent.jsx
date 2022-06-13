@@ -25,6 +25,7 @@ const AvatarComponent = () => {
 
     let mail = auth?.user;
 
+    // Tableau de toutes les valeurs possibles pour chaque caractéristique de la librairie 'react-nice-avatar'.
     const shirts = ["hoody", "short", "polo"]
     const glasses = ["none", "round", "square"]
     const noses = ["short", "long", "round"]
@@ -52,6 +53,7 @@ const AvatarComponent = () => {
 
     const changeHat = (e) => {
         e.preventDefault();
+        // On cherche l'endroit du tableau qui correspond à la variante actuelle et on ajoute 1, modulo la longueur du tableau pour revenir au début.
         let i = hatsnhairs.findIndex((e) => e[0] == config.hatStyle && e[1] == config.hairStyle)
         setConfig({
             ...config,
@@ -72,11 +74,13 @@ const AvatarComponent = () => {
 
     const SaveDB = async (e) => {
         try {
+            // Sauvegarde de l'avatar en JSON sur le serveur. On peut ensuite le lire partout où on peut mettre un <Avatar/> dans l'application
             const response = await axiosPrivate.post("/avatar", JSON.stringify({ mail, avatar: config }),
             {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
+            // Appel à ce hook pour enregistrer l'avatar en tant que PNG sur le serveur. Permet ensuite de le récupérer pour l'afficher dans Jitsi Meet.
             saveAvatarAsImage('avatarToPrint');
             toast({ title: "Avatar sauvegardé !", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
         } catch (err) { console.log("couldnt save avatar"); }

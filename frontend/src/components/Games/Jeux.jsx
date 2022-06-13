@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { Text, Heading, Box, Stack, Center, Image, Wrap, Badge } from "@chakra-ui/react"
+import { motion } from "framer-motion";
 
 
 const Jeux = () => {
     return (
         <Center flexGrow={1} >
-            <Wrap spacing={10} justify={'center'} p={5}>
-                <Link to="/tictactoe" style={{ textDecoration: "none" }} >
+            <Wrap spacing={10} justify={'center'} p={5} as={motion.div} initial={{ y:50 }} animate={{ y:0 }} transition='0.2s ease-out'>
+                <Link to="/tictactoe" style={{ textDecoration: "none" }}>
                     <Box maxW={'xs'} p={2} transition={'transform 200ms'} _hover={{ transform: 'translate(0px, -0.3rem)', transition: 'transform 500ms' }}>
                         <Image src="https://i.pinimg.com/originals/ce/6f/7f/ce6f7ffd885e477efa2110437ab779dd.gif"></Image>
                         <Stack mt={2} direction={'column'} align="flex-start">

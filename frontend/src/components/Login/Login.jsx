@@ -1,4 +1,4 @@
-import { Flex, Box, FormControl, FormLabel, Input, InputGroup, HStack, InputRightElement, Stack, Button, Heading, Text, useColorModeValue, Link, } from '@chakra-ui/react';
+import { Flex, Box, FormControl, FormLabel, Input, InputGroup, Spinner, InputRightElement, Stack, Button, Heading, Text, useColorModeValue, Link, } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { createSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { Link as ReactRouterLink } from 'react-router-dom';
@@ -21,8 +21,11 @@ export default function Login() {
     const [user, setUser] = useState('');
     const [pwd, setPwd] = useState('');
 
+    const [displaySpinner, setDisplaySpinner] = useState(false);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setDisplaySpinner(true)
         try {
             const response = await axios.post(LOGIN_URL, JSON.stringify({ user, pwd }),
                 {
@@ -59,6 +62,7 @@ export default function Login() {
 
 
         } catch (err) {
+            setDisplaySpinner(false)
             if (!err?.response) {
                 toast({ title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 4000, isClosable: true, position: "top" })
             } else if (err.response?.status === 400) {
@@ -122,7 +126,10 @@ export default function Login() {
                                 _hover={{
                                     bg: 'cyan.700',
                                 }} onClick={handleSubmit}>
-                                Connexion
+                                {
+                                 displaySpinner ? <Spinner/> : 'Connexion'
+                                }
+
                             </Button>
                         </Stack>
                         <Text align={'center'} >Pas encore de compte ? <Link to="/choice" as={ReactRouterLink} color={'cyan.600'}>S'inscrire</Link></Text>

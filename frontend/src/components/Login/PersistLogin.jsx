@@ -6,6 +6,8 @@ import { CircularProgress, Progress, Stack, Center,useColorModeValue, Text, Flex
 import * as React from "react";
 import { motion } from 'framer-motion'
 
+// Ce composant permet de rester connecter au refresh. Il appele refresh() qui demande un nouveau JWToken au serveur 
+// Il affiche également l'animation de chargement.
 const PersistLogin = () => {
     const [isLoading, setIsLoading] = useState(true);
     const refresh = useRefreshToken();

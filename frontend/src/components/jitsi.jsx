@@ -2,7 +2,7 @@ import React, { Component, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import { useState } from 'react';
-import { Center, Spinner, Stack } from "@chakra-ui/react"
+import { Button, Center, Spinner, Stack } from "@chakra-ui/react"
 import useUserData from '../hooks/useUserData';
 
 const JitsiComponent = () => {
@@ -10,14 +10,13 @@ const JitsiComponent = () => {
     const navigate = useNavigate();
     const { userData } = useUserData();
     const { auth } = useAuth();
-    console.log(userData?.imageURL)
-    console.log(auth?.user)
+    console.log(userData)
 
     const domain = 'meet.jit.si';
     let api = {};
 
     const [room, setRoom] = useState("MimiRooms" + auth?.idclasse)
-    const [user, setUser] = useState(localStorage.getItem("pseudo") || "classe")
+    const [user, setUser] = useState(userData?.pseudo || "classe")
     const [isAudioMuted, setIsAudioMuted] = useState(false)
     const [isVideoMuted, setIsVideoMuted] = useState(false)
 
@@ -34,6 +33,7 @@ const JitsiComponent = () => {
     //     console.log(URL.createObjectURL(blob));
     //     setAvatarURL(blob)
     // }, [userData?.avatarAsImage])
+
 
     let startMeet = () => {
         if (auth?.idclasse) {
@@ -80,8 +80,6 @@ const JitsiComponent = () => {
 
     const handleVideoConferenceJoined = async (participant) => {
         console.log("handleVideoConferenceJoined", participant); // { roomName: "bwb-bfqi-vmh", id: "8c35a951", displayName: "Akash Verma", formattedDisplayName: "Akash Verma (me)"}
-        console.log('*********************EXECTURING THE COMMAND************************')
-        console.log(userData?.imageURL)
         api.executeCommand('avatarUrl', userData?.avatarURL);
         const data = await getParticipants();
     }
@@ -127,6 +125,14 @@ const JitsiComponent = () => {
         }
     }
 
+    
+    const chooseImage = () => {
+        api.executeCommand('avatarUrl', userData?.imageURL);
+    }
+    const chooseAvatar = () => {
+        api.executeCommand('avatarUrl', userData?.avatarURL);
+    }
+
     useEffect(() => {
         if (window.JitsiMeetExternalAPI) {
             startMeet();
@@ -146,16 +152,16 @@ const JitsiComponent = () => {
             }
 
 
-            {/*<div className="item-center">
-                <span>Custom Controls</span>
-            </div>
-            <div className="item-center">
-                <span>&nbsp;&nbsp;</span>
-                <i onClick={ () => executeCommand('toggleAudio') } className={`fas fa-2x grey-color ${isAudioMuted ? 'fa-microphone-slash' : 'fa-microphone'}`} aria-hidden="true" title="Mute / Unmute"></i>
+            <Stack direction={'row'} align='center' justify={'center'}>
+                <Button colorScheme={'blue'} onClick={() => chooseImage()}>Choisir l'image</Button>
+                <Button colorScheme={'blue'} onClick={() => chooseAvatar()}>Choisir l'avatar</Button>
+            </Stack>
+                
+                {/* <i onClick={ () => executeCommand('toggleAudio') } className={`fas fa-2x grey-color ${isAudioMuted ? 'fa-microphone-slash' : 'fa-microphone'}`} aria-hidden="true" title="Mute / Unmute"></i>
                 <i onClick={ () => executeCommand('hangup') } className="fas fa-phone-slash fa-2x red-color" aria-hidden="true" title="Leave"></i>
                 <i onClick={ () => executeCommand('toggleVideo') } className={`fas fa-2x grey-color ${isVideoMuted ? 'fa-video-slash' : 'fa-video'}`} aria-hidden="true" title="Start / Stop camera"></i>
-                <i onClick={ () => executeCommand('toggleShareScreen') } className="fas fa-film fa-2x grey-color" aria-hidden="true" title="Share your screen"></i>
-        </div>*/}
+                <i onClick={ () => executeCommand('toggleShareScreen') } className="fas fa-film fa-2x grey-color" aria-hidden="true" title="Share your screen"></i> */}
+            
 
         </>
     );
