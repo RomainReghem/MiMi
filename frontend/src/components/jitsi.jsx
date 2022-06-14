@@ -12,7 +12,6 @@ const JitsiComponent = () => {
     const navigate = useNavigate();
     const { userData } = useUserData();
     const { auth } = useAuth();
-    console.log(userData)
 
     const domain = 'meet.jit.si';
     let api = {};
@@ -105,7 +104,6 @@ const JitsiComponent = () => {
     }
 
     const handleRaiseHandStatus = (e) => {
-        console.log(e)
         e.handRaised === 0 ? setHandRaised(false) : setHandRaised(true)
     }
 
@@ -146,7 +144,6 @@ const JitsiComponent = () => {
     useEffect(() => {
         if (window.JitsiMeetExternalAPI) {
             startMeet();
-            console.log("MEET STARTED ONCE")
         } else {
             alert('JitsiMeetExternalAPI not loaded');
         }

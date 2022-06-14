@@ -12,8 +12,8 @@ import { useToast } from "@chakra-ui/react";
 import { CircularProgress, Center, Button, Text, Stack, AlertDialogFooter, AlertDialogOverlay, AlertDialog, AlertDialogHeader, AlertDialogContent, Wrap, Grid, Divider, Heading, Badge, StackDivider, Box, GridItem } from "@chakra-ui/react";
 
 
-const socket = io.connect("http://localhost:5000");
-//const socket = io.connect("https://mimi.connected-health.fr/api-games");
+//const socket = io.connect("http://localhost:5000");
+const socket = io("https://mimi.connected-health.fr", { path:'/api-games' });
 
 const TicTacToe = () => {
     const { auth } = useAuth();
@@ -171,7 +171,7 @@ const TicTacToe = () => {
             </> :
                 (<div className="waitingRoom">
                     {roomJoined ? <><CircularProgress isIndeterminate color='green.300' /><p>{waitingText}</p></> :
-                        auth?.idclasse ? <Text>Impossible de rejoindre la salle</Text> :
+                        auth?.idclasse ? <Text>Impossible de rejoindre la salle essayez d'actualiser la page</Text> :
                             <Text>{auth?.role == "eleve" ? "Il faut être membre d'une classe pour accéder aux jeux" : "Il faut avoir au moins 1 élève membre de la classe pour accéder aux jeux"}</Text>}
                 </div>)
             }

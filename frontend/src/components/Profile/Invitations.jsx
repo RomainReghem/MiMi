@@ -20,7 +20,7 @@ const Invitations = () => {
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
             await setAuth({
                 ...auth,
-                invitation: "acceptee"
+                invitation: "acceptee",
             })
             toast({ title: "Invitation acceptée !", description: "Vous faites maintenant partie de la classe #" + classe, status: "success", duration: 5000, isClosable: true, position: "top" })
         }
@@ -51,7 +51,8 @@ const Invitations = () => {
             toast({ title: "Classe quittée", description: "", status: "info", duration: 5000, isClosable: true, position: "top" })
             await setAuth({
                 ...auth,
-                invitation: "aucune"
+                invitation: "aucune",
+                idclasse:undefined
             })
         }
         catch (err) {
