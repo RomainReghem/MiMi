@@ -88,6 +88,7 @@ export default function Login() {
     return (
         <Flex
             grow={1}
+            direction='column'
             align={'center'}
             justify={'center'}
             bg={useColorModeValue('gray.50', 'gray.800')}>

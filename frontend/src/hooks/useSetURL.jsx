@@ -30,7 +30,6 @@ const useSetURL = () => {
                 avatarURL: avatarURL,
             }
         })
-        console.log('fini')
         return;
     }
     return setURL;

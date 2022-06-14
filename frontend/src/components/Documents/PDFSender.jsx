@@ -44,6 +44,9 @@ const PDFSender = (props) => {
             props.reload();
 
         } catch (error) {
+            if (error.response?.status === 409) {
+                toast({ title: "Erreur", description: "Ce fichier dépasse votre limite de stockage. Supprimez d'autres fichiers et rééssayez.", status: "error", duration: 5000, isClosable: true, position: "top" })
+            }
             console.log(error)
         }
     }

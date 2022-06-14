@@ -1,5 +1,5 @@
 import {
-    Box, Flex, Text, IconButton, Button, Stack, Heading, Collapse, Icon, Link, Popover, PopoverTrigger, PopoverContent, useColorModeValue, useBreakpointValue, useDisclosure, Center, Badge, Tooltip, Divider, Image,
+    Box, Flex, Text, IconButton, Button, Stack, PopoverBody, Collapse, Icon, Link, Popover, PopoverTrigger, PopoverContent, useColorModeValue, useBreakpointValue, useDisclosure, Center, Badge, Tooltip, Divider, Image,
 } from '@chakra-ui/react';
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 import {
@@ -27,6 +27,7 @@ export default function Nav() {
     const { userData } = useUserData();
     const axiosPrivate = useAxiosPrivate();
     const [imageURL, setImageURL] = useState("");
+    const { onOpen, onClose } = useDisclosure()
 
     const signOut = async () => {
         await logout();
@@ -35,9 +36,9 @@ export default function Nav() {
 
     useEffect(() => {
         async function image() {
-            let blob = new Blob([new Uint8Array(userData?.image)], {type : 'image/jpg'});
+            let blob = new Blob([new Uint8Array(userData?.image)], { type: 'image/jpg' });
             let url = URL.createObjectURL(blob)
-                setImageURL(url)
+            setImageURL(url)
         }
         image();
     }, [userData?.image])
@@ -112,11 +113,38 @@ export default function Nav() {
                             Se connecter
                         </Button>
                     </>}
-                    {auth?.user && <Link as={ReactRouterLink} to="/settings"><IconButton colorScheme={'teal'} icon={<FontAwesomeIcon icon={faGear} />}></IconButton></Link>}
                     <ColorModeSwitcher display={{ base: 'none', md: 'inline-flex' }} />
+                    {auth?.user && <Link as={ReactRouterLink} to="/settings"><IconButton colorScheme={'teal'} icon={<FontAwesomeIcon icon={faGear} />}></IconButton></Link>}
                     {auth?.user && <>
-                        <Button display={{ base: 'none', md: 'inline-flex' }} onClick={signOut} colorScheme={'red'}>Déconnexion</Button>
-                        <IconButton display={{ base: 'inline-flex', md: 'none' }} onClick={signOut} colorScheme={'red'} icon={<FontAwesomeIcon icon={faPowerOff} />}></IconButton></>}
+                        <Popover placement="bottom">
+                            <PopoverTrigger>
+                                <Button display={{ base: 'none', md: 'inline-flex' }} colorScheme={'red'}>Déconnexion</Button>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                                <PopoverBody>
+                                    <Stack>
+                                        <Text>Voulez vous vraiment vous déconnecter ?</Text>
+                                        <Button colorScheme={'red'} onClick={signOut}>Déconnexion</Button>
+                                    </Stack>
+                                </PopoverBody>
+                            </PopoverContent>
+                        </Popover>
+
+                        <Popover placement="bottom">
+                            <PopoverTrigger>
+                                <IconButton display={{ base: 'inline-flex', md: 'none' }} colorScheme={'red'} icon={<FontAwesomeIcon icon={faPowerOff} />}></IconButton>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                                <PopoverBody>
+                                    <Stack>
+                                        <Text>Voulez vous vraiment vous déconnecter ?</Text>
+                                        <Button colorScheme={'red'} onClick={signOut}>Déconnexion</Button>
+                                    </Stack>
+                                </PopoverBody>
+                            </PopoverContent>
+                        </Popover>
+
+                    </>}
                 </Stack>
             </Flex>
 
@@ -131,14 +159,14 @@ const DesktopNav = () => {
     const linkColor = useColorModeValue('gray.600', 'gray.200');
     const linkHoverColor = useColorModeValue('gray.800', 'white');
     const popoverContentBgColor = useColorModeValue('white', 'gray.800');
-    const {auth} = useAuth();
+    const { auth } = useAuth();
 
-    const NAV_ITEMS = auth?.user ?  [
+    const NAV_ITEMS = auth?.user ? [
         { label: 'Profil', href: '/profile', },
         { label: 'Documents', href: '/documents', },
         { label: 'Visioconférence', href: '/video', },
         { label: 'Jeux', href: '/games', },
-    ] : [{label: 'Accueil', href:'/'}, { label: 'Tableau de bord', href: '/profile', }];
+    ] : [{ label: 'Accueil', href: '/' }, { label: 'Tableau de bord', href: '/profile', }, { label: 'Termes et conditions', href: '/terms', }];
 
     return (
         <Stack direction={'row'} spacing={4}>
@@ -147,7 +175,7 @@ const DesktopNav = () => {
                     <Popover trigger={'hover'} placement={'bottom-start'}>
                         <PopoverTrigger>
                             <Link
-                            as={ReactRouterLink}
+                                as={ReactRouterLink}
                                 p={2}
                                 to={navItem.href ?? '#'}
                                 fontSize={'sm'}
@@ -223,12 +251,12 @@ const DesktopSubNav = ({ label, href, subLabel }) => {
 const MobileNav = () => {
     const { auth } = useAuth();
 
-    const NAV_ITEMS = auth?.user ?  [
+    const NAV_ITEMS = auth?.user ? [
         { label: 'Profil', href: '/profile', },
         { label: 'Documents', href: '/documents', },
         { label: 'Visioconférence', href: '/video', },
         { label: 'Jeux', href: '/games', },
-    ] : [{label: 'Accueil', href:'/'}, { label: 'Tableau de bord', href: '/profile', }];
+    ] : [{ label: 'Accueil', href: '/' }, { label: 'Tableau de bord', href: '/profile', }, { label: 'Termes et conditions', href: '/terms', }];
 
     return (
         <Stack
