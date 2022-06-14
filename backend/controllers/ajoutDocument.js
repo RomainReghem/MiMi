@@ -1,5 +1,5 @@
 const fs = require('fs');
-
+const fastFolderSize = require('fast-folder-size')
 
 /**
  * Sauvegarde sur le serveur le document de l'utilisateur dans le dossier approprié.
@@ -39,15 +39,23 @@ const saveFile = (req, res) => {
         console.log("erreur verif nom pas double")
         return res.status(520).send("Erreur lors de la vérification du nom du document.")
     }
-    // Enregistrement du fichier en local sur le serveur
-    fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
+
+    verifTaille(path, file.size, 250000, err => {
         if (err) {
-            console.log("Erreur lors de l'enregistrement du document : " + err);
-            return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+            //console.log("err " + err)
+            return res.status(409).send("L'espace de stockage est limité à 250 Mo !")
         }
-        console.log("Le fichier a bien été sauvegardé");
-        return res.status(201).send("Enregistrement effectué");
-    });
+        // Enregistrement du fichier en local sur le serveur
+        fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
+            if (err) {
+                console.log("Erreur lors de l'enregistrement du document : " + err);
+                return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+            }
+            console.log("Le fichier a bien été sauvegardé");
+            return res.status(201).send("Enregistrement effectué");
+        });
+    })
+
 }
 
 
@@ -110,9 +118,28 @@ function verifNom(path, nom) {
     return name;
 }
 
+/**
+ * Fonction qui vérifie la taille d'un dossier, si la taille du fichier fait dépasser la taille maximale, renvoie une erreur
+ * @param {String} path le chemin du dossier dont on veut vérifier la taille
+ * @param {int} sizeFile la taille du fichier que l'on veut ajouter
+ * @param {int} max la valeur maximale de l'espace de stockage, à ne pas dépasser
+ * @param {*} cb la fonction callback qui renvoie une erreur ou la taille
+ */
+function verifTaille(path, sizeFile, max, cb) {
+    fastFolderSize(path, (err, size) => {
+        if (err) {
+            console.log("Err controllers/ajoutDocument.js > verifTaille " + err)
+            cb(err);
+        }
+        if (max < size + sizeFile) {
+            cb("Erreur taille max dépassée");
+        }
+    })
+}
+
 
 module.exports = {
     saveFile,
-    verificationChemin, 
+    verificationChemin,
     verifNom
 }

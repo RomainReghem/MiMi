@@ -175,10 +175,12 @@ const getScoreTicTacToe = (req, res) => {
                     return res.status(200).json({ scores: [data.scoreeleves, data.scoreclasse], partie: data.nbpartie })
                 })
             }).catch(err => {
-                return res.status(500).send("Erreur récuperation compte classe \n" + err);
+                console.log("Erreur classe findone "+err)
+                return res.status(500).send("Erreur récuperation compte classe.");
             });
 
         } else {
+            console.log("What's this role ? %s",role)
             return res.sendStatus(418)
         }
     } else {

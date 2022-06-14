@@ -88,16 +88,6 @@ const Score = db.define('score',
             allowNull: false,
             defaultValue: 0
         },
-        victoireclasse: {
-            type: Sequelize.INTEGER.UNSIGNED,
-            allowNull: false,
-            defaultValue: 0
-        },
-        victoireeleves: {
-            type: Sequelize.INTEGER.UNSIGNED,
-            allowNull: false,
-            defaultValue: 0
-        },
         nbpartie: {
             type: Sequelize.INTEGER.UNSIGNED,
             allowNull: false,

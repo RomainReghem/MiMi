@@ -41,7 +41,7 @@ const deleteFile=(req,res)=>{
                 console.log("suppression de cours ok ")
                 return 201;
             } catch (err) {
-                console.error(err)
+                console.error("erreur lors de la vérification du chemin "+err)
                 return 520
             }
             // sinon le cours n'a pas été trouvé
