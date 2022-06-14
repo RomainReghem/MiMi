@@ -61,9 +61,10 @@ const Invitations = () => {
 
     return (
         auth?.invitation == "aucune" ? (
-            <Stack p={3} bg={"blackAlpha.100"} borderRadius={5} >
-                <Text>Aucune invitation de classe en attente</Text>
-            </Stack>)
+            <Tooltip label="Demandez à votre classe de vous inviter via son Tableau de bord" fontSize='md' placement="bottom">
+                <Stack p={3} bg={"blackAlpha.100"} borderRadius={5} >
+                    <Text>Aucune invitation de classe en attente</Text>
+                </Stack></Tooltip>)
             : auth?.invitation == "en attente" ? (
                 <Stack w={'100%'} p={3} borderRadius={5} justify={'space-between'} align={'center'} direction={'row'} bg={"blackAlpha.100"}>
                     <Text>La classe #{classe} vous a invité !</Text>
@@ -82,8 +83,8 @@ const Invitations = () => {
                     <Stack justify={'space-between'} w={'100%'} borderRadius={5} p={3} direction={"row"} align={'center'} bg={"blackAlpha.100"}>
                         <p>Vous êtes membre de la classe #{classe}</p>
                         <Tooltip bg={'red.400'} label='Quitter la classe' fontSize='md' placement="top">
-                        <IconButton size={"sm"} colorScheme={"red"} onClick={quitClass} icon={<FontAwesomeIcon icon={faDoorOpen}/>}>                            
-                        </IconButton>
+                            <IconButton size={"sm"} colorScheme={"red"} onClick={quitClass} icon={<FontAwesomeIcon icon={faDoorOpen} />}>
+                            </IconButton>
                         </Tooltip>
                     </Stack>) : <></>);
 }

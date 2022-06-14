@@ -138,7 +138,6 @@ const DesktopNav = () => {
         { label: 'Documents', href: '/documents', },
         { label: 'Visioconférence', href: '/video', },
         { label: 'Jeux', href: '/games', },
-        { label:'test', href:'/test' }
     ] : [{label: 'Accueil', href:'/'}, { label: 'Tableau de bord', href: '/profile', }];
 
     return (
@@ -229,7 +228,6 @@ const MobileNav = () => {
         { label: 'Documents', href: '/documents', },
         { label: 'Visioconférence', href: '/video', },
         { label: 'Jeux', href: '/games', },
-        { label:'test', href:'/test' }
     ] : [{label: 'Accueil', href:'/'}, { label: 'Tableau de bord', href: '/profile', }];
 
     return (

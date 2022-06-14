@@ -1,13 +1,14 @@
 import axios from '../api/axios';
 import useAuth from './useAuth';
 import useUserData from './useUserData'
+import useSetURL from './useSetURL';
 import jwt_decode from "jwt-decode";
 
 const useRefreshToken = () => {
+    const setURL = useSetURL();
     const { setAuth } = useAuth();
-    const { setUserData } = useUserData();
-    let imageURL;
-    let avatarURL;
+    const { userData, setUserData } = useUserData();
+
 
     const refresh = async () => {
         const response = await axios.get('/refresh', {
@@ -26,35 +27,27 @@ const useRefreshToken = () => {
                 preference: JSON.parse(localStorage.getItem("preference" + jwt_decode(response?.data?.accessToken).UserInfo.mail))
             }
         });
-
-        let binary = '';
-        let bytes = new Uint8Array(response.data.image.data);
-        for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
-        imageURL = "data:image/png;base64," + window.btoa(binary)
-
-        let binary2 = '';
-        let bytes2 = new Uint8Array(response?.data?.avatarAsImg.data);
-        for (let i = 0; i < bytes2.byteLength; i++) {
-            binary2 += String.fromCharCode(bytes2[i]);
-        }
-        avatarURL = "data:image/png;base64," + window.btoa(binary2)
-
-
         // Si c'est un élève on aura besoin d'afficher son pseudo et ses images, la classe n'en a pas.
-        response.data.role == "eleve" && setUserData(prev => {
-            return {
-                ...prev,
-                image: response.data.image.data,
-                avatar: response.data.avatar,
-                pseudo: response.data.pseudo,
-                avatarAsImage: response?.data?.avatarAsImg.data,
-                imageURL: imageURL,
-                avatarURL: avatarURL,
-            }
-        })
+        if (response.data.role == "eleve") {
+            setUserData(prev => {
+                return {
+                    ...prev,
+                    image: response.data.image.data,
+                    avatar: response.data.avatar,
+                    pseudo: response.data.pseudo,
+                    avatarAsImage: response?.data?.avatarAsImg.data,
+                }
+            })
 
+            // On appelle le hook qui permet de transformer les images en URL pour la visioconférence.
+            try {
+                await setURL(response.data.image.data, response?.data?.avatarAsImg.data)
+            }
+            catch (err) {
+                console.log(err)
+            }
+        }
+        
         return response.data.accessToken;
     }
     return refresh;
