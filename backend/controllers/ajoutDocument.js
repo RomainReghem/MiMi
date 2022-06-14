@@ -39,8 +39,8 @@ const saveFile = (req, res) => {
         console.log("erreur verif nom pas double")
         return res.status(520).send("Erreur lors de la vérification du nom du document.")
     }
-
-    verifTaille(path, file.size, 25000000, err => {
+    // 250Mo = 262144000o
+    verifTaille(path, file.size, 262144000, err => {
         if (err) {
             //console.log("err " + err)
             return res.status(409).send("L'espace de stockage est limité à 250 Mo !")
