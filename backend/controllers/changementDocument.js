@@ -1,13 +1,14 @@
 const fs = require('fs');
-const {verifNom} = require("./ajoutDocument")
+const { verifNom } = require("./ajoutDocument")
+
 
 /**
  * Renomme le cours d'un utilisateur avec le nouveau nom donné
  * @param {*} req la requête du client, doit contenir l'email de l'élève, l'ancien nom du cours et le nouveau nom.
  * @param {*} res la réponse du serveur
  */
- const renameFile = (req, res) => {
-    console.log("\n*** Changement de nom de fichier ***")
+const renameFile = (req, res) => {
+    //console.log("\n*** Changement de nom de fichier ***")
 
     let nouvCours = req.body.newName;
     const ancienCours = req.body.currentName;
@@ -24,7 +25,7 @@ const {verifNom} = require("./ajoutDocument")
 
     let path = "./Documents/" + email + "/";
 
-    if(nouvCours==ancienCours){
+    if (nouvCours == ancienCours) {
         return res.status(204).send("Même nom : aucun changement")
     }
     // avant de renommer on vérifie que le nouveau nom soit bien unique
@@ -50,15 +51,15 @@ function renameDoc(path, oldname, newname, callback) {
         if (fs.existsSync(path + oldname)) {
             // s'il existe alors on peut le renommer
             fs.renameSync(path + oldname, path + newname);
-            console.log("renommage du fichier/dossier  " + oldname + " en " + newname + " effectué.")
+            //console.log("renommage du fichier/dossier  " + oldname + " en " + newname + " effectué.")
             return callback(201);
             // sinon le document n'a pas été trouvé
         } else {
-            console.log("Pas de dossier/fichier portant le nom " + oldname + " trouvé dans le chemin %s.", path);
+            console.log("Err controllers/changementDocument.js > renameDoc : pas de dossier/fichier portant le nom " + oldname + " trouvé dans le chemin %s.", path);
             return callback(404);
         }
     } catch (err) {
-        console.error("Erreur lors de la vérification des dossiers" + err)
+        console.error("Err controllers/changementDocument.js > renameDoc : erreur lors de la vérification des dossiers" + err)
         return callback(520);
     }
 }

@@ -2,6 +2,7 @@ const Users = require('../models/users');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
+
 /**
  * Change l'invitation de l'élève 
  * @param {*} invitation le statut de l'invitation d'une classe à l'élève
@@ -10,16 +11,16 @@ const Classe = Users.Classe;
  * @returns un nombre correspond au code http à renvoyer 
  */
 function setInvitation(invitation, emailEleve, emailClass, callback) {
-    console.log("\n*** Changement d'invitation ***")
-    console.log("invitation " + invitation + " eleve " + emailEleve + " classe " + emailClass)
+   // console.log("\n*** Changement d'invitation ***")
+   // console.log("invitation " + invitation + " eleve " + emailEleve + " classe " + emailClass)
     // vérification du mail
     if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
-        console.log("forme mail incorrecte")
+        console.log("Err controllers/modificationInvitation.js > setInvitation : forme mail incorrecte")
         return callback(400)
     }
     // vérification de l'invitation (n'a que 3 valeurs possible)
     if (invitation != "aucune" && invitation != "en attente" && invitation != "acceptee") {
-        console.log("forme invitation incorrecte")
+        console.log("Err controllers/modificationInvitation.js > setInvitation : forme invitation incorrecte")
         return callback(400)
     }
     let emailClasse = "";
@@ -31,11 +32,11 @@ function setInvitation(invitation, emailEleve, emailClass, callback) {
     Eleve.findOne({ where: { courriel: emailEleve } })
         .then(eleve => {
             if (!eleve) {
-                console.log("Aucun élève trouvé avec cette adresse.");
+                console.log("Err controllers/modificationInvitation.js > setInvitation : aucun élève trouvé avec cette adresse.");
                 return callback(404);
             }
             if (emailClasse == "") {
-                console.log("pas d'invitation : suppression des valeurs antérieures")
+                // pas d'invitation : suppression des valeurs antérieures
                 Eleve.update(
                     {
                         idclasse: null,
@@ -45,27 +46,27 @@ function setInvitation(invitation, emailEleve, emailClass, callback) {
                         where: { ideleve: eleve.ideleve },
                     }
                 ).then(newEleve => {
-                    console.log("Modification de l'invitation effectuée !")
+                    // Modification de l'invitation effectuée !
                     return callback(201);
                 })
                 .catch(err=>{
-                    console.log("Erreur eleve update : "+err)
+                    console.log("Err controllers/modificationInvitation.js > setInvitation : eleve update : "+err)
                     return callback(520)
                 })
             } else {
-                console.log("invitation : changement/ajout de l'id de la classe")
+                // console.log("invitation : changement/ajout de l'id de la classe")
                 if (eleve.invitation != "aucune" && invitation == "en attente") {
-                    console.log("Erreur : l'élève est dans une classe ou a une demande en attente")
+                    console.log("Err controllers/modificationInvitation.js > setInvitation : l'élève est dans une classe ou a une demande en attente")
                     return callback(403)
                 }
                 if ((invitation == "acceptee" && eleve.invitation != "en attente")) {
-                    console.log("Invitation impossible : l'élève n'a pas de demande en attente")
+                    console.log("Err controllers/modificationInvitation.js > setInvitation : invitation impossible : l'élève n'a pas de demande en attente")
                     return callback(409)
                 }
                 Classe.findOne({ where: { courriel: emailClasse } })
                     .then(classe => {
                         if (!classe) {
-                            console.log("Erreur : aucune classe trouvée avec l'adresse mail %s",emailClasse)
+                            console.log("Err controllers/modificationInvitation.js > setInvitation : aucune classe trouvée avec l'adresse mail %s",emailClasse)
                             return callback(404);
                         }
                         Eleve.update(
@@ -77,18 +78,18 @@ function setInvitation(invitation, emailEleve, emailClass, callback) {
                                 where: { ideleve: eleve.ideleve },
                             }
                         ).then(newEleve => {
-                            console.log("Modification de l'invitation effectuée !")
+                            console.log("Err controllers/modificationInvitation.js > setInvitation : modification de l'invitation effectuée !")
                             return callback(201);
                         });
                     })
                     .catch(err=>{
-                        console.log("Erreur : classe findone "+err)
+                        console.log("Err controllers/modificationInvitation.js > setInvitation : classe findone "+err)
                         return callback(520)
                     })
             }
         })
         .catch(err=>{
-            console.log("Erreur : eleve findone "+err)
+            console.log("Err controllers/modificationInvitation.js > setInvitation : eleve findone "+err)
             return callback(520)
         })
 }

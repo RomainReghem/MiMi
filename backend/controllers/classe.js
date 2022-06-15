@@ -12,7 +12,7 @@ const Score = require('../models/users').Score
  * @param {*} res la réponse du serveur
  */
 const getAllStudents = (req, res) => {
-    console.log("\n*** Récuperation des eleves ***")
+    //console.log("\n*** Récuperation des eleves ***")
     //console.log("Classe.js --> getAllStudents")
     const mail = req.query.mail
     // on cherche tous les élèves qui appartiennent à la classe dont l'email est donné
@@ -32,8 +32,8 @@ const getAllStudents = (req, res) => {
     }).then(eleves => {
         return res.json({ eleves: eleves })
     }).catch(err => {
-        console.log(err)
-        return res.send(err).status(520)
+        console.log("Err controllers/classe.js > getAllStudents :  erreur eleve findall " + err)
+        return res.status(520).send("Erreur lors de la récupèration des informations des élèves.")
     });
 }
 
@@ -44,7 +44,7 @@ const getAllStudents = (req, res) => {
  * @param {*} res la réponse du serveur
  */
 const getAllStudentsInvited = (req, res) => {
-    console.log("\n*** Récuperation des eleves invités***")
+    //console.log("\n*** Récuperation des eleves invités***")
     const mail = req.query.mail
     Eleve.findAll({
         attributes: ['courriel', 'nom', 'prenom'],
@@ -60,8 +60,8 @@ const getAllStudentsInvited = (req, res) => {
     }).then(eleves => {
         return res.json({ eleves: eleves })
     }).catch(err => {
-        console.log(err)
-        return res.send(err).status(520)
+        console.log("Err controllers/classe.js > getAllStudentsInvited :  erreur eleve findall " + err)
+        return res.status(520).send("Erreur lors de la récupèration des informations des élèves invités.")
     });
 }
 
@@ -73,7 +73,7 @@ const getAllStudentsInvited = (req, res) => {
  * @param {*} res la réponse du serveur
  */
 const deleteClasse = (req, res) => {
-    console.log("\n*** Suppression de la classe ***")
+    //console.log("\n*** Suppression de la classe ***")
     //console.log("Classe.js --> deleteClasse")
     const mail = req.body.mail
 
@@ -84,7 +84,7 @@ const deleteClasse = (req, res) => {
     })
         .then(classe => {
             if (!classe) {
-                console.log("Pas de classe trouvée à supprimer")
+                console.log("Err controllers/classe.js > deleteClasse : pas de classe trouvée à supprimer")
                 return res.status(404).send("Pas de classe trouvée à supprimer")
             }
             const num = classe.idclasse;
@@ -100,41 +100,41 @@ const deleteClasse = (req, res) => {
                         }
                     })
                         .then(() => {
-                            console.log("Suppression des infos sur la classe effectué.")
+                            // console.log("Suppression des infos sur la classe effectué.")
                             // Delete
                             Classe.destroy({
                                 where: {
                                     idclasse: num
                                 }
                             }).then(() => {
-                                console.log("ok")
+                                // console.log("ok")
                                 // maintenant on doit supprimer les dossiers et les documents de la classe
                                 const path = "./Documents/" + mail
                                 // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
                                 fs.rmdir(path, { recursive: true }, (err) => {
                                     if (err) {
-                                        console.log("erreur suppression dossiers : " + err)
+                                        console.log("Err controllers/classe.js > deleteClasse : erreur suppression dossiers : " + err)
                                         return res.status(500).send("Erreur lors de la suppression de documents.")
                                     }
-                                    console.log("Suppression effectuée !")
+                                    // console.log("Suppression effectuée !")
                                     return res.status(201).send("Suppression effectuée")
                                 });
                             }).catch(err => {
-                                console.log("erreur Classe destroy "+err)
+                                console.log("Err controllers/classe.js > deleteClasse : classe destroy " + err)
                                 return res.status(500).send("Erreur survenue lors de la suppression de la classe.")
                             })
                         })
                         .catch(err => {
-                            console.log("erreur score destroy"+err)
+                            console.log("Err controllers/classe.js > deleteClasse : score destroy" + err)
                             return res.status(500).send("Erreur survenue lors de la suppression du score.")
                         })
                 })
                 .catch(err => {
-                    console.log("Erreur eleve update" + err)
+                    console.log("Err controllers/classe.js > deleteClasse : eleve update " + err)
                     return res.status(520).send("Erreur lors du retrait des invitations des élèves")
                 });
         }).catch(err => {
-            console.log("erreur classe findone "+err)
+            console.log("Err controllers/classe.js > deleteClasse : classe findone " + err)
             return res.status(520).send("Serveur injoignable.")
         })
 }

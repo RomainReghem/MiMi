@@ -1,6 +1,7 @@
 const fs = require('fs');
 const fastFolderSize = require('fast-folder-size')
 
+
 /**
  * Sauvegarde sur le serveur le document de l'utilisateur dans le dossier approprié.
  * 
@@ -8,21 +9,21 @@ const fastFolderSize = require('fast-folder-size')
  * @param {*} res la réponse du serveur
  */
 const saveFile = (req, res) => {
-    console.log("\n*** Sauvegarde du fichier ***");
+    //console.log("\n*** Sauvegarde du fichier ***");
     const email = req.body.mail;
     const path = './Documents/' + email
 
     const file = req.file
 
     if (file == null) {
-        for (r in req.body.formData) {
-            console.log("-" + r)
-        }
-        console.log("Pas de fichier " + file + " maybe " + req.files)
+        /* for (r in req.body.formData) {
+             console.log("-" + r)
+         }*/
+        console.log("Err controllers/ajoutDocument.js => saveFile : Pas de fichier " + file + " maybe " + req.files)
         return res.status(600).send("Erreur : aucun fichier n'a été trouvé")
     }
     if (file.mimetype != "application/pdf") {
-        console.log("Pas le bon type de fichier")
+        console.log(`Err controllers/ajoutDocument.js => saveFile : Pas le bon type de fichier (mimetype ${file.mimetype})`)
         return res.status(400).send("Le fichier n'est pas un pdf.")
     }
     const nom = file.originalname;
@@ -30,28 +31,28 @@ const saveFile = (req, res) => {
     try {
         verificationChemin(path)
     } catch (err) {
-        console.log("erreur verifchemin")
+        console.log("Err controllers/ajoutDocument.js => saveFile : erreur verifchemin pour le chemin %s", path)
         return res.status(520).send(err);
     }
     // Vérification de si un fichier est unique dans son chemin, si ce n'est pas le cas, il lui attribue un nouveau nom
     let name = verifNom(path, nom);
     if (name == "") {
-        console.log("erreur verif nom pas double")
+        console.log("Err controllers/ajoutDocument.js => saveFile : erreur verif nom pas double")
         return res.status(520).send("Erreur lors de la vérification du nom du document.")
     }
 
-    verifTaille(path, file.size, 250000, err => {
+    verifTaille(path, file.size, 25000000, err => {
         if (err) {
-            //console.log("err " + err)
+            console.log("Err controllers/ajoutDocument.js => saveFile : " + err)
             return res.status(409).send("L'espace de stockage est limité à 250 Mo !")
         }
         // Enregistrement du fichier en local sur le serveur
         fs.writeFile(path + "/" + name, file.buffer, 'utf8', function (err) {
             if (err) {
-                console.log("Erreur lors de l'enregistrement du document : " + err);
+                console.log("Err controllers/ajoutDocument.js => saveFile : Erreur lors de l'enregistrement du document : " + err);
                 return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
             }
-            console.log("Le fichier a bien été sauvegardé");
+            //console.log("Le fichier a bien été sauvegardé");
             return res.status(201).send("Enregistrement effectué");
         });
     })
@@ -79,7 +80,7 @@ function verificationChemin(pathToVerify) {
                 fs.mkdirSync(path);
             }
         } catch (err) {
-            console.error("erreur lors de verification chemin " + err);
+            console.error("Err controllers/ajoutDocument.js => verificationChemin : erreur lors de verification chemin " + err);
             throw new Error("Erreur lors de la création de dossier pour le chemin" + path)
             //return res.status(600).send("Erreur lors de la création de dossier pour le chemin" + path)
         }
@@ -111,7 +112,7 @@ function verifNom(path, nom) {
                 isNotUnique = false
             }
         } catch (err) {
-            console.log("Erreur verification nom " + err);
+            console.log("Err controllers/ajoutDocument.js => verifNom : Erreur verification nom " + err);
             return "";
         }
     }

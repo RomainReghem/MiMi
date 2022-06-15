@@ -12,7 +12,7 @@ const { Eleve, Classe } = require('../models/users');
  * @param {*} res la réponse du serveur
  */
 const getUsernameStudent = (req, res) => {
-    console.log("\n*** Récupération du pseudo ***")
+    //console.log("\n*** Récupération du pseudo ***")
     const email = req.query.mail
 
     const role = req.role;
@@ -26,18 +26,20 @@ const getUsernameStudent = (req, res) => {
             }
         }).then(eleve => {
             if (eleve) {
-                console.log('pseudo ' + eleve.pseudo)
+                //console.log('pseudo ' + eleve.pseudo)
                 return res.status(201).json({ pseudo: eleve.pseudo })
             } else {
+                console.log("Err controllers/eleve.js > getUsernameStudent : pas d'eleve trouve avec mail %s", email)
                 return res.status(409).send("Aucun élève avec cette adresse")
             }
         })
             .catch(err => {
-                console.log(err)
+                console.log("Err controllers/eleve.js > getUsernameStudent : eleve findone" + err)
                 return res.status(520).send("Erreur lors de la récupération du pseudo")
             });
     } else {
-        return res.send("Pas un élève / pas le bon élève").status(403)
+        console.log("Err controllers/eleve.js > getUsernameStudent : role %s ou email %s du token invalide ", role, emailToken)
+        return res.status(403).send("Pas un élève / pas le bon élève")
     }
 }
 
@@ -95,7 +97,7 @@ const getUsernameStudent = (req, res) => {
  * @param {*} res la réponse du serveur
  */
 const deleteStudent = (req, res) => {
-    console.log('\n*** Suppression de compte élève ***')
+    //console.log('\n*** Suppression de compte élève ***')
     const email = req.body.mail
 
     const role = req.role;
@@ -110,6 +112,7 @@ const deleteStudent = (req, res) => {
             .then(eleve => {
                 // si aucun élève n'a été trouvé
                 if (!eleve) {
+                    console.log("Err controllers/eleve.js > deleteStudent : pas d'eleve trouve avec l'adresse %s", email)
                     return res.status(404).send("Pas d'élève trouvé avec cet adresse mail.");
                 }
                 // sinon on supprime l'élève
@@ -123,22 +126,23 @@ const deleteStudent = (req, res) => {
                     // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
                     fs.rm(path, { recursive: true }, (err) => {
                         if (err) {
-                            console.log("erreur suppression dossiers : " + err)
+                            console.log("Err controllers/eleve.js > deleteStudent : erreur suppression dossiers : " + err)
                             return res.status(500).send("Erreur lors de la suppression des documents.")
                         }
-                        console.log("Suppression effectuée !")
+                        // console.log("Suppression effectuée !")
                         return res.status(205).send("Suppression de l'élève effectuée !");
                     })
                 }).catch(err => {
-                    console.log("erreur eleve destroy "+err)
+                    console.log("Err controllers/eleve.js > deleteStudent : eleve destroy " + err)
                     return res.status(520).send("Erreur survenue lors de la suppression du compte.");
                 });
             })
             .catch(err => {
-                console.log(err)
+                console.log("Err controllers/eleve.js > deleteStudent : erreur eleve findone " + err)
                 return res.status(520).send("Erreur lors de la récupération des données du compte à supprimer.")
             });
     } else {
+        console.log("Err controllers/eleve.js > deleteStudent : role %s ou email %s du token invalide ", role, emailToken)
         return res.status(403).send("Pas un élève / pas le bon élève")
     }
 }
@@ -165,15 +169,15 @@ const deleteStudent = (req, res) => {
  * @param {String} emailEleve l'email de l'èleve dont on veut l'invitation
  */
 function getInvitation(emailEleve, cb) {
-    console.log("\n***Récupération d'invitation.***")
+    //console.log("\n***Récupération d'invitation.***")
     // console.log("eleve.js => getInvitation")
-     // on vérifie que le mail soit bien présent
-     if (!emailEleve) {
-        console.log("Adresse mail manquante pour la recuperation d'invitation ")
+    // on vérifie que le mail soit bien présent
+    if (!emailEleve) {
+        console.log("Err controllers/eleve.js > getInvitation : adresse mail manquante pour la recuperation d'invitation ")
         return cb(400);
     }
     if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
-        console.log("forme mail incorrect")
+        console.log("Err controllers/eleve.js > getInvitation : forme mail incorrect")
         return cb(400)
     }
 
@@ -184,7 +188,7 @@ function getInvitation(emailEleve, cb) {
         .then(eleve => {
             // si aucun élève n'a été trouvé
             if (!eleve) {
-                console.log("Erreur eleve.js/getInvitation : aucun eleve trouvé avec l'adresse %s", emailEleve)
+                console.log("Err controllers/eleve.js > getInvitation : aucun eleve trouvé avec l'adresse %s", emailEleve)
                 return cb(404)
             }
             const invitation = eleve.invitation;
@@ -192,23 +196,23 @@ function getInvitation(emailEleve, cb) {
                 Classe.findOne({ attributes: ["idclasse", "courriel"], where: { idclasse: eleve.idclasse } })
                     .then(classe => {
                         if (!classe) {
-                            console.log(`Erreur eleve.js/getInvitation : aucun eleve trouvé avec l'id ${eleve.idclasse}`)
+                            console.log(`Err controllers/eleve.js > getInvitation : aucun eleve trouvé avec l'id ${eleve.idclasse}`)
                             return cb(404);
                         }
-                        console.log("invitation envoyée avec l'id de la classe, ainsi que le mail de la classe")
-                        return cb({ invitation: invitation, idclasse: classe.idclasse, mailClasse:classe.courriel })
+                        // console.log("invitation envoyée avec l'id de la classe, ainsi que le mail de la classe")
+                        return cb({ invitation: invitation, idclasse: classe.idclasse, mailClasse: classe.courriel })
                     })
                     .catch(err => {
-                        console.log(`erreur classe findone ${err}`)
+                        console.log(`Err controllers/eleve.js > getInvitation : classe findone ${err}`)
                         return cb(520)
                     });
             } else {
-                console.log("aucune invitation en attente ou acceptee")
+                //console.log("aucune invitation en attente ou acceptee")
                 return cb({ invitation: invitation })
             }
         })
         .catch(err => {
-            console.log(`erreur eleve findone ${err}`)
+            console.log(`Err controllers/eleve.js > getInvitation : eleve findone ${err}`)
             return cb(520)
         });
 }

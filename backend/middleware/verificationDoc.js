@@ -14,7 +14,7 @@ const storage = multer.memoryStorage();
  * @returns 
  */
 function fileFilter(req, file, cb) {
-  console.log("** Verification de type de document **")
+  // console.log("** Verification de type de document **")
   // Allowed ext
   const filetypes = /pdf/;
 
@@ -24,10 +24,10 @@ function fileFilter(req, file, cb) {
   const mimetype = filetypes.test(file.mimetype);
 
   if (mimetype && extname) {
-    console.log("bon type (pdf)")
+    // console.log("bon type (pdf)")
     return cb(null, true);
   } else {
-    console.log("ps le bon type")
+    console.log("Err middleware/verificationDoc.js > fileFilter : ps le bon type fichier attendu pdf mais %s type mimi %s", extname, mimetype)
     return cb('Erreur : seuls les pdf sont autorisés !');
   }
 }

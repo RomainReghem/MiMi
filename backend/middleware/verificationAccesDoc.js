@@ -20,12 +20,12 @@ const verifyAccesGet = (req, res, next) => {
 
     // On doit d'abord vérifier que l'adresse mail qu'on nous donne est correcte syntaxiquement
     if (mail == undefined || mailDossier == undefined) {
-        console.log("récupération impossible sans mail!")
+        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : récupération impossible sans mail!")
         return res.status(400).send("Aucune adresse email reçue !");
     }
 
     if (!(mail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= mail.length || !(mailDossier.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= mailDossier.length) {
-        console.log("forme mail incorrect")
+        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : forme mail incorrect")
         return res.status(400).send("L'adresse mail %s n'est pas de la bonne forme ! ", mail)
     }
 
@@ -37,21 +37,23 @@ const verifyAccesGet = (req, res, next) => {
         req.roleFound = roleDetermined;
         // verification pour les roles
         if (roleToken != roleDetermined) {
+            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : role %s ne correspond pas au role %s ", roleToken, roleDetermined)
             return res.status(403).send("Le role de l'utilisateur ne correspond au role inscrit dans ses cookies !");
         }
         // on regarde si les deux mails donnés par le client sont équivalent
         if (mailDossier == mail) {
             if (mailToken == mail) {
-                console.log('pas de problème d\'accès')
+                //console.log('pas de problème d\'accès')
                 next()
             } else {
-                console.log('Mail trouvé dans le token incorrect : %s et non %s', mailToken, mail)
+                console.log('Err middleware/verificationAccesDoc.js > verifyAccesGet : mail trouvé dans le token incorrect : %s et non %s', mailToken, mail)
                 return res.status(403).send("Le mail %s de l'utilisateur n'est pas %s", mailToken, mail)
             }
             // sinon ça doit être une classe qui essaie d'accèder à un compte élève ou inversement
         } else {
             determiningRole(mailDossier, function (err, roleDossier) {
                 if (err) {
+                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : role %s ne correspond pas au role %s ", roleToken, roleDetermined)
                     return res.status(520).send(err);
                 }
                 // quand c'est un eleve
@@ -59,55 +61,66 @@ const verifyAccesGet = (req, res, next) => {
                     // on verifie qu'il essaie d'accèder au dossier d'une classe
                     if (roleDossier != "classe") {
                         // ce n'est pas une classe
+                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : c'est un %s qui essaie d'accèder au dossier ", roleDossier);
                         return res.status(403).send("Tentative d'accès aux fichiers d'un autre élève");
                     }
                     Eleve.findOne({ attributes: ['idclasse'], where: { courriel: mail, invitation: "acceptee" } })
                         .then(eleve => {
                             if (!eleve) {
+                                console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : aucune classe pour cet élève %s.", mail);
                                 return res.status(404).send("Aucune classe pour cet élève %s.", mail)
                             }
                             Classe.findOne({ attributes: ['courriel'], where: { idclasse: eleve.idclasse } })
                                 .then(classe => {
                                     if (!classe) {
+                                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : la classe de l'élève n'existe pas.");
                                         return res.status(404).send("La classe de l'élève n'existe pas.")
                                     }
                                     if (classe.courriel != mailDossier) {
+                                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : tentative d'accès aux fichiers d'une autre classe");
                                         return res.status(403).send("Tentative d'accès aux fichiers d'une autre classe");
                                     }
                                     // console.log("tout est bon, la classe appartient à l'élève qui essaie d'y accèder")
                                     next();
                                 })
                                 .catch(err => {
+                                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : classe findone "+err);
                                     return res.status(520).send("Erreur lors de la vérification du compte classe.")
                                 })
                         })
                         .catch(err => {
+                            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : eleve findone "+err);
                             return res.status(520).send("Erreur lors de la vérification du compte élève.")
                         })
                 } else {
                     // on verifie qu'on essaie d'accèder au dossier d'un élève
                     if (roleDossier != "eleve") {
                         // ce n'est pas une classe
+                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : tentative d'accès aux fichiers d'une autre classe");
                         return res.status(403).send("Tentative d'accès aux fichiers d'une autre classe");
                     }
                     Classe.findOne({ attributes: ['idclasse'], where: { courriel: mail } })
                         .then(classe => {
                             if (!classe) {
+                                console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : aucune classe trouvée");
                                 return res.status(404).send("Aucune classe trouvée pour ce mail %s.", mail)
                             }
                             Eleve.findOne({ attributes: ['ideleve'], where: { idclasse: classe.idclasse, invitation: "acceptee", courriel: mailDossier } })
                                 .then(eleve => {
                                     if (!eleve) {
+                                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : tentative d'accès aux fichiers d'un élève pas dans la classe.");
                                         return res.status(403).send("Tentative d'accès aux fichiers d'un élève pas dans la classe.")
                                     }
                                     // console.log("tout est bon, l'élève appartient à la classe qui essaie d'y accèder")
                                     next();
                                 })
                                 .catch(err => {
+                                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : eleve findone "+err);
                                     return res.status(520).send("Erreur lors de la vérification du compte élève.")
                                 })
                         })
                         .catch(err => {
+                            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : classe findone "+err);
                             return res.status(520).send("Erreur lors de la vérification du compte classe.")
                         })
                 }
@@ -125,7 +138,7 @@ const verifyAccesGet = (req, res, next) => {
  * @returns la réponse du serveur en cass d'erreur
  */
 const verifyAccessSave = (req, res, next) => {
-    console.log("\n*** Vérification des droits d'accès au document ***")
+    // console.log("\n*** Vérification des droits d'accès au document ***")
     // le mail de la personne qui est censée demander les accès
     const mail = req.body.mail;
     // le mail enregistré dans le cookie de la session, est censé être équivalent au mail donné
@@ -135,12 +148,12 @@ const verifyAccessSave = (req, res, next) => {
 
     // On doit d'abord vérifier que l'adresse mail qu'on nous donne est correcte syntaxiquement
     if (mail == undefined) {
-        console.log("pas de mail!")
+        console.log("Err middleware/verificationAccesDoc.js > verifyAccesSave : pas de mail!")
         return res.status(400).send("Aucune adresse email reçue !");
     }
 
     if (!(mail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= mail.length) {
-        console.log("forme mail incorrect")
+        console.log("Err middleware/verificationAccesDoc.js > verifyAccesSave : forme mail incorrect")
         return res.status(400).send("L'adresse mail %s n'est pas de la bonne forme ! ", mail)
     }
     console.log(mail)
@@ -152,6 +165,7 @@ const verifyAccessSave = (req, res, next) => {
         req.roleFound = roleDetermined;
         // verification pour les roles
         if (roleToken != roleDetermined) {
+            console.log("Err middleware/verificationAccesDoc.js > verifyAccesSave : role %s ne correspond pas au role %s ", roleToken, roleDetermined)
             return res.status(403).send("Le role de l'utilisateur ne correspond pas au role inscrit dans ses cookies !");
         }
         // on regarde si les deux mails donnés par le client sont équivalent
@@ -159,7 +173,7 @@ const verifyAccessSave = (req, res, next) => {
             // console.log('pas de problème d\'accès')
             next()
         } else {
-            console.log('Mail trouvé dans le token incorrect : %s et non %s', mailToken, mail)
+            console.log('Err middleware/verificationAccesDoc.js > verifyAccesSave : mail trouvé dans le token incorrect : %s et non %s', mailToken, mail)
             return res.status(403).send("Le mail %s de l'utilisateur n'est pas %s", mailToken, mail)
         }
     })
@@ -189,15 +203,19 @@ function determiningRole(email, callback) {
                 .then(classe => {
                     // pas de classe, pas de chocolat !
                     if (!classe) {
-                        console.log("Aucun utilisateur avec l'adresse mail %s trouvée :( ", email);
+                        console.log("Err middleware/verificationAccesDoc.js > determiningRole : aucun utilisateur avec l'adresse mail %s trouvée :( ", email);
                         return callback("Aucun utilisateur trouvé ayant cette adresse : "+email)
                     }
                     //console.log("Oh... C'est une classe...")
                     return callback(null, "classe")
                 })
+                .catch(err=>{
+                    console.log("Err middleware/verificationAccesDoc.js > determiningRole : classe findone");
+                    return callback("Problème lors de la vérification d'identité de compte");
+                })
         })
         .catch(err => {
-            console.log("Erreur lors de verif si eleve : " + err)
+            console.log("Err middleware/verificationAccesDoc.js > determiningRole : eleve findone " + err)
             return callback("Problème lors de la vérification d'identité de compte");
         })
 }

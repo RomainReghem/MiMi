@@ -11,7 +11,7 @@ const { verificationChemin } = require("./ajoutDocument")
  * @param {*} res la réponse du serveur
  */
 const saveAvatar = (req, res) => {
-    console.log("\n*** Sauvegarde d'avatar ***")
+    // console.log("\n*** Sauvegarde d'avatar ***")
     let avatar = req.body.avatar;
     const email = req.body.mail;
 
@@ -20,16 +20,16 @@ const saveAvatar = (req, res) => {
     try {
         verificationChemin(path);
     } catch (err) {
-        console.log("Erreur images.js=>saveAvatar : " + err)
+        console.log("Err controllers/image.js > saveAvatar : " + err)
         return res.status(520).send("Erreur lors de la vérification des dossiers de sauvegarde.")
     }
     // on enregistre le fichier JSON correspondant à l'avatar de l'élève
     fs.writeFile(path + "/avatar.json", avatar, 'utf8', function (err) {
         if (err) {
-            console.log("Erreur lors de l'enregistrement de l'avatar : " + err);
+            console.log("Err controllers/image.js > saveAvatar : enregistrement de l'avatar : " + err);
             return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
         }
-        console.log("Le fichier JSON a bien été sauvegardé");
+        // console.log("Le fichier JSON a bien été sauvegardé");
         return res.status(201).send("Enregistrement effectué");
     });
 }
@@ -48,22 +48,19 @@ const saveAvatarAsImage = (req, res) => {
     const email = req.body.mail;
 
     if (avatar == undefined || avatar.buffer == null) {
-        console.log("Pas d'image d'avatar")
-        console.log(req.body.file)
-        console.log(req.body.filename)
+        console.log("Err controllers/image.js > saveAvatarAsImage : pas d'image d'avatar")
         return res.status(404).send("Erreur : aucun avatar trouvé")
     }
-    console.log(" nom fichier " + req.body.filename)
-
+    // le chemin où enregistrer l'image png de l'avatar (c'est le meme chemin pour la photo de profil et l'avatar)
     const path = "./Documents/" + email + "/images"
 
     // sauvegarde image
     fs.writeFile(path + "/avatar.png", avatar.buffer, 'utf8', function (err, data) {
         if (err) {
-            console.log("Erreur lors de l'enregistrement de l'avatar en image : " + err);
+            console.log("Err controllers/image.js > saveAvatarAsImage : enregistrement de l'avatar en image : " + err);
             return res.status(600).send("Erreur lors de l'enregistrement de l'avatar, réesayez.")
         }
-        console.log("L'avatar a bien été sauvegardé");
+        // console.log("L'avatar a bien été sauvegardé");
         return res.status(201).json(avatar.buffer);
     });
 }
@@ -79,12 +76,12 @@ function getAvatar(mail, callback) {
     try {
         verificationChemin(path);
     } catch (err) {
-        console.log("Erreur controllers/images.js/getAvatar " + err)
+        console.log("Err controllers/image.js > getAvatar : " + err)
         return callback(err)
     }
     fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
         if (err) {
-            console.log('Erreur lors de la récupération de l\'avatar : ' + err)
+            console.log('Err controllers/image.js > getAvatar :  la récupération de l\'avatar : ' + err)
             //return res.status(600).send("Problème de lecture de l'avatar.")
             avatar = {
                 bgColor: "#E0DDFF",
@@ -104,13 +101,13 @@ function getAvatar(mail, callback) {
                 shirtStyle: "polo"
             }
             //avatar = JSON.stringify(avatar)
-            console.log("avatar crée")
+            // console.log("avatar crée")
             // on envoie le fichier json au front
             return callback(null, { avatar: avatar });
         }
 
         avatar = JSON.parse(avatar)
-        console.log("avatar récupéré !")
+        // console.log("avatar récupéré !")
         // on envoie le fichier json au front
         return callback(null, { avatar: avatar });
     })
@@ -129,10 +126,10 @@ function getAvatarAsImage(email, callback) {
         if (err) {
             fs.readFile("./Image/avatar.png", function (error, avtr) {
                 if (error) {
-                    console.log("Erreur lors de la recup de la photo par défaut " + error)
+                    console.log("Err controllers/image.js > getAvatarAsImage : erreur recup de la photo par défaut " + error)
                     return callback("Aucun avatar trouvé pour ce compte.");
                 } else {
-                    console.log("renvoi avatar par défaut " + err)
+                    console.log("Err controllers/image.js > getAvatarAsImage : renvoi avatar par défaut " + err)
                     return callback(null, { avatarAsImg: avtr });
 
                 }
@@ -153,13 +150,13 @@ function getAvatarAsImage(email, callback) {
  * @returns la réponse
  */
 const savePicture = (req, res) => {
-    console.log("\n*** Sauvegarde de l'image de profil de l'élève ***")
+    // console.log("\n*** Sauvegarde de l'image de profil de l'élève ***")
     const img = req.file
     const email = req.body.mail;
 
     if (img == null) {
-        console.log("Pas de fichier")
-        return res.status(600).send("Erreur serveur")
+        console.log("Err controllers/image.js > savePicture : pas de fichier")
+        return res.status(600).send("Erreur serveur : aucune image récupérée")
     }
 
     const path = "./Documents/" + email + "/images"
@@ -167,16 +164,16 @@ const savePicture = (req, res) => {
     try {
         verificationChemin(path)
     } catch (error) {
-        console.log("Erreur verif chemin dans savePicture");
+        console.log("Err controllers/image.js > savePicture : verif chemin dans savePicture");
         return res.status(520).send("Erreur lors de la récupération du dossier où se situe l'image.")
     }
     // const type = img.mimetype.split("/")[1]
     const type = req.fileextname;
-    console.log("type " + type)
+    // console.log("type " + type)
     // avant de sauvegarder on va supprimer les anciennes photos de profil, s'il en existe
     fs.readdir(path, function (err, files) {
         if (err) {
-            console.log("erreur durant la récupération " + err)
+            console.log("Err controllers/image.js > savePicture : readdir " + err)
             return res.status(600).send('Erreur lors de la récupération de la pp.');
         }
         // on va supprimer l'ancienne photo de profil
@@ -184,7 +181,7 @@ const savePicture = (req, res) => {
             if (f.startsWith('photo')) {
                 fs.unlink(path + "/" + f, function (err) {
                     if (err) {
-                        console.log("erreur lors de la suppression de l'ancienne pp " + err)
+                        console.log("Err controllers/image.js > savePicture : erreur lors de la suppression de l'ancienne pp " + err)
                         return res.status(520).send("Erreur lors de la suppression de l'ancienne image de profil.")
                     }
                     //console.log("Suppression ok")
@@ -194,10 +191,10 @@ const savePicture = (req, res) => {
         // sauvegarde image
         fs.writeFile(path + "/photo" + type, img.buffer, 'utf8', function (err, data) {
             if (err) {
-                console.log("Erreur lors de l'enregistrement de la photo : " + err);
+                console.log("Err controllers/image.js > savePicture : erreur lors de l'enregistrement de la photo : " + err);
                 return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
             }
-            console.log("La photo a bien été sauvegardée");
+            // console.log("La photo a bien été sauvegardée");
             return res.status(201).json(img.buffer);
         });
     })
@@ -215,13 +212,13 @@ function getImage(email, callback) {
     try {
         verificationChemin(path);
     } catch (error) {
-        console.log("Erreur controllers/image.js/getImage : " + err);
+        console.log("Err controllers/image.js > getImage : verificationChemin : " + err);
         return res.status(520).send("Erreur lors de la récupération de l'image.")
     }
 
     fs.readdir(path, function (err, files) {
         if (err) {
-            console.log("erreur durant la récupération " + err)
+            console.log("Err controllers/image.js > getImage : readdir " + err)
             return callback('Erreur lors de la récupération de la photo de profil.');
         } else {
             for (const f of files) {
@@ -231,11 +228,11 @@ function getImage(email, callback) {
                 }
             }
             if (file == "") {
-                console.log("pas d'image")
+                // console.log("pas d'image")
                 // on va retourner une image par défaut 
                 fs.readFile("./Image/chat.jpg", function (error, img) {
                     if (err) {
-                        console.log("erreur lors de la recup de la photo par défaut " + error)
+                        console.log("Err controllers/image.js > getImage : erreur lors de la recup de la photo par défaut " + error)
                         return callback("L'élève n'a pas de photo de profil.");
                     }
                     return callback(null, { image: img });
@@ -243,7 +240,7 @@ function getImage(email, callback) {
             } else {
                 fs.readFile(path + "/" + file, function (err, image) {
                     if (err) {
-                        console.log("Erreur lors de la recup de pp " + err)
+                        console.log("Err controllers/image.js > getImage : erreur lors de la recup de pp " + err)
                         return callback("Erreur lors de la récupération de l'image de profil")
                     }
                     return callback(null, { image: image });

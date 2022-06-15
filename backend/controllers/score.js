@@ -12,22 +12,22 @@ const Classe = require('../models/users').Classe
  * @returns la réponse du serveur
  */
 const resetScore = (req, res) => {
-    console.log('\n*** Remise à zéro du score ***')
+    // console.log('\n*** Remise à zéro du score ***')
     const email = req.query.mail;
     const jeu = "tictactoe"//req.query.game;
 
-    console.log("** Vérification mail **")
+    // console.log("** Vérification mail **")
     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-        console.log("forme mail incorrect")
+        console.log("Err controllers/score.js > resetScore : forme mail incorrect")
         return res.sendStatus(407)
     }
-    console.log("** Vérification jeu **")
+    //console.log("** Vérification jeu **")
     if (jeu != 'tictactoe') {
-        console.log("jeu inconnu")
+        console.log("Err controllers/score.js > resetScore : jeu inconnu")
         return res.status(400).send('Jeu %s inconnu', jeu)
     }
 
-    console.log("** Vérification droit d'accès au score **")
+    // console.log("** Vérification droit d'accès au score **")
     const role = req.role;
     const emailToken = req.mail
 
@@ -41,36 +41,39 @@ const resetScore = (req, res) => {
                 }
             ).then(eleve => {
                 if (!eleve) {
-                    console.log("eleve pas trouve avec l'addresse : " + email)
-                    return res.send("Pas de compte correspondant à cette addresse.\nElève non trouvé").status(404);
+                    console.log("Err controllers/score.js > resetScore : eleve pas trouve avec l'addresse : " + email)
+                    return res.status(404).send("Pas de compte correspondant à cette addresse.\nElève non trouvé");
                 } else if ("acceptee" != eleve.invitation) {
-                    console.log("Cet élève n'est pas dans une classe ! " + email)
+                    console.log("Err controllers/score.js > resetScore : cet élève n'est pas dans une classe ! " + email)
                     return res.status(409).send("Vous n'appartenez à aucune classe");
                 }
                 Score.findOne(
                     { attributes: ['idscore'], where: { idclasse: eleve.idclasse, jeu: jeu } }
                 ).then(score => {
                     if (!score) {
-                        console.log("pas de score trouvé pour le jeu %s et l'élève %s", jeu, email)
-                        return res.send("Pas de score correspondant à ce jeu et cet élève.\nScore non trouvé").status(404);
+                        console.log("Err controllers/score.js > resetScore : pas de score trouvé pour le jeu %s et l'élève %s", jeu, email)
+                        return res.status(404).send("Pas de score correspondant à ce jeu et cet élève.\nScore non trouvé");
                     }
-                    console.log("** Début de la suppression des données **")
+                    //console.log("** Début de la suppression des données **")
                     // on met toutes les données à zéro
                     Score.update(
                         { scoreclasse: 0, scoreeleves: 0, nbpartie: 0 },
-                        { where: { idscore: score.idscore } }
-                    ).then(() => {
-                        console.log("Mise à 0 du score réussie !")
-                        return res.sendStatus(201)
-                    })
+                        { where: { idscore: score.idscore } })
+                        .then(() => {
+                            //console.log("Mise à 0 du score réussie !")
+                            return res.status(201).send("Le score a bien été réinitialisé !")
+                        })
                         .catch(err => {
-                            return res.status(500).send("Erreur suppression score \n" + err);
+                            console.log("Err controllers/score.js > resetScore : score update " + err)
+                            return res.status(500).send("Erreur suppression score.");
                         });
                     return res.send({ score: score.score, win: score.victoire, loss: score.defaite, nbpartie: score.nbpartie }).status(201)
                 }).catch(err => {
+                    console.log("Err controllers/score.js > resetScore : score findone " + err)
                     return res.status(500).send("Erreur récuperation score \n" + err);
                 });
             }).catch(err => {
+                console.log("Err controllers/score.js > resetScore : elevefindone " + err)
                 return res.status(500).send("Erreur récuperation compte eleve \n" + err);
             });
         } else if (role == "classe") {
@@ -79,7 +82,7 @@ const resetScore = (req, res) => {
                 where: { courriel: email }
             }).then(classe => {
                 if (!classe) {
-                    console.log("Classe pas trouvée avec l'addresse : " + email)
+                    console.log("Err controllers/score.js > resetScore : Classe pas trouvée avec l'addresse : " + email)
                     return res.send("Pas de compte correspondant à cette addresse.\nClasse non trouvée").status(404);
                 }
                 // on récupère le score de la classe
@@ -94,17 +97,20 @@ const resetScore = (req, res) => {
                             return res.status(201).send("Réinitialisation du score effectué avec succès !")
                         })
                         .catch(err => {
-                            return res.status(500).send("Erreur changement score \n" + err);
+                            console.log("Err controllers/score.js > resetScore : score update " + err)
+                            return res.status(500).send("Erreur changement score.");
                         });
                 })
             }).catch(err => {
+                console.log("Err controllers/score.js > resetScore : classe findOne " + err)
                 return res.status(500).send("Erreur récuperation compte classe \n" + err);
             });
         } else {
+            console.log("Err controllers/score.js > resetScore : role impossible " + role)
             return res.sendStatus(418)
         }
     } else {
-        console.log("Tentative de suppression du score d'un eleve !")
+        console.log("Err controllers/score.js > resetScore : tentative de reinitialisation du score d'un compte par " + emailToken)
         return res.status(403).send("Accès interdit : tentative de suppression du score d'un eleve")
     }
 }
@@ -120,7 +126,7 @@ const resetScore = (req, res) => {
  */
 const getScoreTicTacToe = (req, res) => {
     console.log("\n*** Récupération du score ***");
-    console.log("get score : " + (Date.now())/1000)
+    console.log("get score : " + (Date.now()) / 1000)
     const email = req.query.mail;
 
     console.log("** Vérification mail **")
@@ -143,14 +149,15 @@ const getScoreTicTacToe = (req, res) => {
                     } else if (eleve.invitation != "acceptee") {
                         console.log("Cet élève n'est pas dans une classe ! " + email)
                         return res.status(403).send("Cet élève n'est pas dans une classe ! ");
+                    } else {
+                        getScore(eleve.idclasse, "tictactoe", function (err, data) {
+                            if (err) {
+                                return res.status(409).send(err)
+                            }
+                            console.log("%i à %i pour l'élève, nombre de parties jouées %i", data.scoreeleves, data.scoreclasse, data.nbpartie)
+                            return res.status(201).json({ scores: [data.scoreeleves, data.scoreclasse], partie: data.nbpartie })
+                        })
                     }
-                    getScore(eleve.idclasse, "tictactoe", function (err, data) {
-                        if (err) {
-                            return res.status(409).send(err)
-                        }
-                        console.log("%i à %i pour l'élève, nombre de parties jouées %i", data.scoreeleves, data.scoreclasse, data.nbpartie)
-                        return res.status(201).json({ scores: [data.scoreeleves, data.scoreclasse], partie: data.nbpartie })
-                    })
                 }).catch(err => {
                     console.log("Erreur récuperation compte eleve \n" + err)
                     return res.status(500).send("Erreur lors de la récuperation du compte eleve");
@@ -175,12 +182,12 @@ const getScoreTicTacToe = (req, res) => {
                     return res.status(200).json({ scores: [data.scoreeleves, data.scoreclasse], partie: data.nbpartie })
                 })
             }).catch(err => {
-                console.log("Erreur classe findone "+err)
+                console.log("Erreur classe findone " + err)
                 return res.status(500).send("Erreur récuperation compte classe.");
             });
 
         } else {
-            console.log("What's this role ? %s",role)
+            console.log("What's this role ? %s", role)
             return res.sendStatus(418)
         }
     } else {
@@ -205,21 +212,22 @@ function getScore(id, jeu, callback) {
         }
     ).then(score => {
         if (!score) {
-            console.log("pas de score pour le jeu trouvé : création du score ")
+            //console.log("pas de score pour le jeu trouvé : création du score ")
             Score.create({ jeu: jeu, idclasse: id })
                 .then(newscore => {
-                    console.log("Création du score effectuée");
+                    //console.log("Création du score effectuée");
                     return callback(null, newscore);
                 })
                 .catch(err => {
-                    console.log("Erreur serveur creation des données pour le jeu \n" + err)
+                    console.log("Err controllers/score.js > getScore : serveur creation des données pour le jeu \n" + err)
                     return callback("Erreur du serveur lors de la creation des données pour le jeu");
                 });
+        } else {
+            // on renvoie le score
+            return callback(null, score)
         }
-        // on renvoie le score
-        return callback(null, score)
     }).catch(err => {
-        console.log("Erreur récuperation score \n" + err)
+        console.log("Err controllers/score.js > getScore : récuperation score \n" + err)
         return callback("Erreur lors de la récupération du score.");
     });
 }
@@ -231,24 +239,24 @@ function getScore(id, jeu, callback) {
  */
 async function addVictory(email) {
     if (email != undefined) {
-        console.log('\n***Ajout de point***')
-        console.log("addPoints : " + (Date.now())/1000)
+        // console.log('\n***Ajout de point***')
+        //console.log("addPoints : " + (Date.now()) / 1000)
         try {
             const eleve = await Eleve.findOne({ attributes: ["idclasse"], where: { courriel: email } })
             if (!eleve) {
                 const classe = await Classe.findOne({ attributes: ["idclasse"], where: { courriel: email } });
                 if (!classe) {
-                    //error
+                    console.log("Err controllers/score.js > addVictory : pas de classe")
                     throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
                 }
                 await Score.increment({ scoreclasse: +1, nbpartie: +1 }, { where: { idclasse: classe.idclasse } })
-                console.log("ajout de point pour la classe %s", email)
+                // console.log("ajout de point pour la classe %s", email)
             } else {
                 await Score.increment({ scoreeleves: +1, nbpartie: +1 }, { where: { idclasse: eleve.idclasse } })
-                console.log("ajout de point pour l'eleve %s", email)
+                //console.log("ajout de point pour l'eleve %s", email)
             }
         } catch (error) {
-            console.log("erreur lors des requetes " + error)
+            console.log("Err controllers/score.js > addVictory : erreur lors des requetes " + error)
             throw new Error("Erreur lors du changement du score.")
         }
     }
@@ -262,24 +270,24 @@ async function addVictory(email) {
  */
 async function addPartie(email) {
     if (email != undefined) {
-        console.log('\n***Augmentation du nombre de partie***')
-        console.log("addPartie : " + (Date.now())/1000)
+        //console.log('\n***Augmentation du nombre de partie***')
+        //console.log("addPartie : " + (Date.now()) / 1000)
         try {
             const eleve = await Eleve.findOne({ attributes: ["idclasse"], where: { courriel: email } })
             if (!eleve) {
                 const classe = await Classe.findOne({ attributes: ["idclasse"], where: { courriel: email } });
                 if (!classe) {
-                    //error
+                    console.log("Err controllers/score.js > resetScore : aucun utilisateur trouvé avec ce mail %s !", email);
                     throw new Error("Aucun utilisateur trouvé avec ce mail %s !", email)
                 }
                 await Score.increment({ nbpartie: +1 }, { where: { idclasse: classe.idclasse } })
-                console.log("ajout de partie classe ok")
+                //console.log("ajout de partie classe ok")
             } else {
                 await Score.increment({ nbpartie: +1 }, { where: { idclasse: eleve.idclasse } })
-                console.log("ajout de partie pour l'élève ok")
+                //console.log("ajout de partie pour l'élève ok")
             }
         } catch (err) {
-            console.log("Erreur : " + err)
+            console.log("Err controllers/score.js > resetScore : addPartie " + err)
             throw new Error("Erreur durant l'ajout du nombre de partie");
         }
     }
