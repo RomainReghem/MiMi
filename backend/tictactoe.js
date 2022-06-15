@@ -3,6 +3,7 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
+// const io = require("socket.io")(server, { path: '/api-games', cors: { origin: "*" } });
 const rooms = io.sockets.adapter.rooms
 const { addVictory, addPartie } = require("./controllers/score")
 
