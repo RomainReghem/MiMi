@@ -175,8 +175,9 @@ const JitsiComponent = () => {
                 auth?.idclasse && auth?.role == "eleve" &&
 
                 <Stack direction={'row'} align='center' justify={'center'} p={5}>
-                    <Button colorScheme={'blue'} onClick={() => chooseImage()}>Choisir l'image</Button>
-                    <Button colorScheme={'blue'} onClick={() => chooseAvatar()}>Choisir l'avatar</Button>
+                    <Button colorScheme={'blue'}>Caméra droite</Button>
+                    <Button colorScheme={'blue'}>Caméra centre</Button>
+                    <Button colorScheme={'blue'}>Caméra gauche</Button>
                 </Stack>
             }
 
