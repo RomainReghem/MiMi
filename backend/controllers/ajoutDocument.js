@@ -40,7 +40,7 @@ const saveFile = (req, res) => {
         console.log("Err controllers/ajoutDocument.js => saveFile : erreur verif nom pas double")
         return res.status(520).send("Erreur lors de la vérification du nom du document.")
     }
-
+    // 250Mo = 262144000o
     verifTaille(path, file.size, 250000000, err => {
         if (err) {
             console.log("Err controllers/ajoutDocument.js => saveFile : " + err)

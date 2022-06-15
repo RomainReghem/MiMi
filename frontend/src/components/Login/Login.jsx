@@ -35,9 +35,13 @@ export default function Login() {
                     withCredentials: true
                 });
             const accessToken = response?.data?.accessToken;
+            // Eleve ou classe
             const role = response?.data?.role;
+            // Acceptee, en attente, aucune
             const invitation = response?.data?.invitation;
+            // Les classes le reçoivent toujours. L'élève le reçoit s'il est membre d'une classe
             const idclasse = response?.data?.idclasse;
+            // Les classes ne le reçoivent jamais, correspond à leur user. L'élève le reçoit s'il est membre d'une classe
             const mailclasse = response?.data?.mailClasse;
             // Au login, si rien ne correspond dans le local storage, on attribue "avatar" à "préférence"
             // On ajoute aussi la variable au localstorage, default "avatar"
@@ -88,6 +92,7 @@ export default function Login() {
     return (
         <Flex
             grow={1}
+            direction='column'
             align={'center'}
             justify={'center'}
             bg={useColorModeValue('gray.50', 'gray.800')}>

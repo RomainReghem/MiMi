@@ -3,18 +3,20 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import { useToast,Stack, Center, FormControl, FormLabel, Input, Button, Text } from "@chakra-ui/react";
+import { useToast,Stack, Center, FormControl, FormLabel, Input, Button, Text, Spinner } from "@chakra-ui/react";
 
 const PDFSender = (props) => {
     const toast = useToast()
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileWaitingToBeSent, setFileWaitingToBeSent] = useState(false);
+    const [fileUploading, setFileUploading] = useState(false)
     const axiosPrivate = useAxiosPrivate();
     const { auth } = useAuth();
     let saveFileURL = (auth?.role == "classe" ? "/saveFileClass" : "/saveFile");
 
     const handleSubmit = async (event) => {
         event.preventDefault()
+        setFileUploading(true)
         const formData = new FormData();
         // PDF only
         if (selectedFile.type != "application/pdf") {
@@ -44,8 +46,12 @@ const PDFSender = (props) => {
             props.reload();
 
         } catch (error) {
+            if (error.response?.status === 409) {
+                toast({ title: "Erreur", description: "Ce fichier dépasse votre limite de stockage. Supprimez d'autres fichiers et rééssayez.", status: "error", duration: 5000, isClosable: true, position: "top" })
+            }
             console.log(error)
         }
+        setFileUploading(false)
     }
 
     const handleFileSelect = (event) => {
@@ -62,8 +68,8 @@ const PDFSender = (props) => {
                     <Text display={'inline'} ml={2} noOfLines={1}>{fileWaitingToBeSent ? selectedFile?.name : "Choisir un fichier"}</Text>
                 </Center>
             </FormLabel>
-            <Button w={'25%'} borderRadius={'0px 3px 3px 0px'} onClick={handleSubmit} colorScheme={'green'} disabled={fileWaitingToBeSent ? false : true} leftIcon={<FontAwesomeIcon icon={faPaperPlane} bounce={fileWaitingToBeSent ? true : false} />}>
-                <Text display={{base:'none', md:'inline'}}>Envoyer</Text>
+            <Button w={'25%'} borderRadius={'0px 3px 3px 0px'} onClick={handleSubmit} colorScheme={'green'} disabled={fileWaitingToBeSent ? false : true} leftIcon={!fileUploading && <FontAwesomeIcon icon={faPaperPlane} bounce={fileWaitingToBeSent ? true : false} />}>
+                {fileUploading ? <Spinner size={'xs'}/> : <Text display={{base:'none', md:'inline'}}>Envoyer</Text>}
             </Button>
             </Stack>
     )

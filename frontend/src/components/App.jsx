@@ -18,6 +18,7 @@ import Jitsi from "../components/jitsi";
 import TicTacToe from "./Games/TicTacToe";
 import Jeux from "./Games/Jeux"
 import NotFound from "./NotFound"
+import Terms from "./Terms"
 
 import Settings from "./Settings/Settings";
 
@@ -63,6 +64,7 @@ export default function App() {
             <Route path="/register-student" element={<RegisterStudent />} />
             <Route path="/register-class" element={<RegisterClass />} />
             <Route path="/choice" element={<Choice />} />
+            <Route path="/terms" element={<Terms />} />
             </Route>
 
             <Route element={<PersistLogin />}>

@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faCheck, faPaperPlane, faDoorOpen, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Avatar from 'react-nice-avatar';
 import Invitations from "./Invitations";
-import { useToast, InputGroup, Tooltip, FormLabel, IconButton, Input, InputRightElement, Text, Button, Heading, Stack, Image, InputRightAddon, Divider, Center } from "@chakra-ui/react";
+import { useToast, InputGroup, Tooltip, FormLabel, IconButton, Input, InputRightElement, Text, Button, Heading, Stack, Image, InputRightAddon, Divider, Center, Spinner } from "@chakra-ui/react";
 import useUserData from "../../hooks/useUserData";
 
 const CHANGEPSEUDO_URL = '/changePseudo';
@@ -23,6 +23,7 @@ const Identity = () => {
     const [selectedPicture, setSelectedPicture] = useState(null);
 
     const [pictureWaitingToBeSent, setPictureWaitingToBeSent] = useState(false);
+    const [pictureUploading, setPictureUploading] = useState(false);
 
     const [picture, setPicture] = useState("");
 
@@ -31,9 +32,9 @@ const Identity = () => {
         // Les URL de blob ne fonctionnent que sur le navigateur du client ou il a été créé. C'est pourquoi on le recrée à chaque fois.
         // Les dataURL en base 64 étaient parfois trop lourdes pour les passer entre composants.
         async function image() {
-            let blob = new Blob([new Uint8Array(userData?.image)], {type : 'image/jpg'});
+            let blob = new Blob([new Uint8Array(userData?.image)], { type: 'image/jpg' });
             let url = URL.createObjectURL(blob)
-                setPicture(url)
+            setPicture(url)
         }
         image();
     }, [userData?.image])
@@ -98,6 +99,7 @@ const Identity = () => {
 
     // Submit de l'image
     const pictureSubmit = async () => {
+        setPictureUploading(true)
         try {
             let formData = new FormData()
             formData.append('file', selectedPicture.data);
@@ -120,6 +122,7 @@ const Identity = () => {
             toast({ title: "Erreur", description: "Vérifiez le fichier", status: "error", duration: 5000, isClosable: true, position: "top" })
 
         }
+        setPictureUploading(false)
     }
 
     // On pourrait ici sauvegarder les préférences sur le serveur.
@@ -131,7 +134,7 @@ const Identity = () => {
     }
 
     const chooseAvatar = () => {
-        setAuth({ ...auth, preference: "avatar" }); 
+        setAuth({ ...auth, preference: "avatar" });
         localStorage.setItem("preference" + auth?.user, JSON.stringify("avatar"));
         toast({ title: "Profil changé !", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
     }
@@ -170,7 +173,9 @@ const Identity = () => {
                         </Center>
                     </FormLabel>
                     <Tooltip bg={'green.400'} label="Valider l'image" fontSize='md' placement="top">
-                        <IconButton borderRadius={'0px 3px 3px 0px'} colorScheme={"green"} onClick={(e) => { pictureSubmit(e); e.currentTarget.blur() }}><FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} /></IconButton>
+                        <IconButton borderRadius={'0px 3px 3px 0px'} colorScheme={"green"} onClick={(e) => {!pictureUploading && pictureSubmit(e)}}>
+                            {pictureUploading ? <Spinner size={'xs'} /> : <FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} />}
+                        </IconButton>
                     </Tooltip>
                 </Stack>
 
