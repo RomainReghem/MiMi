@@ -40,7 +40,7 @@ const saveFile = (req, res) => {
         console.log("Err controllers/ajoutDocument.js => saveFile : erreur verif nom pas double")
         return res.status(520).send("Erreur lors de la vérification du nom du document.")
     }
-    // 250Mo = 262144000o
+    // 250Mio = 262144000o
     verifTaille(path, file.size, 250000000, err => {
         if (err) {
             console.log("Err controllers/ajoutDocument.js => saveFile : " + err)
@@ -130,11 +130,12 @@ function verifTaille(path, sizeFile, max, cb) {
     fastFolderSize(path, (err, size) => {
         if (err) {
             console.log("Err controllers/ajoutDocument.js > verifTaille " + err)
-            cb(err);
+            return cb(err);
         }
         if (max < size + sizeFile) {
-            cb("Erreur taille max dépassée");
+            return cb("Erreur taille max dépassée");
         }
+        return cb()
     })
 }
 

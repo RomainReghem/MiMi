@@ -30,7 +30,7 @@ const getFiles = (req, res) => {
             let f = []
             // on n'affichera que les fichiers pdf
             for (file in files) {
-                console.log("-" + files[file].name)
+                // console.log("-" + files[file].name)
                 if (files[file].name.match("(.pdf|.PDF)$")) {
                     f.push(files[file].name)
                 }

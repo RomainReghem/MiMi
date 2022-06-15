@@ -156,7 +156,6 @@ const verifyAccessSave = (req, res, next) => {
         console.log("Err middleware/verificationAccesDoc.js > verifyAccesSave : forme mail incorrect")
         return res.status(400).send("L'adresse mail %s n'est pas de la bonne forme ! ", mail)
     }
-    console.log(mail)
     // On veut le role de l'eleve qui veut sauvegarder
     determiningRole(mail, function (err, roleDetermined) {
         if (err) {
@@ -210,7 +209,7 @@ function determiningRole(email, callback) {
                     return callback(null, "classe")
                 })
                 .catch(err => {
-                    console.log("Err middleware/verificationAccesDoc.js > determiningRole : classe findone");
+                    console.log("Err middleware/verificationAccesDoc.js > determiningRole : classe findone "+err);
                     return callback("Problème lors de la vérification d'identité de compte");
                 })
         })
