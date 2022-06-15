@@ -38,6 +38,7 @@ const PDFViewer = (props) => {
 
     useEffect(() => {
         async function convertingFile() {
+            setFile(null)
             setDisplaySpinner(true)
             let data = await getFile()
             let binary = '';
