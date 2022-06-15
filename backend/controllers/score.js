@@ -219,7 +219,7 @@ function getScore(id, jeu, callback) {
                     return callback(null, newscore);
                 })
                 .catch(err => {
-                    console.log("Err controllers/score.js > getScore : serveur creation des données pour le jeu \n" + err)
+                    console.log(`Err controllers/score.js > getScore : serveur creation des données pour le jeu \n${err}`)
                     return callback("Erreur du serveur lors de la creation des données pour le jeu");
                 });
         } else {

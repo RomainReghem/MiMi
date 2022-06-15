@@ -75,7 +75,7 @@ router.post('/avatarAsImage', verifyJWT, verifyImg.uploadAvatar.single("file"), 
 // route pour sauvegarder l'image de profil d'un élève
 router.post('/saveImage', verifyJWT, verifyImg.upload.single("file"), verifyMailBody, Image.savePicture)
 
-// PAS IMPLEMENTE : SUPPRESSION
+// PAS IMPLEMENTE : SUPPRESSION de compte
 // route pour supprimer l'élève
 // router.delete("/eleve", verifyJWT, verifyMailBody, Eleve.deleteStudent)
 // PAS IMPLEMENTE

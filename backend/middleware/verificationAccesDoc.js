@@ -84,12 +84,12 @@ const verifyAccesGet = (req, res, next) => {
                                     next();
                                 })
                                 .catch(err => {
-                                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : classe findone "+err);
+                                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : classe findone " + err);
                                     return res.status(520).send("Erreur lors de la vérification du compte classe.")
                                 })
                         })
                         .catch(err => {
-                            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : eleve findone "+err);
+                            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : eleve findone " + err);
                             return res.status(520).send("Erreur lors de la vérification du compte élève.")
                         })
                 } else {
@@ -115,12 +115,12 @@ const verifyAccesGet = (req, res, next) => {
                                     next();
                                 })
                                 .catch(err => {
-                                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : eleve findone "+err);
+                                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : eleve findone " + err);
                                     return res.status(520).send("Erreur lors de la vérification du compte élève.")
                                 })
                         })
                         .catch(err => {
-                            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : classe findone "+err);
+                            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : classe findone " + err);
                             return res.status(520).send("Erreur lors de la vérification du compte classe.")
                         })
                 }
@@ -179,7 +179,7 @@ const verifyAccessSave = (req, res, next) => {
     })
 }
 
- 
+
 /**
  * fonction qui aide à déterminer le role (eleve ou classe) d'un utilisateur en fonction de son adresse mail
  * @param {*} email le mail de l'utilisateur dont on veut connaître le rôle.
@@ -204,12 +204,12 @@ function determiningRole(email, callback) {
                     // pas de classe, pas de chocolat !
                     if (!classe) {
                         console.log("Err middleware/verificationAccesDoc.js > determiningRole : aucun utilisateur avec l'adresse mail %s trouvée :( ", email);
-                        return callback("Aucun utilisateur trouvé ayant cette adresse : "+email)
+                        return callback("Aucun utilisateur trouvé ayant cette adresse : " + email)
                     }
                     //console.log("Oh... C'est une classe...")
                     return callback(null, "classe")
                 })
-                .catch(err=>{
+                .catch(err => {
                     console.log("Err middleware/verificationAccesDoc.js > determiningRole : classe findone");
                     return callback("Problème lors de la vérification d'identité de compte");
                 })

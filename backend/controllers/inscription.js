@@ -1,6 +1,5 @@
-//const db = require('../utils/database');
 const bcrypt = require('bcrypt');
-const fs = require('fs');
+// const fs = require('fs');
 const { verificationChemin } = require("./ajoutDocument")
 
 const Users = require('../models/users');

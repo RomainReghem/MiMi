@@ -5,16 +5,16 @@
  * @param {*} next pour passer à la fonction suivante
  * @returns la réponse en cas d'erreur
  */
-const verifyMailBody =(req, res, next)=>{
+const verifyMailBody = (req, res, next) => {
     const email = req.body.mail;
 
-    if(email==null){
-        console.log("pas de mail :(")
+    if (email == null) {
+        console.log("Err middleware/verificationMail.js > verifyMailBody : pas de mail :(")
         return res.status(404).send("Aucun mail trouvé.")
-    }else if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
-        console.log("forme mail incorrect")
+    } else if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
+        console.log("Err middleware/verificationMail.js > verifyMailBody : forme mail incorrect")
         return res.status(400).send("La forme du mail %s est incorrecte.", email)
-    }else{
+    } else {
         next()
     }
 }
@@ -27,22 +27,23 @@ const verifyMailBody =(req, res, next)=>{
  * @param {*} next pour passer à la fonction suivante
  * @returns la réponse en cas d'erreur
  */
-const verifyMailQuery =(req, res, next)=>{
+const verifyMailQuery = (req, res, next) => {
     const email = req.query.mail;
 
-    if(email==null){
+    if (email == null) {
+        console.log("Err middleware/verificationMail.js > verifyMailQuery : aucun mail contenu dans le query")
         return res.status(404).send("Aucun mail trouvé.")
-    }else if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
-        console.log("forme mail incorrect")
+    } else if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
+        console.log("Err middleware/verificationMail.js > verifyMailQuery : pforme mail incorrect")
         return res.status(400).send("La forme du mail %s est incorrecte.", email)
-    }else{
+    } else {
         //console.log("pas de soucis avec le mail :-)")
         next()
     }
 }
 
 
-module.exports={
+module.exports = {
     verifyMailBody,
     verifyMailQuery
 }
