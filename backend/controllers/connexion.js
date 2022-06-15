@@ -113,8 +113,7 @@ const Connexion = (req, res) => {
                         if (classe) {
                             bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {
                                 if (estValide) {
-                                    console.log("Création des cookies pour la classe")
-                                    // cookie 
+                                    //console.log("Création des cookies pour la classe")
                                     const accessToken = jwt.sign(
                                         {
                                             "UserInfo": {
