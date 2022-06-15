@@ -19,10 +19,10 @@ io.on("connection", (socket) => {
 
     else if (rooms.get(roomCode) && rooms.get(roomCode).players.includes(mail)) {
       // Si la room a déjà été créée c'est qu'il doit y avoir au moins un mail dans la liste des joueurs
-        socket.join(roomCode)
-        socket.mail = mail
-        socket.emit('YoureIn')
-        updateGame(roomCode)
+      socket.join(roomCode)
+      socket.mail = mail
+      socket.emit('YoureIn')
+      updateGame(roomCode)
     }
 
     else if (numClients === 0) {
@@ -150,10 +150,11 @@ io.on("connection", (socket) => {
     if (!board.includes("")) {
       io.in(roomCode).emit("victory");
       try {
-        console.log("mail : " + io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
-        addPartie(io.sockets.sockets.get(rooms.get(roomCode).player2).mail)
+        //console.log("mail : " + io.sockets.sockets.get(rooms.get(roomCode).player1).mail);
+          addPartie(rooms.get(roomCode).players[1])
+        
       } catch (error) {
-        console.log(error)
+        console.log("erreur lors de la tentative d'ajout du nombre de partie en cas d'égalité " + error)
       }
       io.in(roomCode).socketsLeave(roomCode);
       return;

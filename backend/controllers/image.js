@@ -81,7 +81,7 @@ function getAvatar(mail, callback) {
     }
     fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
         if (err) {
-            console.log('Err controllers/image.js > getAvatar :  la récupération de l\'avatar : ' + err)
+            console.log('Err controllers/image.js > getAvatar :  renvoi avatar par défaut : ' + err)
             //return res.status(600).send("Problème de lecture de l'avatar.")
             avatar = {
                 bgColor: "#E0DDFF",

@@ -132,7 +132,7 @@ const Connexion = (req, res) => {
                                     );
                                     Classe.update({ token: refreshToken }, { where: { idclasse: classe.idclasse } })
                                         .then(() => {
-                                            console.log("CONNEXION de la classe OK")
+                                            // console.log("CONNEXION de la classe OK")
                                             res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                                             return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
                                             // si le mot de passe entré correspond bien au mot de passe dans la base de données

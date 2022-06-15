@@ -1,6 +1,5 @@
 const credential = require('./config/credential')
 const router = require('./routes/routes.js')
-const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const cors = require("cors");
@@ -27,7 +26,7 @@ app.use(session({
     secret:process.env.SECRET,
     // ne force pas la sauvegarde de la session
     resave: false,
-    // ne force pas la sauvegarde d'une session nouvelle mais non smodifiée  
+    // ne force pas la sauvegarde d'une session nouvelle mais non modifiée  
     saveUninitialized: false
 }));
 
