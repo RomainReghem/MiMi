@@ -12,10 +12,10 @@ require("dotenv").config();
  * @param {*} res la réponse du serveur
  */
 const Deconnexion = async (req, res) => {
-    console.log("\n*** Déconnexion ***")
+    //console.log("\n*** Déconnexion ***")
     const cookies = req.cookies;
     if (!cookies?.jwt) {
-        console.log("pas de cookies")
+        console.log("Err controllers/deconnexion.js > Deconnexion : pas de cookies")
         // Ne retourne pas d'erreur, il n'y avait pas de cookies
         return res.status(204).send("Déconnexion sans cookies");
     }
@@ -27,7 +27,7 @@ const Deconnexion = async (req, res) => {
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
             if (err || decoded == undefined) {
-                console.log("probleme lors de la verification " + err);
+                console.log("Err controllers/deconnexion.js > Deconnexion : probleme lors de la verification " + err);
                 // accès interdit
                 return res.status(204).send("Déconnexion : aucune informations trouvées.");
             } else {
@@ -35,29 +35,29 @@ const Deconnexion = async (req, res) => {
                 const mail = decoded.mail
                 res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
                 if (role == "eleve") {
-                    console.log("token eleve " + mail)
+                    //console.log("token eleve " + mail)
                     Eleve.update({ token: "" }, { where: { courriel: mail } })
                         .then(() => {
-                            console.log("Déconnexion de l'élève effectuée ! ")
+                            //console.log("Déconnexion de l'élève effectuée ! ")
                             return res.status(204).send("Déconnexion de l'élève.");
                         })
                         .catch(err => {
-                            console.log("erreur lors de la deconnexion " + err)
+                            console.log("Err controllers/deconnexion.js > Deconnexion : eleve update " + err)
                             return res.status(204).send("Erreur survenue lors de la déconnexion !")
                         })
                 } else if (role == "classe") {
                     console.log("token classe")
                     Classe.update({ token: "" }, { where: { courriel: mail } })
                         .then(() => {
-                            console.log("Déconnexion de la classe effectuée ! ")
+                            //console.log("Déconnexion de la classe effectuée ! ")
                             return res.status(204).send("Déconnexion de la classe.");
                         })
                         .catch(err => {
-                            console.log("erreur lors de la deconnexion : " + err)
+                            console.log("Err controllers/deconnexion.js > Deconnexion : classe update " + err)
                             return res.status(204).send("Erreur du serveur survenue lors de la suppression des cookies.")
                         })
                 } else {
-                    console.log("what is this role? " + role)
+                    console.log("Err controllers/deconnexion.js > Deconnexion : what is this role? " + role)
                     return res.status(204).send("Role inexistant : accès interdit")
                 }
             }

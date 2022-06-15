@@ -9,15 +9,15 @@ const fs = require('fs');
  * @param {*} res la réponse du serveur
  * @returns res, la réponse du serveur
  */
-const deleteFile=(req,res)=>{
-    console.log("\n*** Suppression d'un cours ***")
+const deleteFile = (req, res) => {
+    // console.log("\n*** Suppression d'un cours ***")
     const email = req.body.mail;
-    const cours=req.body.name;
+    const cours = req.body.name;
 
     let path = "./Documents/" + email + "/" + cours;
 
     const code = deleteCours(path)
-    console.log("code http : " + code)
+    // console.log("code http : " + code)
     if (code == 201) {
         return res.status(code).send("suppression réussie")
     }
@@ -30,7 +30,7 @@ const deleteFile=(req,res)=>{
  * @param {String} path le chemin du document à supprimer
  * @returns un code http associé à une erreur ou un succès
  */
- function deleteCours(path) {
+function deleteCours(path) {
     try {
         // on vérifie que le cours existe bien 
         if (fs.existsSync(path)) {
@@ -38,23 +38,23 @@ const deleteFile=(req,res)=>{
             try {
                 // suppression
                 fs.unlinkSync(path)
-                console.log("suppression de cours ok ")
+                // console.log("suppression de cours ok ")
                 return 201;
             } catch (err) {
-                console.error("erreur lors de la vérification du chemin "+err)
-                return 520
+                console.error("Err controllers/suppressionDocument.js > deleteCours : erreur lors de la vérification du chemin " + err)
+                return 520;
             }
-            // sinon le cours n'a pas été trouvé
+        // sinon le cours n'a pas été trouvé
         } else {
-            console.log("Pas de document dans le chemin " + path + ".");
+            console.log("Err controllers/suppressionDocument.js > deleteCours : Pas de document dans le chemin " + path + ".");
             return 404;
         }
 
     } catch (err) {
-        console.error("Erreur lors de la vérification des dossiers" + err)
+        console.error("Err controllers/suppressionDocument.js > deleteCours :Erreur lors de la vérification des dossiers" + err)
         return 520;
     }
 }
 
 
-module.exports = {deleteFile }
+module.exports = { deleteFile }

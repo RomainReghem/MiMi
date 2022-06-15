@@ -21,13 +21,14 @@ require('dotenv').config()
  * @param {*} res la réponse du serveur
  */
 const Connexion = (req, res) => {
-    console.log("\n*** Connexion ***")
-    console.log("connexion.js -> Connexion")
+    //console.log("\n*** Connexion ***")
+    // console.log("connexion.js -> Connexion")
 
     const email = req.body.user;
     const mdp = req.body.pwd;
     //console.log("connexion " + mdp + " " + email)
     if (mdp == "" || email == "") {
+        console.log("Err controllers/connexion.js > Connexion : mdp ou mail vide")
         return res.status(402).send("Mot de passe ou mail vide");
     }
     // on regarde si le mail correspond à un élève
@@ -42,7 +43,7 @@ const Connexion = (req, res) => {
                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                     // si le mot de passe entré correspond bien au mot de passe dans la base de données
                     if (estValide) {
-                        console.log("** Création des cookies pour l'élève **")
+                        //console.log("** Création des cookies pour l'élève **")
                         // l'acces token se périme au bout de 20 min sans activités
                         const accessToken = jwt.sign(
                             { "UserInfo": { "mail": eleve.courriel, "role": "eleve" } },
@@ -62,11 +63,11 @@ const Connexion = (req, res) => {
                         )
                             .then(() => {
                                 //console.log("refresh token connexion " + refreshToken)
-                                console.log("** Connexion de l'élève effectuée **")
+                                //console.log("** Connexion de l'élève effectuée **")
                                 // pour récupérer le statut de l'invitation de l'élève
                                 getInvitation(eleve.courriel, function (reponse) {
                                     if (reponse == 404 || reponse == 400 || reponse == 520) {
-                                        console.log("Erreur lors de la récupération de l'invitation " + reponse)
+                                        console.log("Err controllers/connexion.js > Connexion : erreur lors de la récupération de l'invitation code " + reponse)
                                         return res.sendStatus(reponse)
                                     } else {
                                         // pour récupérer l'avatar de l'élève
@@ -83,7 +84,7 @@ const Connexion = (req, res) => {
                                                     if (err) {
                                                         return res.status(520).send(err);
                                                     }
-                                                    console.log('envoi des infos')
+                                                    //console.log('envoi des infos')
                                                     res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                                                     return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseAvatarAsImage, reponseImage));
                                                 })
@@ -94,11 +95,11 @@ const Connexion = (req, res) => {
                                 })
                             })
                             .catch(err => {
-                                console.log("Erreur lors de l'ajout de Token" + err);
+                                console.log("Err controllers/connexion.js > Connexion : erreur lors de l'ajout de Token" + err);
                                 return res.status(520).send("Erreur lors de l'ajout de cookies.")
                             })
                     } else {
-                        console.log("Mauvais mot de passe ELEVE" + err)
+                        console.log("Err controllers/connexion.js > Connexion : mauvais mot de passe ELEVE" + err)
                         // sinon, si ce n'est pas le bon mdp mais le bon email
                         return res.status(400).send("Ce n'est pas le bon mot de passe.")
                     }
@@ -137,33 +138,33 @@ const Connexion = (req, res) => {
                                             // si le mot de passe entré correspond bien au mot de passe dans la base de données
                                             //res.send(classe)
                                         }).catch(err => {
-                                            console.log(err);
-                                            return res.sendStatus(520)
+                                            console.log("Err controllers/connexion.js > Connexion : update classe " + err);
+                                            return res.status(520).send("Erreur lors de l'enregistrement des cookies.")
                                         })
                                 } else {
-                                    console.log("Mauvais mot de passe CLASSE")
+                                    console.log("Err controllers/connexion.js > Connexion : mauvais mot de passe CLASSE")
                                     // si ce n'est pas le bon mdp mais le bon email
-                                    return res.sendStatus(400)
+                                    return res.status(400).send("Ce n'est pas le bon mot de passe.")
                                 }
                             });
                         } else {
                             // Sinon c'est que l'utilisateur s'est soit trompé, soit qu'il n'existe pas
-                            console.log("Utilisateur pas trouvé.")
+                            console.log("Err controllers/connexion.js > Connexion : Utilisateur pas trouvé.")
                             // si pour l'adresse mail donnée, aucun utilisateur ne correspond 
-                            return res.sendStatus(401);
+                            return res.status(401).send("Aucun utilisateur correspondant à cette adresse mail trouvé.");
                         }
                     })
                     .catch(err => {
                         // console.log(err);
-                        console.log("Erreur impossible de récupérer  les informations de la classe: " + err)
-                        return res.sendStatus(520)
+                        console.log("Err controllers/connexion.js > Connexion : erreur impossible de récupérer les informations de la classe: " + err)
+                        return res.status(520).send("Erreur survenue lors de la vérification du compte.")
                     })
             }
         })
         .catch(err => {
             // console.log(err);
-            console.log("Erreur : délai d'attente dépassé : " + err)
-            return res.sendStatus(504);
+            console.log("Err controllers/connexion.js > Connexion :  délai d'attente dépassé eleve findone " + err)
+            return res.status(504).send("Problème au niveau du serveur.");
         })
 }
 

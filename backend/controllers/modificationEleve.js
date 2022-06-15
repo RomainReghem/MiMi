@@ -19,14 +19,14 @@ const jwt = require('jsonwebtoken');
  * @param {*} res la réponse du serveur
  */
 const ChangementPseudo = (req, res) => {
-    console.log("\n*** Changement du pseudo ***")
+    // console.log("\n*** Changement du pseudo ***")
     const email = req.body.mail;
     const pseudo = req.body.newPseudo;
     //console.log("email " + email + " new " + pseudo)
 
     if (!(pseudo.match("^[A-z0-9-_]{3,24}$"))) {
-        console.log("forme pseudo incorrect")
-        return res.status(405).send("Le pseudo ne respecte pas les règles.")
+        console.log("Err controllers/modificationEleve.js > ChangementPseudo : forme pseudo incorrect")
+        return res.status(400).send("Le pseudo ne respecte pas les règles.")
     }
 
     const role = req.role;
@@ -36,7 +36,8 @@ const ChangementPseudo = (req, res) => {
         Eleve.findOne({ attributes: ['ideleve', 'pseudo'], where: { courriel: email } })
             .then(eleveToChange => {
                 if (!eleveToChange) {
-                    return res.status(401).send("L'élève n'a pas été trouvé")
+                    console.log("Err controllers/modificationEleve.js > ChangementPseudo : aucun compte élève trouvé avec l'adresse %s", email)
+                    return res.status(404).send("L'élève n'a pas été trouvé")
                 }
                 // si le pseudo actuel est différent de l'ancien, sinon on ne change rien
                 if (eleveToChange.pseudo != pseudo) {
@@ -46,7 +47,7 @@ const ChangementPseudo = (req, res) => {
                     ).then(() => {
                         return res.status(201).send("Modification de pseudo réussie.");
                     }).catch(err => {
-                        console.log("erreur UPDATE ON ELEVE " + err)
+                        console.log("Err controllers/modificationEleve.js > ChangementPseudo : UPDATE ON ELEVE " + err)
                         return res.status(520).send("Erreur lors de la modification de pseudo.")
                     })
                 } else {
@@ -54,10 +55,11 @@ const ChangementPseudo = (req, res) => {
                 }
             })
             .catch(err => {
-                console.log("error eleve findone " + err)
+                console.log("Err controllers/modificationEleve.js > ChangementPseudo : eleve findone " + err)
                 return res.status(520).send("Erreur survenue lors de la vérification des données")
             });
     } else {
+        console.log("Err controllers/modificationEleve.js > ChangementPseudo : role %s ou email %s incorrects ", role, emailToken)
         return res.status(403).send("Pas un élève / pas le bon élève : accès interdit")
     }
 
@@ -69,7 +71,7 @@ const ChangementPseudo = (req, res) => {
  * @param {*} res la réponse du serveur
  */
 const SuppressionClasse = (req, res) => {
-    console.log("\n*** Suppression de l'invititaion d'une classe pour un élève ***")
+    // console.log("\n*** Suppression de l'invititaion d'une classe pour un élève ***")
     const email = req.body.user;
 
     const role = req.role;
@@ -77,13 +79,14 @@ const SuppressionClasse = (req, res) => {
     // seul un eleve peut supprimer /refuser une invitation de classe son propre pseudo
     if (role == "eleve" && emailToken == email) {
         Modification.setInvitation("aucune", email, "", function (code) {
-            console.log("Code " + code)
+            //console.log("Code " + code)
             if (code == 201) {
                 return res.status(201).send("Suppression de classe réussie !")
             }
             return res.status(code).send("Erreur lorsque l'éleve a essayé de quitter la classe.")
         })
     } else {
+        console.log("Err controllers/modificationEleve.js > SuppressionClasse : role %s ou email %s incorrects ", role, emailToken)
         return res.status(403).send("Pas un élève / pas le bon élève : accès interdit")
     }
 }
@@ -91,29 +94,36 @@ const SuppressionClasse = (req, res) => {
 
 /**
  * Change la valeur d'invitation à acceptee et l'id de classe à l'id de la classe dont on reçoit le mail
+ * Vérifie en même temps les informations données
  * @param {*} req la requête du client
  * @param {*} res la réponse du serveur
  */
 const AcceptationInvitation = (req, res) => {
-    console.log("\n*** Acceptation de l'invitation d'une classe ***")
+    // console.log("\n*** Acceptation de l'invitation d'une classe ***")
     //console.log("modificationEleve.js => AcceptationInvitation")
+    // le mail de l'élève
     const email = req.body.user;
+    //le role sauvegarde dans le token
     const role = req.role;
+    // le mail sauvegardé dans le token
     const emailToken = req.mail
-    // seul un eleve peut changer son propre pseudo
+    // seul un eleve peut accepter son invitation
     if (role == "eleve" && emailToken == email) {
-        /// RECUP MAIL CLASSE 
+        // on récupère l'identifiant de la classe qui a fait la demande
         Eleve.findOne({
             attributes: ["idclasse"],
             where: { courriel: email }
         })
             .then(eleve => {
                 if (!eleve) {
+                    console.log("Err controllers/modificationEleve.js > AcceptationInvitation : aucun compte élève trouvé avec l'adresse %s", email)
                     return res.status(404).send("Aucun élève correspondant à l'adresse : %s", email)
                 }
-                Classe.findOne({ attributes: ['courriel'], where: { idclasse: eleve.idclasse } })
+                // On récupère le mail de la classe, il a été sauvegardé en même temps que le statut est passé en atttenete
+                Classe.findOne({ attributes: ['courriel'], where: { idclasse: eleve.idclasse, invitation: "en attente" } })
                     .then(classe => {
                         if (!classe) {
+                            console.log("Err controllers/modificationEleve.js > AcceptationInvitation : aucun classe trouvée")
                             return res.status(404).send("Aucune classe trouvée.")
                         }
                         Modification.setInvitation("acceptee", email, classe.courriel, function (code) {
@@ -124,15 +134,16 @@ const AcceptationInvitation = (req, res) => {
                         })
                     })
                     .catch(err => {
-                        console.log("erreur classe findone "+err)
+                        console.log("Err controllers/modificationEleve.js > AcceptationInvitation : classe findone " + err)
                         return res.status(520).send("Erreur lors de la récupération des informations de la classe.")
                     });
             })
             .catch(err => {
-                console.log("erreur eleve findone "+err)
+                console.log("Err controllers/modificationEleve.js > AcceptationInvitation : eleve findone " + err)
                 return res.status(520).send("Erreur lors de la récupération des informations du compte utilisateur.")
             });
     } else {
+        console.log("Err controllers/modificationEleve.js > AcceptationInvitation : role %s ou email %s incorrects ", role, emailToken)
         return res.status(403).send("Pas un élève / pas le bon élève")
     }
 }
@@ -148,20 +159,20 @@ const AcceptationInvitation = (req, res) => {
  * @returns la réponse du serveur, avec un code HTTP (d'erreur ou de succès) et un message
  */
 const ChangementMdp = (req, res) => {
-    console.log("\n***Changement mdp eleve***")
+    // console.log("\n***Changement mdp eleve***")
 
     let email = req.body.mail;
     const mdp = req.body.pwd;
     const newMdp = req.body.newPwd;
 
-    console.log("** Vérification validité informations **")
+    //console.log("** Vérification validité informations **")
 
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
-        console.log("taille mdp pas ok")
+        console.log("Err controllers/modificationEleve.js > ChangementMdp : taille mdp pas ok")
         return res.status(406).send("Le mot de passe actuel n'est pas de la bonne forme ! ")
     }
     if (!(newMdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
-        console.log("taille mdp pas ok")
+        console.log("Err controllers/modificationEleve.js > ChangementMdp : taille nouveau mdp pas ok")
         return res.status(406).send("Le nouveau mot de passe n'est pas de la bonne forme !")
     }
 
@@ -173,21 +184,22 @@ const ChangementMdp = (req, res) => {
         Eleve.findOne({ attributes: ['ideleve', 'motdepasse'], where: { courriel: email } })
             .then(eleve => {
                 if (!eleve) {
+                    console.log("Err controllers/modificationEleve.js > ChangementMdp : pas de compte eleve à l'adr %s",email)
                     return res.status(404).send("Aucun compte correspondant à cet adresse.")
                 }
                 // si aucun changement, on ne fait pas de vérifications
                 if (mdp == newMdp) {
-                    console.log("Mot de passe inchangé !")
+                    // console.log("Mot de passe inchangé !")
                     return res.status(204).send("Mot de passe inchangé !");
                 }
                 // on vérifie maintenant dans la bd si le mdp donné est bien celui associé au mail
                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                     if (estValide) {
-                        console.log("Bon mot de passe de l'élève")
+                        // console.log("Bon mot de passe de l'élève")
                         bcrypt.hash(newMdp, 10, (err, hash) => {
                             if (err) {
                                 //erreur lors du hahage
-                                console.log("error bcrypt : " + err)
+                                console.log("Err controllers/modificationEleve.js > ChangementMdp : bcrypt.hash " + err)
                                 return res.status(520).send("Erreur lors du chiffrement du mot de passe")
                             }
                             // on change le mdp
@@ -199,21 +211,21 @@ const ChangementMdp = (req, res) => {
                                     // si le mot de passe entré correspond bien au mot de passe dans la base de données
                                     return res.status(201).send("Le mot de passe a bien été modifié !")
                                 }).catch(err => {
-                                    console.log("error update table eleve " + err)
+                                    console.log("Err controllers/modificationEleve.js > ChangementMdp : update eleve " + err)
                                     return res.status(520).send("Erreur survenue lors de la modification du mot de passe !")
                                 });
                         });
                     } else {
-                        console.log("Mauvais mot de passe ELEVE " + err)
+                        console.log("Err controllers/modificationEleve.js > ChangementMdp : mauvais mot de passe ELEVE " + err)
                         return res.status(400).send("Le mot de passe fourni n'est pas le bon")
                     }
                 });
             }).catch(err => {
-                console.log("error findOne on Eleve : " + err)
+                console.log("Err controllers/modificationEleve.js > ChangementMdp : findOne on Eleve : " + err)
                 return res.status(520).send("Erreur lors de la vérification du compte !")
             });
     } else {
-        console.log("Accès interdit : tentative de changement de mot de passe d'un élève %s par %s! ", email, emailToken)
+        console.log("Err controllers/modificationEleve.js > ChangementMdp : accès interdit : tentative de changement de mot de passe d'un élève %s par %s! ", email, emailToken)
         return res.status(403).send("Accès interdit : tentative de changement de mot de passe d'un élève !")
     }
 }
@@ -229,23 +241,23 @@ const ChangementMdp = (req, res) => {
  * @returns la réponse du serveur, erreur ou succès
  */
 const ChangementMail = (req, res) => {
-    console.log("\n*** Changement de l'adresse mail d'un élève ***")
+    // console.log("\n*** Changement de l'adresse mail d'un élève ***")
     let email = req.body.mail;
     const newEmail = req.body.newMail;
     const mdp = req.body.pwd;
     // console.log("email " + email + " new " + newEmail + " mdp " + mdp)
 
-    console.log("** Vérification mail **")
+    // console.log("** Vérification mail **")
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
-        console.log("taille mdp pas ok")
+        console.log("Err controllers/modificationEleve.js > ChangementMail : taille mdp pas ok")
         return res.status(406).send("Le mot de passe n'est pas de la bonne forme ! ")
     }
-    if ( !(newEmail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= newEmail.length) {
-        console.log("forme mail incorrect")
+    if (!(newEmail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= newEmail.length) {
+        console.log("Err controllers/modificationEleve.js > ChangementMail : forme mail incorrect")
         return res.status(407).send("L'adresse mail fournie n'est pas de la bonne forme !")
     }
     if (newEmail == email) {
-        console.log("mails identiques")
+        console.log("Err controllers/modificationEleve.js > ChangementMail : mails identiques")
         return res.status(204).send("Mail identiques : pas de changement")
     }
 
@@ -259,41 +271,41 @@ const ChangementMail = (req, res) => {
             .then(eleve => {
                 // un eleve est bien associé à l'ancien mail
                 if (!eleve) {
+                    console.log("Err controllers/modificationEleve.js > ChangementMail : aucun compte élève trouvé avec l'adresse %s", email)
                     return res.status(404).send("Aucun compte correspondant à cet adresse.")
                 }
                 // On vérifie que dans la table ELEVE aucun élève ne possède déjà cet email
                 Eleve.findOne({ attributes: ['ideleve'], where: { courriel: newEmail } })
                     .then(eleve2 => {
                         if (eleve2) {
-                            console.log("Mail pas unique");
+                            console.log("Err controllers/modificationEleve.js > ChangementMail : mail pas unique");
                             return res.status(409).send("Un élève possède déjà cette adresse mail !")
                         }
                         // console.log("mail unique pour eleves");
                         Classe.findOne({ attributes: ['idclasse'], where: { courriel: newEmail } })
                             .then(classe => {
                                 if (classe) {
-                                    console.log("Mail existant pour la classe");
+                                    console.log("Err controllers/modificationEleve.js > ChangementMail : mail existant pour la classe");
                                     return res.status(410).send("Une classe est déjà enregistrée avec cette adresse mail !")
                                 }
                                 // on vérifie maintenant dans la bd si le mdp donné est bien celui associé au mail
                                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                                     if (err) {
-                                        console.log("error on bcrypt compare : " + err)
+                                        console.log("Err controllers/modificationEleve.js > ChangementMail : error on bcrypt compare : " + err)
                                         return res.status(520).send("Erreur lors de la vérification du mot de passe !")
                                     }
                                     if (estValide) {
-                                        console.log("Bon mot de passe de l'élève")
+                                        // console.log("Bon mot de passe de l'élève")
                                         // Comme on a changé l'adresse mail, on doit aussi changer les tokens
                                         const cookies = req.cookies;
                                         //console.log("refresh cookies" + cookies.jwt);
                                         if (!cookies?.jwt) {
-                                            console.log("accès refusé")
+                                            console.log("Err controllers/modificationEleve.js > ChangementMail : accès refusé, pas de cookies")
                                             // 401 : authentification raté
                                             return res.status(401).send("Accès refusé : authentification requise")
                                         }
                                         // on crée de nouveaux token 
-                                        console.log("** Recréation des cookies pour l'élève **")
-                                        // cookie 
+                                        //console.log("** Recréation des cookies pour l'élève **")
                                         const accessToken = jwt.sign(
                                             { "UserInfo": { "mail": newEmail, "role": "eleve" } },
                                             process.env.ACCESS_TOKEN_SECRET,
@@ -307,10 +319,7 @@ const ChangementMail = (req, res) => {
                                         Eleve.update(
                                             { courriel: newEmail, token: refreshToken },
                                             { where: { ideleve: eleve.ideleve } }
-                                        ).then(newEleve => {
-                                            if (!newEleve) {
-                                                return res.status(600).send("Erreur lors du changement du mail de l'élève")
-                                            }
+                                        ).then(() => {
                                             console.log("Changement de mail ok")
                                             // On récupère des informations sur l'élève pour les renvoyer au client
                                             getInvitation(newEmail, function (reponse) {
@@ -327,12 +336,11 @@ const ChangementMail = (req, res) => {
                                                             if (err) {
                                                                 return res.status(520).send(err);
                                                             }
-                                                            console.log('envoi des infos')
                                                             getAvatarAsImage(eleve.courriel, function (err, reponseAvatarAsImage) {
                                                                 if (err) {
                                                                     return res.status(520).send(err);
                                                                 }
-                                                                console.log('envoi des infos')
+                                                                // console.log('envoi des infos')
                                                                 res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                                                                 return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseAvatarAsImage, reponseImage));
                                                             })
@@ -341,25 +349,26 @@ const ChangementMail = (req, res) => {
                                                 }
                                             })
                                         }).catch(err => {
-                                            console.log("error UPDATE on ELEVE : " + err)
+                                            console.log("Err controllers/modificationEleve.js > ChangementMail : UPDATE on ELEVE : " + err)
                                             return res.status(520).send("Erreur lors de l'enregistrement du nouveau mail.")
                                         });
                                     } else {
-                                        console.log("Mauvais mot de passe de l'eleve ")
+                                        console.log("Err controllers/modificationEleve.js > ChangementMail : mauvais mot de passe de l'eleve ")
                                         return res.status(400).send("Ce n'est pas le bon mot de passe !")
                                     }
                                 });
                             }).catch(err => {
-                                console.log("error CLASSE findone : " + err).status
+                                console.log("Err controllers/modificationEleve.js > ChangementMail : error CLASSE findone : " + err).status
                                 return res.status(600).send("Erreur survenue lors de la vérification de l'unicité de la nouvelle adresse")
                             });
                     })
                     .catch(err => {
-                        console.log("error ELEVE findone : " + err).status;
+                        console.log("Err controllers/modificationEleve.js > ChangementMail : error ELEVE findone : " + err).status;
                         return res.status(600).send("Erreur survenue lors de la vérification de l'unicité de la nouvelle adresse");
                     });
             });
     } else {
+        console.log("Err controllers/modificationEleve.js > ChangementMail : accès interdit : tentative de changement de mot de passe d'un élève %s par %s! ", email, emailToken)
         return res.status(403).send("Accès interdit : tentative de changement de mail de l'eleve !")
     }
 }

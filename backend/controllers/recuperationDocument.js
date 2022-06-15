@@ -9,7 +9,7 @@ const { verificationChemin } = require('./ajoutDocument');
  * @param {*} res la réponse du serveur, composé d'un code http (erreur ou succès),et soit d'un message d'erreur, soit la liste des noms des fichiers
  */
 const getFiles = (req, res) => {
-    console.log("\n*** Récupération des documents ***")
+    //console.log("\n*** Récupération des documents ***")
     //console.log("recuperationDocument.js => getFiles")
     const mailDossier = req.query.findMail;
     const path = './Documents/' + mailDossier;
@@ -18,19 +18,19 @@ const getFiles = (req, res) => {
         verificationChemin(path);
 
     } catch (err) {
-        console.log("Erreur verifchemin " + err)
+        console.log("Err controllers/recuperationDocument.js > getFiles : erreur verifchemin " + err)
         return res.status(520).send(err);
 
     }
     fs.readdir(path, { withFileTypes: true }, function (err, files) {
         if (err) {
-            console.log("erreur durant la récupération " + err)
+            console.log("Err controllers/recuperationDocument.js > getFiles : readdir " + err)
             return res.status(520).send("Erreur durant le récupération des fichiers !");
         } else {
             let f = []
             // on n'affichera que les fichiers pdf
             for (file in files) {
-                console.log("-" + files[file].name)
+                // console.log("-" + files[file].name)
                 if (files[file].name.match("(.pdf|.PDF)$")) {
                     f.push(files[file].name)
                 }
@@ -49,32 +49,32 @@ const getFiles = (req, res) => {
  * @returns la réponse du serveur : res
  */
 const getFile = (req, res) => {
-    console.log("\n*** Récupération d'un document ***")
+    // console.log("\n*** Récupération d'un document ***")
     //console.log("recuperationDocument.js => getFile")
     const mailDossier = req.query.findMail;
     const name = req.query.name;
-    console.log("nom du mail : " + mailDossier)
+    // console.log("nom du mail : " + mailDossier)
 
     let path = './Documents/' + mailDossier
 
     try {
         verificationChemin(path);
     } catch (err) {
-        console.log("Erreur verif chemin : " + err)
+        console.log("Err controllers/recuperationDocument.js > getFile : verif chemin : " + err)
         return res.status(520).send(err);
     }
     path += "/" + name;
     if (fs.existsSync(path)) {
         fs.readFile(path, function (err, fichier) {
             if (err) {
-                console.log("erreur lors de la recup de fichier " + err)
+                console.log("Err controllers/recuperationDocument.js > getFiles : readFile " + err)
                 return res.status(520).send(err)
             }
-            console.log("Récupération ok")
+            //console.log("Récupération ok")
             return res.status(201).send({ file: fichier });
         });
     } else {
-        console.log("Erreur : rien trouvé au chemin %s", path)
+        console.log("Err controllers/recuperationDocument.js > getFiles : rien trouvé au chemin %s", path)
         return res.status(404).send("Dossier inexistant")
     }
 }
