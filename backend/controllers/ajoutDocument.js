@@ -41,7 +41,7 @@ const saveFile = (req, res) => {
         return res.status(520).send("Erreur lors de la vérification du nom du document.")
     }
 
-    verifTaille(path, file.size, 25000000, err => {
+    verifTaille(path, file.size, 250000000, err => {
         if (err) {
             console.log("Err controllers/ajoutDocument.js => saveFile : " + err)
             return res.status(409).send("L'espace de stockage est limité à 250 Mo !")
