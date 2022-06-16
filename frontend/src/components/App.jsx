@@ -14,7 +14,7 @@ import Profile from "./Profile/Profile"
 import PersistLogin from "./Login/PersistLogin"
 import RequireAuth from "./RequireAuth"
 import Documents from "./Documents/Documents"
-import Jitsi from "../components/jitsi";
+import Jutsu from "../components/Jutsu";
 import TicTacToe from "./Games/TicTacToe";
 import Jeux from "./Games/Jeux"
 import NotFound from "./NotFound"
@@ -72,7 +72,7 @@ export default function App() {
               <Route element={<RequireAuth />}>
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/documents" element={<Documents />} />
-                <Route path="/video" element={<Jitsi />} />
+                <Route path="/video" element={<Jutsu />} />
                 <Route path="/games" element={<Jeux />} />
                 <Route path="/tictactoe" element={<TicTacToe />} />
                 <Route path="/settings" element={<Settings />} />

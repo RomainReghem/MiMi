@@ -23,6 +23,7 @@
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-icons": "^3.11.0",
+    "react-jutsu": "^3.0.3",
     "react-nice-avatar": "^1.2.4",
     "react-pdf": "^5.7.2",
     "react-router-dom": "^6.3.0",
@@ -41,8 +42,8 @@
     "rules": {
       "no-unused-vars": "off",
       "eqeqeq": "off",
-      "react-hooks/exhaustive-deps":"off",
-      "no-useless-escape":"off"
+      "react-hooks/exhaustive-deps": "off",
+      "no-useless-escape": "off"
     }
   },
   "browserslist": {

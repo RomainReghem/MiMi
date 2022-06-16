@@ -23,7 +23,7 @@ app.use(express.json());
 
 app.use(session({
     // pour signer l'id du cookie
-    secret:process.env.SECRET,
+    secret: process.env.SECRET,
     // ne force pas la sauvegarde de la session
     resave: false,
     // ne force pas la sauvegarde d'une session nouvelle mais non modifiée  
@@ -34,32 +34,32 @@ app.use(cookieParser());
 
 app.use(router);
 
-/*const server = http.createServer(app);
-const io = require("socket.io")(server, { cors: { origin: "*" } });
-
-
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {
+    cors: {
+        origin: '*',
+    }
+});
 io.on("connection", (socket) => {
-  console.log("User Connected");
+    socket.on("joinRoom", (roomCode) => {
+        socket.join(roomCode)
+    })
 
-  socket.on("joinRoom", (roomCode) => {
-    console.log(`A user joined the room ${roomCode}`);
-    socket.join(roomCode);
-  });
+    socket.on("leftCamera", () => {
+        console.log('leftCamera')
+        socket.broadcast.emit("switchCamera", 0);
+    })
+    socket.on("centerCamera", () => {
+        console.log('centerCamera')
+        socket.broadcast.emit("switchCamera", 1);
+    })
+    socket.on("rightCamera", () => {
+        console.log('rightCamera')
+        socket.broadcast.emit("switchCamera", 2);
+    })
+})
 
-  socket.on("play", ({ id, roomCode }) => {
-    console.log(`play at ${id} to ${roomCode}`);
-    socket.broadcast.to(roomCode).emit("updateGame", id);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User Disconnected");
-  });
-});*/
-/*server.listen(5000, () =>
-  console.log("server running => http://localhost:5000")
-);*/
-
-app.listen(3500, () => {
+server.listen(3500, () => {
     console.log("Serveur en marche")
 }
 );

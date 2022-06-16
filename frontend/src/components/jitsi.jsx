@@ -1,11 +1,15 @@
 import React, { Component, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import io from "socket.io-client"
 import { useState } from 'react';
 import { Button, Alert, AlertIcon, AlertTitle, AlertDescription, Icon, Center, Text, Box, Spinner, Stack, Progress } from "@chakra-ui/react"
 import useUserData from '../hooks/useUserData';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHand } from "@fortawesome/free-solid-svg-icons";
+
+
+const socket = io.connect("http://localhost:3500");
 
 const JitsiComponent = () => {
 
@@ -21,21 +25,20 @@ const JitsiComponent = () => {
     const [isAudioMuted, setIsAudioMuted] = useState(false)
     const [isVideoMuted, setIsVideoMuted] = useState(false)
     const [handRaised, setHandRaised] = useState(false);
+    const [videoConfJoined, setVideoConfJoined] = useState(false);
 
-    // useEffect(() => {
-    //     let bytes = new Uint8Array(userData?.image);
-    //     let blob = new Blob([bytes], {type: 'image/jpg'});
-    //     console.log(URL.createObjectURL(blob));
-    //     setImageURL(blob)
-    // }, [userData?.image])
+    useEffect(() => {
+        socket.emit("joinRoom", auth?.idclasse);
 
-    // useEffect(() => {
-    //     let bytes = new Uint8Array(userData?.avatarAsImage.data);
-    //     let blob = new Blob([bytes], {type: 'image/png'});
-    //     console.log(URL.createObjectURL(blob));
-    //     setAvatarURL(blob)
-    // }, [userData?.avatarAsImage])
+        socket.on("switchCamera", (whichOne) => {
+            console.log('someone wants to switch to camera ' + whichOne)
+            // api.setVideoInputDevice(devices.videoInput[whichOne].label, devices.videoInput[whichOne].deviceId);
+            console.log(api)
+            executeCommand('toggleCamera');
 
+        })
+
+    }, [videoConfJoined])
 
     let startMeet = () => {
         if (auth?.idclasse) {
@@ -85,6 +88,7 @@ const JitsiComponent = () => {
     const handleVideoConferenceJoined = async (participant) => {
         console.log("handleVideoConferenceJoined", participant); // { roomName: "bwb-bfqi-vmh", id: "8c35a951", displayName: "Akash Verma", formattedDisplayName: "Akash Verma (me)"}
         api.executeCommand('avatarUrl', userData?.avatarURL);
+        setVideoConfJoined(true)
         const data = await getParticipants();
     }
 
@@ -117,7 +121,7 @@ const JitsiComponent = () => {
 
     // custom events
     const executeCommand = (command) => {
-        api.executeCommand(command);;
+        api.executeCommand(command);
         if (command == 'hangup') {
             navigate({
                 pathname: "/profile"
@@ -134,11 +138,20 @@ const JitsiComponent = () => {
     }
 
 
-    const chooseImage = () => {
-        //api.executeCommand('avatarUrl', userData?.imageURL);
-    }
-    const chooseAvatar = () => {
-        // api.executeCommand('avatarUrl', userData?.avatarURL);
+    const switchCamera = (whichOne) => {
+        switch (whichOne) {
+            case 0:
+                socket.emit('leftCamera')
+                break;
+            case 1:
+                socket.emit('centerCamera')
+                break;
+            case 2:
+                socket.emit('rightCamera')
+                break;
+            default:
+                console.log('wrong argument');
+        }
     }
 
     useEffect(() => {
@@ -175,9 +188,9 @@ const JitsiComponent = () => {
                 auth?.idclasse && auth?.role == "eleve" &&
 
                 <Stack direction={'row'} align='center' justify={'center'} p={5}>
-                    <Button colorScheme={'blue'}>Caméra droite</Button>
-                    <Button colorScheme={'blue'}>Caméra centre</Button>
-                    <Button colorScheme={'blue'}>Caméra gauche</Button>
+                    <Button colorScheme={'blue'} onClick={() => switchCamera(0)}>Caméra gauche</Button>
+                    <Button colorScheme={'blue'} onClick={() => switchCamera(1)}>Caméra centre</Button>
+                    <Button colorScheme={'blue'} onClick={() => switchCamera(2)}>Caméra droite</Button>
                 </Stack>
             }
 
