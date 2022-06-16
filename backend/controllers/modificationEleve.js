@@ -119,8 +119,8 @@ const AcceptationInvitation = (req, res) => {
                     console.log("Err controllers/modificationEleve.js > AcceptationInvitation : aucun compte élève trouvé avec l'adresse %s", email)
                     return res.status(404).send("Aucun élève correspondant à l'adresse : %s", email)
                 }
-                // On récupère le mail de la classe, il a été sauvegardé en même temps que le statut est passé en atttenete
-                Classe.findOne({ attributes: ['courriel'], where: { idclasse: eleve.idclasse, invitation: "en attente" } })
+                // On récupère le mail de la classe, il a été sauvegardé en même temps que le statut est passé en attente
+                Classe.findOne({ attributes: ['courriel'], where: { idclasse: eleve.idclasse} })
                     .then(classe => {
                         if (!classe) {
                             console.log("Err controllers/modificationEleve.js > AcceptationInvitation : aucun classe trouvée")
