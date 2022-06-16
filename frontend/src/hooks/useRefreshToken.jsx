@@ -38,7 +38,6 @@ const useRefreshToken = () => {
                     avatarAsImage: response?.data?.avatarAsImg.data,
                 }
             })
-
             // On appelle le hook qui permet de transformer les images en URL pour la visioconférence.
             try {
                 await setURL(response.data.image.data, response?.data?.avatarAsImg.data)

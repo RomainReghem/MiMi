@@ -1,4 +1,4 @@
-import { Flex, Box, FormControl, FormLabel, Input, InputGroup, Spinner, InputRightElement, Stack, Button, Heading, Text, useColorModeValue, Link, } from '@chakra-ui/react';
+import { Center, Box, FormControl, FormLabel, Input, InputGroup, Spinner, InputRightElement, Stack, Button, Heading, Text, useColorModeValue, Link, } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { createSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { Link as ReactRouterLink } from 'react-router-dom';
@@ -91,13 +91,9 @@ export default function Login() {
     }
 
     return (
-        <Flex
-            grow={1}
-            direction='column'
-            align={'center'}
-            justify={'center'}
+        <Center flexGrow={1}
             bg={useColorModeValue('gray.50', 'gray.800')}>
-            <Stack spacing={8} mx={'auto'} w={'md'} py={12} px={6}>
+            <Stack spacing={6} mx={'auto'} w={'lg'} py={12} px={6}>
                 <Stack align={'center'}>
                     <Heading fontSize={'3xl'} textAlign={'center'}>
                         Se connecter
@@ -147,6 +143,6 @@ export default function Login() {
                     </Stack>
                 </Box>
             </Stack>
-        </Flex>
+        </Center>
     );
 }

@@ -8,25 +8,26 @@ import useUserData from '../hooks/useUserData';
 import io from "socket.io-client"
 
 
-const socket = io.connect("http://localhost:3500");
+//const socket = io.connect("http://localhost:5555");
+const socket = io("https://mimi.connected-health.fr", { path:'/api-cameras' });
 
 const Jutsu = () => {
     const { auth } = useAuth()
     const { userData } = useUserData()
     const [handRaised, setHandRaised] = useState(false);
+    localStorage.removeItem('jitsiLocalStorage');
 
 
     const jitsiConfig = {
         roomName: "MimiRooms" + auth?.idclasse,
-        displayName: userData?.pseudo || "classe",
-        password: 'KD23!XZ?F234!!',
+        displayName: userData?.pseudo,
         subject: 'cours',
         parentNode: 'jitsi-container',
         interfaceConfigOverwrite: {
             SHOW_JITSI_WATERMARK: false,
             HIDE_INVITE_MORE_HEADER: true,
             MOBILE_APP_PROMO: false,
-        }
+        },
     };
     const { loading, error, jitsi } = useJitsi(jitsiConfig);
 
@@ -48,11 +49,11 @@ const Jutsu = () => {
 
     const confJoined = () => {
         jitsi.executeCommand('avatarUrl', userData?.avatarURL);
-        
+
         socket.emit("joinRoom", auth?.idclasse);
 
         socket.on("switchCamera", (whichOne) => {
-            if(auth?.role == 'classe'){
+            if (auth?.role == 'classe') {
                 console.log('someone wants to switch to camera ' + whichOne)
                 jitsi.getAvailableDevices().then(devices => {
                     console.log(devices.videoInput[0].label)
@@ -78,8 +79,8 @@ const Jutsu = () => {
 
     return (
         <>
-            <Stack flexGrow={1} >
-            {
+            <Stack flexGrow={1}>
+                {
                     auth?.role == 'classe' && handRaised &&
                     <Alert onClick={() => setHandRaised(false)} p={10} status='success' variant='subtle' flexDirection='column' alignItems='center' justifyContent='space-between' textAlign='center' zIndex={99} >
                         <AlertIcon mr={0} />
@@ -93,11 +94,11 @@ const Jutsu = () => {
                 {error && <p>{error}</p>}
                 {loading && <Spinner />}
                 <Stack flexGrow={1} h='xl' id={jitsiConfig.parentNode} />
-                { auth?.role == 'eleve' && <Stack direction={'row'}>
+                {auth?.role == 'eleve' && <Stack direction={'row'}>
                     <Button colorScheme={'blue'} onClick={() => switchCamera(0)}>Cam1</Button>
                     <Button colorScheme={'blue'} onClick={() => switchCamera(1)}>Cam2</Button>
                     <Button colorScheme={'blue'} onClick={() => switchCamera(2)}>Cam3</Button>
-                    </Stack>}
+                </Stack>}
             </Stack>
 
         </>);
