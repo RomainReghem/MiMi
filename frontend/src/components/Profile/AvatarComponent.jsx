@@ -89,10 +89,10 @@ const AvatarComponent = () => {
     return (
         <>
             <Stack spacing={2}>
-                <Heading fontSize={'2xl'} >Créateur d'avatar</Heading>
+                <Heading fontSize={'2xl'} mb={2} >Créateur d'avatar</Heading>
                 <Avatar id='avatarToPrint'
                     {...config}
-                    style={{ width: '15rem', height: '15rem', minWidth: '250px', minHeight: '250px'}}
+                    style={{ width: '15rem', height: '15rem', marginTop:'0px', minWidth: '250px', minHeight: '250px'}}
                 />
                 <Stack spacing={3} direction={'row'} w={'100%'} justify='center'>
                     <IconButton colorScheme={'blue'} size={'lg'} onClick={changeBg} icon={<AiOutlineBgColors/>}></IconButton>

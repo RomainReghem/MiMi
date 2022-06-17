@@ -40,32 +40,22 @@ const PDFViewer = (props) => {
         async function convertingFile() {
             setFile(null)
             setDisplaySpinner(true)
-            let data = await getFile()
-            let binary = '';
-            let bytes = new Uint8Array(data)
-            for (let i = 0; i < bytes.byteLength; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            let b64 = window.btoa(binary)
-            let byteChar = window.atob(b64)
-            const byteNumbers = new Array(byteChar.length);
-            for (let i = 0; i < byteChar.length; i++) {
-                byteNumbers[i] = byteChar.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: "pdf" });
 
+            // On convertit le Buffer en Blob pour pouvoir l'afficher
+            let data = await getFile(props.clickedFile)
+            let blob = new Blob([new Uint8Array(data)], { type: 'pdf' });
             setFile(URL.createObjectURL(blob))
+
             setDisplaySpinner(false)
         }
         if (props.clickedFile)
             convertingFile();
     }, [props.clickedFile])
 
-    const getFile = async () => {
+    const getFile = async (filename) => {
         try {
             const response = await axiosPrivate.get('file', {
-                params: { ...parameters, mail: auth?.user, name: props.clickedFile },
+                params: { ...parameters, mail: auth?.user, name: filename },
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
@@ -74,6 +64,20 @@ const PDFViewer = (props) => {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    useEffect(() => {
+        props.downloadThis && downloadFile(props.downloadThis)
+    }, [props.downloadThis])
+
+    const downloadFile = async (filename) => {
+        let data = await getFile(filename)
+        let blob = new Blob([new Uint8Array(data)], { type: 'pdf' });
+        let url = URL.createObjectURL(blob);
+        let tempLink = document.createElement('a');
+        tempLink.href = url;
+        tempLink.setAttribute('download', `${filename}`);
+        tempLink.click();
     }
 
 
@@ -87,7 +91,7 @@ const PDFViewer = (props) => {
                 </Document>)
                 : displaySpinner ?
                     <Alert status='info' justifyContent='center'>
-                        <Spinner mr={3}/>
+                        <Spinner mr={3} />
                         Chargement du fichier...
                     </Alert> :
 

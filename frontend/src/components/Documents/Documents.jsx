@@ -3,7 +3,7 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useToast, Tooltip, Text, Button, useDisclosure, ModalOverlay, Modal, ModalHeader, ModalCloseButton, ModalContent, ModalBody, ModalFooter, Input, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls, Badge, Kbd } from "@chakra-ui/react";
 import PDFViewer from "../Documents/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRotate, faXmark, faPencil, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faRotate, faXmark, faPencil, faDownload } from "@fortawesome/free-solid-svg-icons";
 import useAuth from "../../hooks/useAuth";
 import { useState, useEffect } from "react";
 import useGetStudents from "../../hooks/useGetStudents";
@@ -28,6 +28,8 @@ const Documents = () => {
 
     // Le fichier actuellement séléctionné dans la liste. On le passera à PDFViewer.
     const [file, setFile] = useState(null);
+    // Le fichier à télécharger, on le passe aussi à PDFViewer qui possède les bonnes fonctions pour le faire
+    const [fileToDownload, setFileToDownload] = useState(null);
 
     const [loadingFiles, setLoadingFiles] = useState(false);
     const [renaming, setRenaming] = useState('')
@@ -125,6 +127,9 @@ const Documents = () => {
                                 <Button w={'100%'} onClick={() => setFile(menuSelection[i])} noOfLines={1}>
                                     {menuSelection[i]}
                                 </Button>
+                                <Tooltip label="Télécharger" fontSize='md' placement="top">
+                                    <IconButton onClick={() => {setFileToDownload(menuSelection[i])}} colorScheme={'teal'} icon={<FontAwesomeIcon icon={faDownload} />}></IconButton>
+                                </Tooltip>
                                 {selectedUI == "my" && <>
                                     <Tooltip label="Renommer" fontSize='md' placement="top">
                                         <IconButton colorScheme={'teal'} onClick={() => { onOpen(); setRenaming(menuSelection[i]) }} icon={<FontAwesomeIcon icon={faPencil} />}></IconButton>
@@ -139,10 +144,10 @@ const Documents = () => {
                     </Stack>
                 </Stack>
                 <Stack h={'34rem'} overflow={'scroll'} w='xl'>
-                    <PDFViewer clickedFile={file} selected={selectedUI} />
+                    <PDFViewer clickedFile={file} selected={selectedUI} downloadThis={fileToDownload} />
                 </Stack>
             </Wrap>
-            <Modal isOpen={isOpen} onClose={() => {onClose(); setRenamedName('')}} isCentered>
+            <Modal isOpen={isOpen} onClose={() => { onClose(); setRenamedName('') }} isCentered>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader noOfLines={1}>Renommer {renaming}</ModalHeader>
@@ -151,7 +156,7 @@ const Documents = () => {
                         <Input onChange={(e) => setRenamedName(e.target.value)} placeholder='Nouveau nom' />
                     </ModalBody>
                     <ModalFooter>
-                        <Button onClick={() => {onClose(); setRenamedName('')}} mr={3}>Cancel</Button>
+                        <Button onClick={() => { onClose(); setRenamedName('') }} mr={3}>Cancel</Button>
                         <Button onClick={() => { editFileName(renamedName, renaming); onClose() }} colorScheme='green' >
                             Save
                         </Button>

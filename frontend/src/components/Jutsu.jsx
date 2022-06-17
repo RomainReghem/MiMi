@@ -9,7 +9,7 @@ import io from "socket.io-client"
 
 
 //const socket = io.connect("http://localhost:5555");
-const socket = io("https://mimi.connected-health.fr", { path:'/api-cameras' });
+const socket = io("https://mimi.connected-health.fr", { path: '/api-cameras' });
 
 const Jutsu = () => {
     const { auth } = useAuth()
@@ -21,6 +21,7 @@ const Jutsu = () => {
     const jitsiConfig = {
         roomName: "MimiRooms" + auth?.idclasse,
         displayName: userData?.pseudo,
+        password: "mimi",
         subject: 'cours',
         parentNode: 'jitsi-container',
         interfaceConfigOverwrite: {
@@ -80,6 +81,7 @@ const Jutsu = () => {
     return (
         <>
             <Stack flexGrow={1}>
+                <Spinner position={'absolute'} top='50%' left='50%' zIndex={1} />
                 {
                     auth?.role == 'classe' && handRaised &&
                     <Alert onClick={() => setHandRaised(false)} p={10} status='success' variant='subtle' flexDirection='column' alignItems='center' justifyContent='space-between' textAlign='center' zIndex={99} >
@@ -93,7 +95,7 @@ const Jutsu = () => {
                 }
                 {error && <p>{error}</p>}
                 {loading && <Spinner />}
-                <Stack flexGrow={1} h='xl' id={jitsiConfig.parentNode} />
+                <Stack flexGrow={1} h='xl' id={jitsiConfig.parentNode} zIndex={99} />
                 {auth?.role == 'eleve' && <Stack direction={'row'}>
                     <Button colorScheme={'blue'} onClick={() => switchCamera(0)}>Cam1</Button>
                     <Button colorScheme={'blue'} onClick={() => switchCamera(1)}>Cam2</Button>
