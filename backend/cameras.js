@@ -10,6 +10,16 @@ io.on("connection", (socket) => {
         socket.join(roomCode)
     })
 
+    socket.on("raiseHand", () => {
+        console.log('fromsocket : handraised')
+        socket.broadcast.emit("raiseHand");
+    })
+
+    socket.on("lowerHand", () => {
+        console.log('fromsocket : handlowerd')
+        socket.broadcast.emit("lowerHand");
+    })
+
     socket.on("leftCamera", () => {
         console.log('leftCamera')
         socket.broadcast.emit("switchCamera", 0);

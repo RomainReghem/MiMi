@@ -57,8 +57,8 @@ const PersistLogin = () => {
                             initial="hidden"
                             animate="visible"
                             transition={{
-                                default: { duration: 2, ease: "easeInOut" },
-                                fill:{duration:2 }
+                                default: { duration: 3, ease: "easeInOut" },
+                                fill:{duration:3 }
                             }}
                         />
                     </motion.svg>
