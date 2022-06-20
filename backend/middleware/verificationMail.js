@@ -34,7 +34,7 @@ const verifyMailQuery = (req, res, next) => {
         console.log("Err middleware/verificationMail.js > verifyMailQuery : aucun mail contenu dans le query")
         return res.status(404).send("Aucun mail trouvé.")
     } else if (100 <= email.length || !(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+"))) {
-        console.log("Err middleware/verificationMail.js > verifyMailQuery : pforme mail incorrect")
+        console.log("Err middleware/verificationMail.js > verifyMailQuery : forme mail incorrect")
         return res.status(400).send("La forme du mail %s est incorrecte.", email)
     } else {
         //console.log("pas de soucis avec le mail :-)")

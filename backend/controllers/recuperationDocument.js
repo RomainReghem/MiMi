@@ -24,7 +24,7 @@ const getFiles = (req, res) => {
     }
     fs.readdir(path, { withFileTypes: true }, function (err, files) {
         if (err) {
-            console.log("Err controllers/recuperationDocument.js > getFiles : readdir " + err)
+            console.log("Err controllers/recuperationDocument.js > getFiles : fs readdir " + err)
             return res.status(520).send("Erreur durant le récupération des fichiers !");
         } else {
             let f = []
@@ -57,24 +57,24 @@ const getFile = (req, res) => {
 
     let path = './Documents/' + mailDossier
 
-    try {
+  /*  try {
         verificationChemin(path);
     } catch (err) {
         console.log("Err controllers/recuperationDocument.js > getFile : verif chemin : " + err)
         return res.status(520).send(err);
-    }
+    }*/
     path += "/" + name;
     if (fs.existsSync(path)) {
         fs.readFile(path, function (err, fichier) {
             if (err) {
-                console.log("Err controllers/recuperationDocument.js > getFiles : readFile " + err)
+                console.log("Err controllers/recuperationDocument.js > getFile : fs readFile " + err)
                 return res.status(520).send(err)
             }
             //console.log("Récupération ok")
             return res.status(201).send({ file: fichier });
         });
     } else {
-        console.log("Err controllers/recuperationDocument.js > getFiles : rien trouvé au chemin %s", path)
+        console.log("Err controllers/recuperationDocument.js > getFile : rien trouvé au chemin %s", path)
         return res.status(404).send("Dossier inexistant")
     }
 }

@@ -3,7 +3,8 @@ const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken")
 
 const Users = require('../models/users');
-const { getAvatar, getImage, getAvatarAsImage } = require("./image")
+//const { getAvatar, getImage, getAvatarAsImage } = require("./image")
+const { getAvatar, getImage, getAvatarAsImage } = require("./imagePromise")
 const { getInvitation } = require('./eleve');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
@@ -65,7 +66,7 @@ const Connexion = (req, res) => {
                                 //console.log("refresh token connexion " + refreshToken)
                                 //console.log("** Connexion de l'élève effectuée **")
                                 // pour récupérer le statut de l'invitation de l'élève
-                                getInvitation(eleve.courriel, function (reponse) {
+                               /* getInvitation(eleve.courriel, function (reponse) {
                                     if (reponse == 404 || reponse == 400 || reponse == 520) {
                                         console.log("Err controllers/connexion.js > Connexion : erreur lors de la récupération de l'invitation code " + reponse)
                                         return res.sendStatus(reponse)
@@ -93,6 +94,29 @@ const Connexion = (req, res) => {
                                         })
                                     }
                                 })
+                                */
+                                getInvitation(eleve.courriel, function (reponse) {
+                                    if (reponse == 404 || reponse == 400 || reponse == 520) {
+                                        console.log("Err controllers/connexion.js > Connexion : erreur lors de la récupération de l'invitation code " + reponse)
+                                        return res.sendStatus(reponse)
+                                    } else {
+                                        Promise.all([
+                                            getImage(eleve.courriel),
+                                            getAvatarAsImage(eleve.courriel),
+                                            getAvatar(eleve.courriel),
+                                        ])
+                                            .then((data) => {
+                                                //envoi des infos recuperees sur l'eleve
+                                                res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, {image:data[0].image}, {avatarAsImg:data[1].avatarAsImg}, {avatar :data[2].avatar}));
+                                            }
+                                            ).catch((err) => {
+                                                console.log(err)
+                                                return res.status(520).send("Erreur du serveur lors de la récupération des informations du serveur.")
+                                            })
+                                    }
+                                })
+
                             })
                             .catch(err => {
                                 console.log("Err controllers/connexion.js > Connexion : erreur lors de l'ajout de Token" + err);
@@ -166,5 +190,6 @@ const Connexion = (req, res) => {
             return res.status(504).send("Problème au niveau du serveur.");
         })
 }
+
 
 module.exports = { Connexion };

@@ -180,8 +180,8 @@ const verifyAccessSave = (req, res, next) => {
 
 
 /**
- * fonction qui aide à déterminer le role (eleve ou classe) d'un utilisateur en fonction de son adresse mail
- * @param {*} email le mail de l'utilisateur dont on veut connaître le rôle.
+ * Fonction qui aide à déterminer le role (eleve ou classe) d'un utilisateur en fonction de son adresse mail
+ * @param {String} email le mail de l'utilisateur dont on veut connaître le rôle.
  * @param {*} callback la fonction qui peut contenir deux variables, une variable d'erreur ou le role
  */
 function determiningRole(email, callback) {
