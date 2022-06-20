@@ -15,6 +15,7 @@ const Jutsu = () => {
     const { auth } = useAuth()
     const { userData } = useUserData()
     const [handRaised, setHandRaised] = useState(false);
+    const [selected, setSelected] = useState([false, false, false])
     localStorage.removeItem('jitsiLocalStorage');
 
 
@@ -36,12 +37,15 @@ const Jutsu = () => {
         switch (whichOne) {
             case 0:
                 socket.emit('leftCamera')
+                setSelected([true, false, false])
                 break;
             case 1:
                 socket.emit('centerCamera')
+                setSelected([false, true, false])
                 break;
             case 2:
                 socket.emit('rightCamera')
+                setSelected([false, false, true])
                 break;
             default:
                 console.log('wrong argument');
@@ -96,10 +100,10 @@ const Jutsu = () => {
                 {error && <p>{error}</p>}
                 {loading && <Spinner />}
                 <Stack flexGrow={1} h='xl' id={jitsiConfig.parentNode} zIndex={99} />
-                {auth?.role == 'eleve' && <Stack direction={'row'}>
-                    <Button colorScheme={'blue'} onClick={() => switchCamera(0)}>Cam1</Button>
-                    <Button colorScheme={'blue'} onClick={() => switchCamera(1)}>Cam2</Button>
-                    <Button colorScheme={'blue'} onClick={() => switchCamera(2)}>Cam3</Button>
+                {auth?.role == 'eleve' && <Stack direction={'row'} justify='center'pb='2'>
+                    <Button colorScheme={selected[0] ? 'darkblue' : 'blue'} onClick={() => switchCamera(0)}>Cam1</Button>
+                    <Button colorScheme={selected[1] ? 'darkblue' : 'blue'} onClick={() => switchCamera(1)}>Cam2</Button>
+                    <Button colorScheme={selected[2] ? 'darkblue' : 'blue'} onClick={() => switchCamera(2)}>Cam3</Button>
                 </Stack>}
             </Stack>
 

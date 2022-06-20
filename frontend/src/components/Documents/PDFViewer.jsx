@@ -12,10 +12,10 @@ const PDFViewer = (props) => {
 
     const { auth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
-
     const [numPages, setNumPages] = useState(null);
     const [file, setFile] = useState(null);
 
+    // Spinner du chargement d'un fichier
     const [displaySpinner, setDisplaySpinner] = useState(false)
 
     let parameters;
@@ -71,13 +71,18 @@ const PDFViewer = (props) => {
     }, [props.downloadThis])
 
     const downloadFile = async (filename) => {
+        console.log('starting')
         let data = await getFile(filename)
+        console.log('got file !')
         let blob = new Blob([new Uint8Array(data)], { type: 'pdf' });
         let url = URL.createObjectURL(blob);
         let tempLink = document.createElement('a');
         tempLink.href = url;
         tempLink.setAttribute('download', `${filename}`);
         tempLink.click();
+
+        // On callback le parent pour stopper le spinner
+        props.onDownloadFinished();
     }
 
 

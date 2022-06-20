@@ -1,6 +1,6 @@
 import PDFSender from "../Documents/PDFSender"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useToast, Tooltip, Text, Button, useDisclosure, ModalOverlay, Modal, ModalHeader, ModalCloseButton, ModalContent, ModalBody, ModalFooter, Input, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls, Badge, Kbd } from "@chakra-ui/react";
+import { useToast, Tooltip, Text, Button, useDisclosure, ModalOverlay, Modal, ModalHeader, ModalCloseButton, ModalContent, ModalBody, ModalFooter, Input, IconButton, Wrap, Stack, Center, Heading, useBreakpointValue, Editable, EditablePreview, EditableInput, useEditableControls, Badge, Kbd, Spinner } from "@chakra-ui/react";
 import PDFViewer from "../Documents/PDFViewer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faXmark, faPencil, faDownload } from "@fortawesome/free-solid-svg-icons";
@@ -30,6 +30,8 @@ const Documents = () => {
     const [file, setFile] = useState(null);
     // Le fichier à télécharger, on le passe aussi à PDFViewer qui possède les bonnes fonctions pour le faire
     const [fileToDownload, setFileToDownload] = useState(null);
+    // Spinner du téléchargement d'un fichier
+    const [isDownloading, setIsDownloading] = useState(false);
 
     const [loadingFiles, setLoadingFiles] = useState(false);
     const [renaming, setRenaming] = useState('')
@@ -107,6 +109,11 @@ const Documents = () => {
         }
     }
 
+    const handleDownloadFinished = () => {
+        setIsDownloading(false);
+        setFileToDownload(null);
+    }
+
     return (
         <Center flexGrow={1}>
             <Wrap spacing={10} p={5} justify={'center'} >
@@ -128,7 +135,7 @@ const Documents = () => {
                                     {menuSelection[i]}
                                 </Button>
                                 <Tooltip label="Télécharger" fontSize='md' placement="top">
-                                    <IconButton onClick={() => {setFileToDownload(menuSelection[i])}} colorScheme={'teal'} icon={<FontAwesomeIcon icon={faDownload} />}></IconButton>
+                                    <IconButton onClick={() => { setFileToDownload(menuSelection[i]); setIsDownloading(true) }} colorScheme={'teal'} icon={isDownloading ? <Spinner size={'xs'}/> : <FontAwesomeIcon icon={faDownload} />} disabled={isDownloading}></IconButton>
                                 </Tooltip>
                                 {selectedUI == "my" && <>
                                     <Tooltip label="Renommer" fontSize='md' placement="top">
@@ -144,7 +151,7 @@ const Documents = () => {
                     </Stack>
                 </Stack>
                 <Stack h={'34rem'} overflow={'scroll'} w='xl'>
-                    <PDFViewer clickedFile={file} selected={selectedUI} downloadThis={fileToDownload} />
+                    <PDFViewer clickedFile={file} selected={selectedUI} downloadThis={fileToDownload} onDownloadFinished={handleDownloadFinished} />
                 </Stack>
             </Wrap>
             <Modal isOpen={isOpen} onClose={() => { onClose(); setRenamedName('') }} isCentered>
