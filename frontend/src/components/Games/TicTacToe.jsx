@@ -30,6 +30,7 @@ const TicTacToe = () => {
     const [UIboard, setUIboard] = useState([])
     const [canPlay, setCanPlay] = useState(false);
     const [score, setScore] = useState([0, 0])
+    const [gamesPlayed, setGamesPlayed] = useState(0);
 
     useEffect(() => {
         if (!auth?.idclasse) {
@@ -96,7 +97,9 @@ const TicTacToe = () => {
                     params: { mail: auth?.user }
                 }
             );
+            console.log(response.data)
             setScore(response.data.scores)
+            setGamesPlayed(response.data.partie)
         } catch (err) { console.log("Erreur du chargement du score"); }
     }
 
@@ -132,7 +135,8 @@ const TicTacToe = () => {
                                 )}
                         </Grid >
                         <Stack direction={'column'} w={'md'} spacing={10} >
-                            <Heading alignSelf={'center'} fontSize={'2xl'}>Scores</Heading>
+                            <Stack align={'center'}><Heading fontSize={'2xl'}>Scores</Heading>
+                            <Text fontFamily={'mono'}>{gamesPlayed} parties jouées</Text></Stack>
                             <Stack direction={'row'} justify={'space-evenly'}>
                                 <Stack align={'center'} >
                                     <Badge fontSize={'md'} align={'center'} w={'10ch'} colorScheme='green'>ELEVE</Badge>

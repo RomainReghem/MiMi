@@ -148,7 +148,7 @@ export default function Nav() {
                 </Stack>
             </Flex>
 
-            <Collapse in={isOpen} animateOpacity>
+            <Collapse in={isOpen} animateOpacity onClick={onToggle}>
                 <MobileNav />
             </Collapse>
         </Box>
