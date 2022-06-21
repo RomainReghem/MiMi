@@ -35,6 +35,7 @@ function setInvitation(invitation, emailEleve, emailClass, callback) {
                 console.log("Err controllers/modificationInvitation.js > setInvitation : aucun élève trouvé avec cette adresse.");
                 return callback(404);
             }
+            // si la varibale est vide : on veut mettre l'invitation à "aucune"
             if (emailClasse == "") {
                 // pas d'invitation : suppression des valeurs antérieures
                 Eleve.update(
@@ -78,7 +79,7 @@ function setInvitation(invitation, emailEleve, emailClass, callback) {
                                 where: { ideleve: eleve.ideleve },
                             }
                         ).then(newEleve => {
-                            console.log("Err controllers/modificationInvitation.js > setInvitation : modification de l'invitation effectuée !")
+                            //console.log("Err controllers/modificationInvitation.js > setInvitation : modification de l'invitation effectuée !")
                             return callback(201);
                         });
                     })
@@ -93,5 +94,6 @@ function setInvitation(invitation, emailEleve, emailClass, callback) {
             return callback(520)
         })
 }
+
 
 module.exports = { setInvitation }

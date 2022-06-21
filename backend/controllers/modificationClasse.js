@@ -55,12 +55,12 @@ const suppressionEleve = (req, res) => {
         const email = req.body.eleve;
         Modification.setInvitation("aucune", email, "", function (code) {
             if (code == 201) {
-                return res.status(201).send("Suppression de l'élève réussi !")
+                return res.status(201).send("Suppression de l'élève de la classe réussi !")
             }
             return res.status(code).send("Erreur lors de la suppression de l'élève de la classe.")
         })
     } else {
-        console.log("Err controllers/modificationClasse.js > suppressionEleve : role %s inconnu ", role)
+        console.log("Err controllers/modificationClasse.js > suppressionEleve : role %s incorrect ", role)
         return res.status(403).send("Accès interdit")
     }
 }

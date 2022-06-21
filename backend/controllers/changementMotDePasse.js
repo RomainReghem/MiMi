@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer');
+const jwt = require("jsonwebtoken")
+
 const { determiningRole } = require('../middleware/verificationAccesDoc');
 //var generator = require('generate-password')
 
@@ -30,9 +32,20 @@ const resetPassword = (req, res) => {
             return res.status(404).send("Cet utilisateur n'existe pas.")
         }
         else if (role == "eleve") {
-            // generer token
-            //sendEmail(email)
+            // on génère un token
+            const passToken = jwt.sign(
+                { "mail": email, "role": "eleve" },
+                process.env.PASSWORD_TOKEN_SECRET,
+                { expiresIn: '1d' }
+            )
+            sendEmail(email, passToken)
         } else {
+            const passToken = jwt.sign(
+                { "mail": email, "role": "classe" },
+                process.env.PASSWORD_TOKEN_SECRET,
+                { expiresIn: '1d' }
+            )
+            sendEmail(email, passToken)
             // c'est une classe 
         }
         //sendEmail(email, "1234");
@@ -56,7 +69,7 @@ function sendEmail(email, token) {
     var mailOptions = {
         from: "MIMI",
         to: email,
-        subject: "Demande de changement de mot de passe : mimi.connected-health.fr",
+        subject: "Demande de changement de mot de passe sur mimi.connected-health.fr",
         html: `<p>Bonjour, vous avez fait une demande de changement de mot de passe pour votre compte Mimi. </br>
         Pour changer votre mot de passe, <a href="http://localhost:3500/reset-password?token=${token}">appuyez ici</a> ou copiez le lien http://localhost:4000/reset-password?token=${token} dans votre navigateur. (Ce lien est valide seulement pendant 24 heures.) </p>
         <p>Si vous n'êtes pas à l'origine de cette demande, veuillez nous contacter à l'adresse suivante : mimi@connected-health.fr</p>`

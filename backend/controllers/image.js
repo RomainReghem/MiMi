@@ -191,12 +191,12 @@ const savePicture = (req, res) => {
             }
         }
         // si l'image est trop grande, on la reduit
-        if (img.size > 5000000) {
+        if (img.size > 1000000) {
             //console.log("resize de l'image "+img.originalname)
             // avec sharp on redimensionne l'image pour avoir une image carrée.
             // Les méta données sont importantes car elles permettent de conserver des données comme la position de l'image
             // on l'enregistre ensuite dans le chemin donné
-            sharp(img.buffer).resize({height:2000, width: 2000}).withMetadata().toFile(path + "/photo" + type)
+            sharp(img.buffer).resize(1500).withMetadata().toFile(path + "/photo" + type)
                 .then(()=> {
                     // on lit l'image redimensionnée pour pouvoir l'envoyer au serveur
                     fs.readFile(path+"/photo"+type, function (err, image) {

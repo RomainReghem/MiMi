@@ -59,9 +59,6 @@ router.get('/pseudo', verifyJWT, verifyMailQuery, Eleve.getUsernameStudent)
 // Gestion des élèves invités par la classe
 // route qui permet de retourner la liste d'emails, ainsi que le noms des eleves d'une classe
 router.get('/eleves', verifyJWT, verifyMailQuery, Classe.getAllStudents)
-// PAS IMPLEMENTE : liste des eleves invites
-// route qui permet de retourner la liste d'emails des élèves invités dans une classe
-// router.get('/elevesInvited', verifyJWT, verifyMailQuery, Classe.getAllStudentsInvited)
 // route qui permet d'envoyer une invitation à un élève
 router.post('/inviteEleve', verifyJWT, ModificationClasse.ajoutInvitation)
 // route permettant de supprimer un élève de la classe

@@ -30,38 +30,26 @@ const getAllStudents = (req, res) => {
             }
         }]
     }).then(eleves => {
-        return res.json({ eleves: eleves })
+        Eleve.findAll({
+            attributes: ['courriel'],
+            where: { invitation: "en attente" },
+            // jointure avec la table classe
+            include: [{
+                model: Classe,
+                attributes: [],
+                where: {
+                    courriel: mail
+                }
+            }]
+        }).then(elevesInvites => {
+            return res.json({ eleves: eleves, elevesInvites:elevesInvites })
+        }).catch(err => {
+            console.log("Err controllers/classe.js > getAllStudents :  erreur eleve findall " + err)
+            return res.status(520).send("Erreur lors de la récupèration des informations des élèves invités.")
+        });
     }).catch(err => {
         console.log("Err controllers/classe.js > getAllStudents :  erreur eleve findall " + err)
         return res.status(520).send("Erreur lors de la récupèration des informations des élèves.")
-    });
-}
-
-
-/**
- * Renvoie l'adresse mail de tous les élèves à qui la classe a envoyé des invitations
- * @param {*} req la requête du client, contient mail dans les paramètres, qui correspond au mail de la classe
- * @param {*} res la réponse du serveur
- */
-const getAllStudentsInvited = (req, res) => {
-    //console.log("\n*** Récuperation des eleves invités***")
-    const mail = req.query.mail
-    Eleve.findAll({
-        attributes: ['courriel', 'nom', 'prenom'],
-        where: { invitation: "en attente" },
-        // jointure avec la table classe
-        include: [{
-            model: Classe,
-            attributes: [],
-            where: {
-                courriel: mail
-            }
-        }]
-    }).then(eleves => {
-        return res.json({ eleves: eleves })
-    }).catch(err => {
-        console.log("Err controllers/classe.js > getAllStudentsInvited :  erreur eleve findall " + err)
-        return res.status(520).send("Erreur lors de la récupèration des informations des élèves invités.")
     });
 }
 
@@ -142,6 +130,5 @@ const deleteClasse = (req, res) => {
 
 module.exports = {
     getAllStudents,
-    getAllStudentsInvited,
     deleteClasse
 }
