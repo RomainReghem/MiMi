@@ -1,9 +1,7 @@
 // pour l'accès aux documents
 const fs = require('fs');
 const { Eleve, Classe } = require('../models/users');
-const nodemailer = require('nodemailer');
-const { determiningRole } = require('../middleware/verificationAccesDoc');
-//var generator = require('generate-password')
+
 require('dotenv').config()
 
 
@@ -150,73 +148,6 @@ const deleteStudent = (req, res) => {
 }
 
 
-/*const resetPassword=(req, res)=>{
-    const email=req.body.email;
-    // on va génèrer un mot de passe temporaire
-    const pwd=generator.generate({
-        length:24,
-        numbers:true,
-        symbols:"!@#$%",
-        lowercase:true,
-        uppercase:true,
-        strict:true
-    })
-    // on doit lui envoyer par email
-    // on le stocke dans une base de données des mdp tempo avec l'adresse mail associé
-    // va sur la page de changement de mdp 
-    // entre le mdp tempo et son email 
-    // arrive sur une page pour changer son mdp
-}*/
-
-
-const resetPassword = (req, res) => {
-    const email = req.body.mail;
-    determiningRole(email, function (err, role) {
-        if (err) {
-            console.log(err)
-            return res.status(404).send("Cet utilisateur n'existe pas.")
-        }
-        else if (role == "eleve") {
-            //sendEmail(email)
-        } else {
-            // c'est une classe 
-        }
-        //sendEmail(email, "1234");
-        // si l'email appartient bien à un élève/classe on envoie un mail avec un lien contenant un token pour la reinitialisatuion du mdp
-        // dans une autre fonction : verif si tokrn valide pour chnager mdp 
-    })
-}
-
-
-function sendEmail(email, token) {
-    var email = email;
-    var token = token;
-
-    var mail = nodemailer.createTransport({
-        service: process.env.MAIL_SERVICE,
-        auth: {
-            user: process.env.MAIL_ID,
-            pass: process.env.MAIL_PASSWORD,
-        }
-    });
-    var mailOptions = {
-        from: "MIMI",
-        to: email,
-        subject: "Demande de changement de mot de passe : mimi.connected-health.fr",
-        html: `<p>Bonjour, vous avez fait une demande de changement de mot de passe pour votre compte Mimi. </br>
-        Pour changer votre mot de passe, <a href="http://localhost:3500/reset-password?token=${token}">appuyez ici</a> ou copiez le lien http://localhost:4000/reset-password?token=${token} dans votre navigateur. (Ce lien est valide seulement pendant 24 heures.) </p>
-        <p>Si vous n'êtes pas à l'origine de cette demande, veuillez nous contacter à l'adresse suivante : mimi@connected-health.fr</p>`
-    }
-    mail.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log("Err controllers/eleve.js > sendEmail : erreur lors de l'envoi du mail " + error)
-        } else {
-            console.log("mail envoyé ")
-        }
-    });
-}
-
-
 /**
  * Retourne l'invitation, l'id et l'email de la classe associée à l'invitation dans un format JSON
  * 
@@ -272,8 +203,62 @@ function getInvitation(emailEleve, cb) {
 }
 
 
+function getInvitationPromise(emailEleve, cb) {
+    //console.log("\n***Récupération d'invitation.***")
+    // console.log("eleve.js => getInvitation")
+    // on vérifie que le mail soit bien présent
+    return new Promise((resolve, reject) => {
+        if (!emailEleve) {
+            console.log("Err controllers/eleve.js > getInvitation : adresse mail manquante pour la recuperation d'invitation ")
+            return reject("Aucun utilisateur trouvé : la requête est éronnée.");
+        }
+        if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
+            console.log("Err controllers/eleve.js > getInvitation : forme mail incorrect")
+            return reject("Forme dresse mail invalide")
+        }
+
+        Eleve.findOne({
+            attributes: ['invitation', 'idclasse'],
+            where: { courriel: emailEleve }
+        })
+            .then(eleve => {
+                // si aucun élève n'a été trouvé
+                if (!eleve) {
+                    console.log("Err controllers/eleve.js > getInvitation : aucun eleve trouvé avec l'adresse %s", emailEleve)
+                    return reject('Aucun élève avec adr %s', emailEleve)
+                }
+                const invitation = eleve.invitation;
+                if (invitation != "aucune") {
+                    Classe.findOne({ attributes: ["idclasse", "courriel"], where: { idclasse: eleve.idclasse } })
+                        .then(classe => {
+                            if (!classe) {
+                                console.log(`Err controllers/eleve.js > getInvitation : aucun eleve trouvé avec l'id ${eleve.idclasse}`)
+                                return reject('Aucune classe pour eleve %s', emailEleve);
+                            }
+                            // console.log("invitation envoyée avec l'id de la classe, ainsi que le mail de la classe")
+                            return resolve({ invitation: invitation, idclasse: classe.idclasse, mailClasse: classe.courriel })
+                        })
+                        .catch(err => {
+                            console.log(`Err controllers/eleve.js > getInvitation : classe findone ${err}`)
+                            return reject("erreur serveur")
+                        });
+                } else {
+                    //console.log("aucune invitation en attente ou acceptee")
+                    return resolve({ invitation: invitation })
+                }
+            })
+            .catch(err => {
+                console.log(`Err controllers/eleve.js > getInvitation : eleve findone ${err}`)
+                return reject("Erreur serveur")
+            });
+    })
+
+}
+
+
 module.exports = {
     getUsernameStudent,
     deleteStudent,
-    getInvitation
+    getInvitation,
+    getInvitationPromise
 }

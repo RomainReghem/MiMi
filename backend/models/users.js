@@ -1,3 +1,4 @@
+const { TokenExpiredError } = require('jsonwebtoken');
 const Sequelize = require('sequelize')
 const db = require('../utils/database')
 
@@ -63,7 +64,12 @@ const Classe = db.define('classe', {
     token: {
         type: Sequelize.STRING,
         allowNull: true
+    }/*,
+    tokenMail:{
+        type:Sequelize.STRING,
+        allowNull:true
     }
+    */
 }, { timestamps: false, freezeTableName: true, tableName: 'classe' });
 
 const Score = db.define('score',
@@ -98,8 +104,31 @@ const Score = db.define('score',
             references: 'classe',
             referencesKey: 'idclasse',
             allowNull: false
+        }/*,
+        tokenMail:{
+            type:Sequelize.STRING,
+            allowNull:true
         }
-    }, { timestamps: false, freezeTableName: true, tableName: 'score' })
+        */
+    }, { timestamps: false, freezeTableName: true, tableName: 'score' });
+
+/*const Token = db.define('token',{
+    idtoken:{
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true
+    },
+    token:{
+        type:Sequelize.STRING,
+        allowNull:false
+    },
+    courriel:{
+        type:Sequelize.STRING,
+        unique:true,
+        allowNull:false
+    }
+}, { timestamps: false, freezeTableName: true, tableName: 'token' })*/
 
 //relations
 // un eleve a une classe, une classe a un ou plusieurs élèves
@@ -109,4 +138,4 @@ Eleve.belongsTo(Classe, { foreignKey: 'idclasse' })
 Classe.hasMany(Score, { foreignKey: 'idclasse' })
 Score.belongsTo(Classe,{foreignKey:'idclasse'})
 
-module.exports = { Eleve, Classe, Score };
+module.exports = { Eleve, Classe, Score};

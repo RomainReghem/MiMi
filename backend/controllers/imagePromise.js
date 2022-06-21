@@ -1,3 +1,4 @@
+const { RETRY_DELAY_MULTIPLIER_DEFAULT } = require('@google-cloud/storage/build/src/storage');
 const fs = require('fs');
 const { verificationChemin } = require("./ajoutDocument")
 
@@ -66,85 +67,6 @@ const saveAvatarAsImage = (req, res) => {
 
 
 /**
- * Retourne l'avatar' de l'élève, s'il n'en a pas, retourne un avatar par défaut
- * @param {String} mail l'email de l'élève dont on veut récupèrer l'avatar'
- * @param {*} callback la fonction callback qui renvoie l'avatar ou une erreur
- */
-async function getAvatar(mail) {
-    return new Promise((resolve, reject) => {
-        const path = "Documents/" + mail + "/images";
-        try {
-            verificationChemin(path);
-        } catch (err) {
-            console.log("Err controllers/image.js > getAvatar : " + err)
-            return reject(err)
-        }
-        fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
-            if (err) {
-                console.log('Err controllers/image.js > getAvatar :  renvoi avatar par défaut : ' + err)
-                //return res.status(600).send("Problème de lecture de l'avatar.")
-                avatar = {
-                    bgColor: "#E0DDFF",
-                    earSize: "small",
-                    eyeBrowStyle: "up",
-                    eyeStyle: "oval",
-                    faceColor: "#AC6651",
-                    glassesStyle: "none",
-                    hairColor: "#000",
-                    hairStyle: "thick",
-                    hatColor: "#000",
-                    hatStyle: "none",
-                    mouthStyle: "laugh",
-                    noseStyle: "round",
-                    shape: "square",
-                    shirtColor: "#000",
-                    shirtStyle: "polo"
-                }
-                //avatar = JSON.stringify(avatar)
-                // console.log("avatar crée")
-                // on envoie le fichier json au front
-                return resolve({ avatar: avatar });
-            }
-
-            avatar = JSON.parse(avatar)
-            // console.log("avatar récupéré !")
-            // on envoie le fichier json au front
-            return resolve({ avatar: avatar });
-        })
-    })
-}
-
-
-/**
- * Retourne l'avatar de l'élève sous forme d'image, s'il n'en a pas, retourne une photo par défaut (kiwi)
- * @param {String} email l'email de l'élève dont on veut récupèrer l'avatar '
- * @param {*} callback la fonction callback qui renvoie les informations de manière synchrone à qui fait appel de la fonction
- */
-async function getAvatarAsImage(email) {
-    return new Promise((resolve, reject) => {
-        const path = "./Documents/" + email + "/images/avatar.png";
-
-        fs.readFile(path, function (err, avatar) {
-            if (err) {
-                fs.readFile("./Image/avatar.png", function (error, avtr) {
-                    if (error) {
-                        console.log("Err controllers/image.js > getAvatarAsImage : erreur recup de la photo par défaut " + error)
-                        return reject("Aucun avatar trouvé pour ce compte.");
-                    } else {
-                        console.log("Err controllers/image.js > getAvatarAsImage : renvoi avatar par défaut " + err)
-                        return resolve({ avatarAsImg: avtr });
-
-                    }
-                })
-            } else {
-                return resolve({ avatarAsImg: avatar });
-            }
-        });
-    })
-}
-
-
-/**
  * Sauvegarde localement l'image de profil d'un élève dans un dossier dédié, sous le nom "photo".
  * Vérifie aussi que le fichier passé est bien une image.  
  * Un middleware se charge de retrouver la photo.
@@ -205,11 +127,90 @@ const savePicture = (req, res) => {
 
 
 /**
+ * Retourne l'avatar' de l'élève, s'il n'en a pas, retourne un avatar par défaut
+ * @param {String} mail l'email de l'élève dont on veut récupèrer l'avatar'
+ * @param {*} callback la fonction callback qui renvoie l'avatar ou une erreur
+ */
+function getAvatar(mail) {
+    return new Promise((resolve, reject) => {
+        const path = "Documents/" + mail + "/images";
+        try {
+            verificationChemin(path);
+        } catch (err) {
+            console.log("Err controllers/image.js > getAvatar : " + err)
+            return reject(err)
+        }
+        fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
+            if (err) {
+                console.log('Err controllers/image.js > getAvatar :  renvoi avatar par défaut : ' + err)
+                //return res.status(600).send("Problème de lecture de l'avatar.")
+                avatar = {
+                    bgColor: "#E0DDFF",
+                    earSize: "small",
+                    eyeBrowStyle: "up",
+                    eyeStyle: "oval",
+                    faceColor: "#AC6651",
+                    glassesStyle: "none",
+                    hairColor: "#000",
+                    hairStyle: "thick",
+                    hatColor: "#000",
+                    hatStyle: "none",
+                    mouthStyle: "laugh",
+                    noseStyle: "round",
+                    shape: "square",
+                    shirtColor: "#000",
+                    shirtStyle: "polo"
+                }
+                //avatar = JSON.stringify(avatar)
+                // console.log("avatar crée")
+                // on envoie le fichier json au front
+                return resolve({ avatar: avatar });
+            }
+
+            avatar = JSON.parse(avatar)
+            // console.log("avatar récupéré !")
+            // on envoie le fichier json au front
+            return resolve({ avatar: avatar });
+        })
+    })
+}
+
+
+/**
+ * Retourne l'avatar de l'élève sous forme d'image, s'il n'en a pas, retourne une photo par défaut (kiwi)
+ * @param {String} email l'email de l'élève dont on veut récupèrer l'avatar '
+ * @param {*} callback la fonction callback qui renvoie les informations de manière synchrone à qui fait appel de la fonction
+ */
+function getAvatarAsImage(email) {
+    return new Promise((resolve, reject) => {
+        const path = "./Documents/" + email + "/images/avatar.png";
+
+        fs.readFile(path, function (err, avatar) {
+            if (err) {
+                fs.readFile("./Image/avatar.png", function (error, avtr) {
+                    if (error) {
+                        console.log("Err controllers/image.js > getAvatarAsImage : erreur recup de la photo par défaut " + error)
+                        return reject("Aucun avatar trouvé pour ce compte.");
+                    } else {
+                        console.log("Err controllers/image.js > getAvatarAsImage : renvoi avatar par défaut " + err)
+                        return resolve({ avatarAsImg: avtr });
+
+                    }
+                })
+            } else {
+                return resolve({ avatarAsImg: avatar });
+            }
+        });
+    })
+}
+
+
+/**
  * Retourne la photo de profil de l'élève, s'il n'en a pas, retourne une photo par défaut (chat)
  * @param {String} email l'email de l'élève dont on veut récupèrer la photo de profil
  * @param {*} callback la fonction callback qui renvoie les informations de manière synchrone à qui fait appel de la fonction
  */
-async function getImage(email) {
+function getImage(email) {
     return new Promise((resolve, reject) => {
         const path = "./Documents/" + email + "/images";
         let file = "";
@@ -231,24 +232,54 @@ async function getImage(email) {
                         file = f;
                     }
                 }
+               // const CHUNK_SIZE = 10000000; // 10Mo
                 if (file == "") {
                     // console.log("pas d'image")
                     // on va retourner une image par défaut 
-                    fs.readFile("./Image/chat.jpg", function (error, img) {
+                   /* const stream =fs.createReadStream('./Image/chat.jpg', { highWaterMark: CHUNK_SIZE });
+                    stream.on('data', function(chunk){
+                        return resolve({image:chunk})
+                    })
+                    stream.on('error', function(err) {
+                        return reject(err)
+                      });*/
+                   /* fs.readFile("./Image/chat.jpg", function (error, img) {
                         if (err) {
                             console.log("Err controllers/image.js > getImage : erreur lors de la recup de la photo par défaut " + error)
                             return reject("L'élève n'a pas de photo de profil.");
                         }
                         return resolve({ image: img });
-                    })
+                    })*/
+                    try {
+                        const img=fs.readFileSync("./Image/chat.jpg")
+                        return resolve({ image: img });
+                    } catch (error) {
+                        console.log("Err controllers/image.js > getImage : erreur lors de la recup de la photo par défaut " + error)
+                        return reject("L'élève n'a pas de photo de profil.");
+                    }
+  
                 } else {
-                    fs.readFile(path + "/" + file, function (err, image) {
+                    /*const stream =fs.createReadStream(path + "/" + file, { highWaterMark: CHUNK_SIZE });
+                    stream.on('data', function(chunk){
+                        return resolve({image:chunk})
+                    })
+                    stream.on('error', function(err) {
+                        return reject(err)
+                      });*/
+                    /*fs.readFile(path + "/" + file, function (err, image) {
                         if (err) {
                             console.log("Err controllers/image.js > getImage : erreur lors de la recup de pp " + err)
                             return reject("Erreur lors de la récupération de l'image de profil")
                         }
                         return resolve({ image: image });
-                    });
+                    });*/
+                    try {
+                        const image=fs.readFileSync(path + "/" + file)
+                        return resolve({ image: image });
+                    } catch (error) {
+                        console.log("Err controllers/image.js > getImage : erreur lors de la recup de la photo par défaut " + error)
+                        return reject("Erreur lors de la récupération de l'image de profil")
+                    }
                 }
             }
         })

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { verificationChemin } = require("./ajoutDocument")
+const sharp = require('sharp');
 
 
 /**
@@ -144,6 +145,7 @@ function getAvatarAsImage(email, callback) {
  * Sauvegarde localement l'image de profil d'un élève dans un dossier dédié, sous le nom "photo".
  * Vérifie aussi que le fichier passé est bien une image.  
  * Un middleware se charge de retrouver la photo.
+ * Redimensionne l'image si elle dépasse les 5Mo
  * @param {*} req la requête du client, doit contenir le fichier téléchargé et l'adresse mail de l'élève
  * @param {*} res la réponse du serveur
  * @returns la réponse
@@ -166,6 +168,7 @@ const savePicture = (req, res) => {
         console.log("Err controllers/image.js > savePicture : verif chemin dans savePicture");
         return res.status(520).send("Erreur lors de la récupération du dossier où se situe l'image.")
     }
+
     // const type = img.mimetype.split("/")[1]
     const type = req.fileextname;
     // console.log("type " + type)
@@ -187,15 +190,47 @@ const savePicture = (req, res) => {
                 });
             }
         }
-        // sauvegarde image
-        fs.writeFile(path + "/photo" + type, img.buffer, 'utf8', function (err, data) {
-            if (err) {
-                console.log("Err controllers/image.js > savePicture : erreur lors de l'enregistrement de la photo : " + err);
-                return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-            }
-            // console.log("La photo a bien été sauvegardée");
-            return res.status(201).json(img.buffer);
-        });
+        // si l'image est trop grande, on la reduit
+        if (img.size > 5000000) {
+            //console.log("resize de l'image "+img.originalname)
+            // avec sharp on redimensionne l'image pour avoir une image carrée.
+            // Les méta données sont importantes car elles permettent de conserver des données comme la position de l'image
+            // on l'enregistre ensuite dans le chemin donné
+            sharp(img.buffer).resize({height:2000, width: 2000}).withMetadata().toFile(path + "/photo" + type)
+                .then(()=> {
+                    // on lit l'image redimensionnée pour pouvoir l'envoyer au serveur
+                    fs.readFile(path+"/photo"+type, function (err, image) {
+                        if (err) {
+                            fs.readFile("./Image/chat2.jpg", function (error, img) {
+                                if (error) {
+                                    console.log("Err controllers/image.js > savePicture : erreur recup de la photo par défaut " + error)
+                                    return res.status(520).send("Aucun trouvé pour ce compte.");
+                                } else {
+                                    console.log("Err controllers/image.js > savePicture : renvoi image par défaut " + err)
+                                    return res.status(201).json(img);
+                                }
+                            })
+                        } else {
+                            return res.status(201).json(image);
+                        }
+                    });
+
+                })
+                .catch(err => {
+                    console.log("Err controllers/image.js > savePicture : erreur lors de la redimension de l'image " + err);
+                    return res.status(520).send("Erreur lors de l'enregistrement de l'image compressée.")
+                })
+        } else {
+            // sauvegarde image
+            fs.writeFile(path + "/photo" + type, img.buffer, 'utf8', function (err, data) {
+                if (err) {
+                    console.log("Err controllers/image.js > savePicture : erreur lors de l'enregistrement de la photo : " + err);
+                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+                }
+                // console.log("La photo a bien été sauvegardée");
+                return res.status(201).json(img.buffer);
+            });
+        }
     })
 }
 
@@ -229,21 +264,35 @@ function getImage(email, callback) {
             if (file == "") {
                 // console.log("pas d'image")
                 // on va retourner une image par défaut 
-                fs.readFile("./Image/chat.jpg", function (error, img) {
+                /*fs.readFile("./Image/chat.jpg", function (error, img) {
                     if (err) {
                         console.log("Err controllers/image.js > getImage : erreur lors de la recup de la photo par défaut " + error)
                         return callback("L'élève n'a pas de photo de profil.");
                     }
                     return callback(null, { image: img });
-                })
+                })*/
+                try {
+                    const img = fs.readFileSync("./Image/chat.jpg")
+                    return callback(null, { image: img });
+                } catch (error) {
+                    console.log("Err controllers/image.js > getImage : erreur lors de la recup de la photo par défaut " + error)
+                    return callback("L'élève n'a pas de photo de profil.");
+                }
             } else {
-                fs.readFile(path + "/" + file, function (err, image) {
+                /*fs.readFile(path + "/" + file, function (err, image) {
                     if (err) {
                         console.log("Err controllers/image.js > getImage : erreur lors de la recup de pp " + err)
                         return callback("Erreur lors de la récupération de l'image de profil")
                     }
                     return callback(null, { image: image });
-                });
+                });*/
+                try {
+                    const image = fs.readFileSync(path + "/" + file)
+                    return callback(null, { image: image });
+                } catch (error) {
+                    console.log("Err controllers/image.js > getImage : erreur lors de la recup de la photo par défaut " + error)
+                    return callback("Erreur lors de la récupération de l'image de profil")
+                }
             }
         }
     })
