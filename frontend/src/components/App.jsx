@@ -1,11 +1,11 @@
 import * as React from "react";
+import useAuth from "../hooks/useAuth";
 import { Routes, Route, Switch } from "react-router-dom";
 
 import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react';
 
 import Layout from "./Layout"
 import Home from "./Home"
-
 import Login from "./Login/Login"
 import Choice from "./Login/Choice"
 import RegisterStudent from "./Login/RegisterStudent"
@@ -15,11 +15,11 @@ import PersistLogin from "./Login/PersistLogin"
 import RequireAuth from "./RequireAuth"
 import Documents from "./Documents/Documents"
 import Jutsu from "../components/Jutsu";
+import JutsuClass from "../components/JutsuClass"
 import TicTacToe from "./Games/TicTacToe";
 import Jeux from "./Games/Jeux"
 import NotFound from "./NotFound"
 import Terms from "./Terms"
-
 import Settings from "./Settings/Settings";
 
 
@@ -53,6 +53,8 @@ const theme = extendTheme({
 })
 
 export default function App() {
+  const { auth } = useAuth();
+
   return (
     <>
       <ColorModeScript />
@@ -72,7 +74,7 @@ export default function App() {
               <Route element={<RequireAuth />}>
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/documents" element={<Documents />} />
-                <Route path="/video" element={<Jutsu />} />
+                <Route path="/video" element={auth?.role == 'eleve' ? <Jutsu /> : <JutsuClass/>} />
                 <Route path="/games" element={<Jeux />} />
                 <Route path="/tictactoe" element={<TicTacToe />} />
                 <Route path="/settings" element={<Settings />} />

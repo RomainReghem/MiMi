@@ -32,39 +32,39 @@ const Jutsu = () => {
     };
     const { loading, error, jitsi } = useJitsi(jitsiConfig);
 
-    const switchCamera = (whichOne) => {
-        switch (whichOne) {
-            case 0:
-                socket.emit('leftCamera')
-                setSelected([true, false, false])
-                break;
-            case 1:
-                socket.emit('centerCamera')
-                setSelected([false, true, false])
-                break;
-            case 2:
-                socket.emit('rightCamera')
-                setSelected([false, false, true])
-                break;
-            default:
-                console.log('wrong argument');
-        }
-    }
-
     const confJoined = () => {
         jitsi.executeCommand('avatarUrl', userData?.avatarURL);
-        socket.emit("joinRoom", auth?.idclasse);
-    }
 
-    const handleRaiseHandStatus = (e) => {
-        e.handRaised === 0 ? socket.emit("lowerHand") : socket.emit("raiseHand");
+        socket.emit("joinRoom", auth?.idclasse);
+
+        socket.on("switchCamera", (whichOne) => {
+            if (auth?.role == 'classe') {
+                console.log('someone wants to switch to camera ' + whichOne)
+                jitsi.getAvailableDevices().then(devices => {
+                    console.log(devices.videoInput[0].label)
+                    jitsi.setVideoInputDevice(devices.videoInput[whichOne].label, devices.videoInput[whichOne].deviceId);
+                })
+                console.log(jitsi)
+            }
+        })
+
+        socket.on("raiseHand", () => {
+            if (auth?.role == 'classe') {
+                setHandRaised(true);
+            }
+        })
+
+        socket.on("lowerHand", () => {
+            if (auth?.role == 'classe') {
+                setHandRaised(false);
+            }
+        })
     }
 
     useEffect(() => {
         if (jitsi) {
             jitsi.addEventListeners({
                 videoConferenceJoined: confJoined,
-                raiseHandUpdated: handleRaiseHandStatus,
             });
         }
     }, [jitsi])
@@ -73,14 +73,20 @@ const Jutsu = () => {
         <>
             <Stack flexGrow={1}>
                 <Spinner position={'absolute'} top='50%' left='50%' zIndex={1} />
+                {
+                    handRaised &&
+                    <Alert onClick={() => setHandRaised(false)} p={10} status='success' variant='subtle' flexDirection='column' alignItems='center' justifyContent='space-between' textAlign='center' zIndex={99} >
+                        <AlertIcon mr={0} />
+                        <AlertTitle mt={4} fontSize='lg'>
+                            Un élève souhaite prendre la parole
+                        </AlertTitle>
+                        <AlertDescription mb={'36'}>Cliquer pour fermer</AlertDescription>
+                        <FontAwesomeIcon icon={faHand} size='10x' color='#F8AE1A' bounce />
+                    </Alert>
+                }
                 {error && <p>{error}</p>}
                 {loading && <Spinner />}
                 <Stack flexGrow={1} h='xl' id={jitsiConfig.parentNode} zIndex={99} />
-                <Stack direction={'row'} justify='center' pb='2'>
-                    <Button colorScheme={selected[0] ? 'darkblue' : 'blue'} onClick={() => switchCamera(0)}>Cam1</Button>
-                    <Button colorScheme={selected[1] ? 'darkblue' : 'blue'} onClick={() => switchCamera(1)}>Cam2</Button>
-                    <Button colorScheme={selected[2] ? 'darkblue' : 'blue'} onClick={() => switchCamera(2)}>Cam3</Button>
-                </Stack>
             </Stack>
 
         </>);
