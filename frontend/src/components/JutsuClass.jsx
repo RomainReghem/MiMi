@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHand } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import useUserData from '../hooks/useUserData';
 import io from "socket.io-client"
 
@@ -11,6 +12,7 @@ import io from "socket.io-client"
 const socket = io("https://mimi.connected-health.fr", { path: '/api-cameras' });
 
 const Jutsu = () => {
+    const navigate = useNavigate()
     const { auth } = useAuth()
     const { userData } = useUserData()
     const [handRaised, setHandRaised] = useState(false);
@@ -61,10 +63,18 @@ const Jutsu = () => {
         })
     }
 
+    const handleVideoConferenceLeft = () => {
+        console.log("handleVideoConferenceLeft");
+        navigate({
+            pathname: "/profile"
+        });
+    }
+
     useEffect(() => {
         if (jitsi) {
             jitsi.addEventListeners({
                 videoConferenceJoined: confJoined,
+                videoConferenceLeft: handleVideoConferenceLeft,
             });
         }
     }, [jitsi])
@@ -75,12 +85,13 @@ const Jutsu = () => {
                 <Spinner position={'absolute'} top='50%' left='50%' zIndex={1} />
                 {
                     handRaised &&
-                    <Alert onClick={() => setHandRaised(false)} p={10} status='success' variant='subtle' flexDirection='column' alignItems='center' justifyContent='space-between' textAlign='center' zIndex={99} >
+                    <Alert onClick={() => setHandRaised(false)} h='70vh' status='success' variant='subtle' flexDirection='column' alignItems='center' justifyContent='space-evenly' textAlign='center' zIndex={99} >
+                        <Stack alignItems={'center'}>
                         <AlertIcon mr={0} />
                         <AlertTitle mt={4} fontSize='lg'>
                             Un élève souhaite prendre la parole
                         </AlertTitle>
-                        <AlertDescription mb={'36'}>Cliquer pour fermer</AlertDescription>
+                        <AlertDescription mb={'36'}>Cliquer pour fermer</AlertDescription></Stack>
                         <FontAwesomeIcon icon={faHand} size='10x' color='#F8AE1A' bounce />
                     </Alert>
                 }

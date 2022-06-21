@@ -3,6 +3,7 @@ import { Spinner, Center, Stack, Button, Alert, AlertIcon, AlertTitle, AlertDesc
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHand } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import useUserData from '../hooks/useUserData';
 import io from "socket.io-client"
@@ -11,6 +12,7 @@ import io from "socket.io-client"
 const socket = io("https://mimi.connected-health.fr", { path: '/api-cameras' });
 
 const Jutsu = () => {
+    const navigate = useNavigate()
     const { auth } = useAuth()
     const { userData } = useUserData()
     const [handRaised, setHandRaised] = useState(false);
@@ -60,11 +62,19 @@ const Jutsu = () => {
         e.handRaised === 0 ? socket.emit("lowerHand") : socket.emit("raiseHand");
     }
 
+    const handleVideoConferenceLeft = () => {
+        console.log("handleVideoConferenceLeft");
+        navigate({
+            pathname: "/profile"
+        });
+    }
+
     useEffect(() => {
         if (jitsi) {
             jitsi.addEventListeners({
                 videoConferenceJoined: confJoined,
-                raiseHandUpdated: handleRaiseHandStatus,
+                raiseHandUpdated: handleRaiseHandStatus,                
+                videoConferenceLeft: handleVideoConferenceLeft,
             });
         }
     }, [jitsi])

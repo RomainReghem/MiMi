@@ -3,7 +3,8 @@ import useAuth from '../../hooks/useAuth';
 import { Document, Page, pdfjs } from 'react-pdf/dist/esm/entry.webpack'
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useEffect, useState } from "react"
-import { Text, Spinner, Center, AlertIcon, Alert } from "@chakra-ui/react";
+import { Text, Spinner, Center, AlertIcon, Alert, Link } from "@chakra-ui/react";
+import { useRef } from 'react';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -14,6 +15,10 @@ const PDFViewer = (props) => {
     const axiosPrivate = useAxiosPrivate();
     const [numPages, setNumPages] = useState(null);
     const [file, setFile] = useState(null);
+
+    const [urlToDownload, setUrlToDownload] = useState(null)
+    const [fileNameToDownload, setFileNameToDownload] = useState('')
+    const downloadRef = useRef(null)
 
     // Spinner du chargement d'un fichier
     const [displaySpinner, setDisplaySpinner] = useState(false)
@@ -71,19 +76,21 @@ const PDFViewer = (props) => {
     }, [props.downloadThis])
 
     const downloadFile = async (filename) => {
-        console.log('starting')
         let data = await getFile(filename)
-        console.log('got file !')
         let blob = new Blob([new Uint8Array(data)], { type: 'pdf' });
         let url = URL.createObjectURL(blob);
-        let tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.setAttribute('download', `${filename}`);
-        tempLink.click();
-
+        setUrlToDownload(url)
+        setFileNameToDownload(filename)
+        // (1)
         // On callback le parent pour stopper le spinner
         props.onDownloadFinished();
     }
+
+    // useState est asynchrone, s'il y a changement d'url c'est forcément qu'on est passés par download file
+    // mais le state ne sera pas encore update si on clique au (1). Obligé d'utiliser un useEffect pour écouter.
+    useEffect(() => {
+        urlToDownload && downloadRef.current.click();
+    }, [urlToDownload])
 
 
     return (
@@ -105,6 +112,7 @@ const PDFViewer = (props) => {
                         Cliquez sur un document pour le visualiser ici !
                     </Alert>
             }
+            <Link href={urlToDownload} ref={downloadRef} display='none' download={fileNameToDownload}></Link>
 
         </>
     );

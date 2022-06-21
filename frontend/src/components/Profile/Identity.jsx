@@ -7,6 +7,7 @@ import Avatar from 'react-nice-avatar';
 import Invitations from "./Invitations";
 import { useToast, InputGroup, Tooltip, FormLabel, IconButton, Input, InputRightElement, Text, Button, Heading, Stack, Image, InputRightAddon, Divider, Center, Spinner } from "@chakra-ui/react";
 import useUserData from "../../hooks/useUserData";
+import Compressor from 'compressorjs';
 
 const CHANGEPSEUDO_URL = '/changePseudo';
 const PSEUDO_REGEX = /^[A-z0-9-_]{3,24}$/;
@@ -100,15 +101,28 @@ const Identity = () => {
     // Submit de l'image
     const pictureSubmit = async () => {
         setPictureUploading(true)
+        console.log(selectedPicture.data)
+        // On compresse l'image.
+        new Compressor(selectedPicture.data, {
+            quality: 0.6, // 0.6 can also be used, but its not recommended to go below.
+            success: (compressedResult) => {
+                sendImage(new File([compressedResult], selectedPicture.data.name, { type: selectedPicture.data.type }))
+                console.log(new File([compressedResult], selectedPicture.data.name, { type: selectedPicture.data.type }))
+            },
+        });
+    }
+
+    const sendImage = async (compressedResult) => {
         try {
             let formData = new FormData()
-            formData.append('file', selectedPicture.data);
+            formData.append('file', compressedResult);
             formData.append("filename", selectedPicture.data.name);
             formData.append("mail", auth?.user);
             const response = await axiosPrivate.post("/saveImage", formData,
                 {
                     headers: { "Content-Type": "image/*" },
                 });
+
             setPictureWaitingToBeSent(false);
             // On update directement les userData, afin de ne pas avoir à refresh la page pour constater les changements
             setUserData({
@@ -116,11 +130,8 @@ const Identity = () => {
                 image: response.data.data
             })
             toast({ title: "Image de profil sauvegardée", description: "", status: "success", duration: 5000, isClosable: true, position: "top" })
-
-
         } catch (error) {
             toast({ title: "Erreur", description: "Vérifiez le fichier", status: "error", duration: 5000, isClosable: true, position: "top" })
-
         }
         setPictureUploading(false)
     }
@@ -173,7 +184,7 @@ const Identity = () => {
                         </Center>
                     </FormLabel>
                     <Tooltip bg={'green.400'} label="Valider l'image" fontSize='md' placement="top">
-                        <IconButton borderRadius={'0px 3px 3px 0px'} colorScheme={"green"} onClick={(e) => {!pictureUploading && pictureSubmit(e)}}>
+                        <IconButton borderRadius={'0px 3px 3px 0px'} colorScheme={"green"} onClick={(e) => { !pictureUploading && pictureSubmit(e) }}>
                             {pictureUploading ? <Spinner size={'xs'} /> : <FontAwesomeIcon icon={faPaperPlane} bounce={pictureWaitingToBeSent ? true : false} />}
                         </IconButton>
                     </Tooltip>

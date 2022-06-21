@@ -139,7 +139,10 @@ export default function Login() {
 
                             </Button>
                         </Stack>
+                        <Stack direction={'row'}>
                         <Text align={'center'} >Pas encore de compte ? <Link to="/choice" as={ReactRouterLink} color={'cyan.600'}>S'inscrire</Link></Text>
+                        <Text align={'center'} >Mot de passe oublié ? <Link to="/sendmail" as={ReactRouterLink} color={'cyan.600'}>Réinitialiser</Link></Text>
+                        </Stack>
                     </Stack>
                 </Box>
             </Stack>

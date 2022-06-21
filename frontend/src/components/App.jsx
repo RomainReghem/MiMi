@@ -21,6 +21,8 @@ import Jeux from "./Games/Jeux"
 import NotFound from "./NotFound"
 import Terms from "./Terms"
 import Settings from "./Settings/Settings";
+import SendMail from "./Login/SendMail";
+import PwdReset from "./Login/PwdReset";
 
 
 import '../styles/tictactoe.css'
@@ -63,6 +65,8 @@ export default function App() {
           <Route path="/" element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/sendmail" element={<SendMail />} />
+            <Route path="/pwdreset" element={<PwdReset />} />
             <Route path="/register-student" element={<RegisterStudent />} />
             <Route path="/register-class" element={<RegisterClass />} />
             <Route path="/choice" element={<Choice />} />

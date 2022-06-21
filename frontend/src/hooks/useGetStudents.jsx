@@ -16,7 +16,7 @@ const useGetStudents = () => {
             // On met ça dans le local storage pour la partie shared documents
             // a changer et faire par rapport à l'id de la classe + récupération de(s) eleve par l'api
             localStorage.setItem("mailEleve", response?.data?.eleves[0]?.courriel)
-            return response.data.eleves;
+            return response.data;
         } catch (err) {
             console.log(err)
         }

@@ -116,7 +116,7 @@ const Documents = () => {
 
     return (
         <Center flexGrow={1}>
-            <Wrap spacing={10} p={5} justify={'center'} >
+            <Wrap w={'100%'} spacing={10} p={5} justify={'space-evenly'} >
                 <Stack spacing={4} w={useBreakpointValue({ base: "xs", md: "md" })}>
                     <Heading fontSize={'2xl'}>Gestion des documents</Heading>
                     <Text fontSize={'xs'} fontFamily={'mono'}><Kbd colorScheme={'green'}>Clic</Kbd> sur le nom d'un document pour le visualiser</Text>
