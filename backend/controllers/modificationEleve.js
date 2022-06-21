@@ -120,7 +120,7 @@ const AcceptationInvitation = (req, res) => {
                     return res.status(404).send("Aucun élève correspondant à l'adresse : %s", email)
                 }
                 // On récupère le mail de la classe, il a été sauvegardé en même temps que le statut est passé en attente
-                Classe.findOne({ attributes: ['courriel'], where: { idclasse: eleve.idclasse} })
+                Classe.findOne({ attributes: ['courriel'], where: { idclasse: eleve.idclasse } })
                     .then(classe => {
                         if (!classe) {
                             console.log("Err controllers/modificationEleve.js > AcceptationInvitation : aucun classe trouvée")
@@ -181,10 +181,10 @@ const ChangementMdp = (req, res) => {
     // seul une classe peut changer son propre mot de passe
     if (role == "eleve" && email == emailToken) {
         // on cherche un eleve qui a le mail donné
-        Eleve.findOne({ attributes: ['ideleve', 'motdepasse'], where: { courriel: email } })
+        Eleve.findOne({ attributes: ['motdepasse'], where: { courriel: email } })
             .then(eleve => {
                 if (!eleve) {
-                    console.log("Err controllers/modificationEleve.js > ChangementMdp : pas de compte eleve à l'adr %s",email)
+                    console.log("Err controllers/modificationEleve.js > ChangementMdp : pas de compte eleve à l'adr %s", email)
                     return res.status(404).send("Aucun compte correspondant à cet adresse.")
                 }
                 // si aucun changement, on ne fait pas de vérifications
@@ -195,26 +195,12 @@ const ChangementMdp = (req, res) => {
                 // on vérifie maintenant dans la bd si le mdp donné est bien celui associé au mail
                 bcrypt.compare(mdp, eleve.motdepasse, function (err, estValide) {
                     if (estValide) {
-                        // console.log("Bon mot de passe de l'élève")
-                        bcrypt.hash(newMdp, 10, (err, hash) => {
-                            if (err) {
-                                //erreur lors du hahage
-                                console.log("Err controllers/modificationEleve.js > ChangementMdp : bcrypt.hash " + err)
-                                return res.status(520).send("Erreur lors du chiffrement du mot de passe")
+                        changePassword(email, newMdp, function(err, msg){
+                            if (err){
+                                return res.status(520).send(err);
                             }
-                            // on change le mdp
-                            Eleve.update(
-                                { motdepasse: hash },
-                                {
-                                    where: { ideleve: eleve.ideleve }
-                                }).then(() => {
-                                    // si le mot de passe entré correspond bien au mot de passe dans la base de données
-                                    return res.status(201).send("Le mot de passe a bien été modifié !")
-                                }).catch(err => {
-                                    console.log("Err controllers/modificationEleve.js > ChangementMdp : update eleve " + err)
-                                    return res.status(520).send("Erreur survenue lors de la modification du mot de passe !")
-                                });
-                        });
+                            return res.status(201).send(msg);
+                        })
                     } else {
                         console.log("Err controllers/modificationEleve.js > ChangementMdp : mauvais mot de passe ELEVE " + err)
                         return res.status(400).send("Le mot de passe fourni n'est pas le bon")
@@ -228,6 +214,34 @@ const ChangementMdp = (req, res) => {
         console.log("Err controllers/modificationEleve.js > ChangementMdp : accès interdit : tentative de changement de mot de passe d'un élève %s par %s! ", email, emailToken)
         return res.status(403).send("Accès interdit : tentative de changement de mot de passe d'un élève !")
     }
+}
+
+
+/**
+ * A partir d'une adresse mail et d'un mot de passe valide, les insère dans la base de données pour changer le mot de passe 
+ * @param {String} email l'adresse mail de l'élève
+ * @param {String} mdp le nouveau mot de passe, en clair, de l'élève
+ * @param {any} callback la fonction callback, une erreur en premier paramètre, un message de succès en second
+ */
+function changePassword(email, mdp, callback) {
+    bcrypt.hash(mdp, 10, (err, hash) => {
+        if (err) {
+            //erreur lors du hahage
+            console.log("Err controllers/modificationEleve.js > changePassword : bcrypt.hash " + err)
+            return callback("Erreur lors du chiffrement du mot de passe")
+        }
+        // on change le mdp
+        Eleve.update(
+            { motdepasse: hash },
+            {where: { courriel: email }
+            }).then(() => {
+                // si le mot de passe entré correspond bien au mot de passe dans la base de données
+                return callback(null, "Le mot de passe a bien été modifié !")
+            }).catch(err => {
+                console.log("Err controllers/modificationEleve.js > changePassword : update eleve " + err)
+                return callback("Erreur survenue lors de la modification du mot de passe !")
+            });
+    });
 }
 
 
@@ -374,4 +388,4 @@ const ChangementMail = (req, res) => {
 }
 
 
-module.exports = { ChangementPseudo, SuppressionClasse, AcceptationInvitation, ChangementMail, ChangementMdp }
+module.exports = { ChangementPseudo, SuppressionClasse, AcceptationInvitation, ChangementMail, ChangementMdp, changePassword }

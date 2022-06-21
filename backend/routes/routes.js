@@ -2,6 +2,7 @@
 const verifyJWT = require('../middleware/verificationJWT.js').verifyJWT
 const verifyDoc = require('../middleware/verificationDoc.js')
 const verifyImg = require('../middleware/verificationImage.js')
+const verifyTokenMail = require('../middleware/verificationTokenMail.js').verifyTokenMail
 const { verifyMailBody, verifyMailQuery } = require('../middleware/verificationMail.js')
 const { verifyAccesGet, verifyAccessSave } = require('../middleware/verificationAccesDoc.js')
 // CONTROLLERS
@@ -10,6 +11,7 @@ const Inscription = require('../controllers/inscription.js')
 const Deconnexion = require('../controllers/deconnexion.js')
 const refreshToken = require('../controllers/refreshToken.js')
 const Image = require('../controllers/image.js')
+const OubliMdp=require('../controllers/reinitialisationMotDePasse.js')
 // pour les documents
 const SuppressionDoc = require('../controllers/suppressionDocument.js')
 const AjoutDoc = require('../controllers/ajoutDocument.js')
@@ -107,6 +109,12 @@ router.post('/file', verifyJWT, verifyDoc.single("file"), verifyAccessSave, Ajou
 router.delete('/file', verifyJWT, verifyAccessSave, SuppressionDoc.deleteFile)
 // route pour renommer un fichier
 router.put('/file', verifyJWT, verifyAccessSave, ChangeDoc.renameFile)
+
+// Mot de passe oublié
+// route pour envoyer un mail avec un token pour l'oubli de mdp
+router.post("/sendMail", OubliMdp.sendResetPassword)
+// router pour reinitialiser un mot de passe à partir du token d'un eleve
+router.post("/resetPwd", verifyTokenMail, OubliMdp.resetPassword)
 
 
 module.exports = router;

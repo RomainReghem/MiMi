@@ -96,7 +96,7 @@ const changementMdpClasse = (req, res) => {
         Classe.findOne({ attributes: ['idclasse', 'motdepasse'], where: { courriel: email } })
             .then(classe => {
                 if (!classe) {
-                    console.log("Err controllers/modificationClasse.js > changementMdpClasse : aucune classe trouvée avec le mail "+email)
+                    console.log("Err controllers/modificationClasse.js > changementMdpClasse : aucune classe trouvée avec le mail " + email)
                     return res.status(404).send("Aucun compte correspondant à cet adresse.")
                 }
                 // si les mots de passe sont les mêmes
@@ -114,23 +114,12 @@ const changementMdpClasse = (req, res) => {
                         // console.log("Bon mot de passe de la classe")
                         // on change le mdp
                         // si le mot de passe entré correspond bien au mot de passe dans la base de données
-                        bcrypt.hash(newMdp, 10, (err, hash) => {
+                        changePasswordClass(email, mdp, function (err, msg) {
                             if (err) {
-                                //erreur lors du hashage
-                                console.log("Err controllers/modificationClasse.js > changementMdpClasse : bcrypt.hash "+err);
-                                return res.status(520).send("Erreur lors du hashage du mot de passe.")
+                                return res.status(520).send(err)
                             }
-                            Classe.update(
-                                { motdepasse: hash },
-                                { where: { idclasse: classe.idclasse } }
-                            ).then(() => {
-                                // on envoie la classe avec le mdp modifié 
-                                return res.status(201).send("Mot de passe changé avec succès !");
-                            }).catch(err => {
-                                console.log(`Err controllers/modificationClasse.js > changementMdpClasse : update classe : ${err}`)
-                                return res.status(520).send("Erreur lors de la modification du mot de passe ")
-                            });
-                        });
+                            return res.status(201).send(msg)
+                        })
                     }
                     // si le mot de passe
                     console.log("Err controllers/modificationClasse.js > changementMdpClasse : mauvais mot de passe classe")
@@ -142,9 +131,35 @@ const changementMdpClasse = (req, res) => {
                 return res.status(520).send("Erreur lors de la vérification de la validité du compte.")
             });
     } else {
-        console.log('Err controllers/modificationClasse.js > changementMdpClasse : role %s ou mail %s du token invalide ',role, emailToken)
+        console.log('Err controllers/modificationClasse.js > changementMdpClasse : role %s ou mail %s du token invalide ', role, emailToken)
         return res.status(403).send("Accès interdit : tentative de changement de mot de passe de classe !")
     }
+}
+
+/**
+ * Fonction qui change dans la base de données le mot de passe d'une classe spécifiée par son adresse mail
+ * @param {String} email l'email de la classe dont on va changer le mot de passe
+ * @param {String} mdp le nouveau mot de passe de la classe
+ * @param {*} cb la fonction callback
+ */
+function changePasswordClass(email, mdp, cb) {
+    bcrypt.hash(mdp, 10, (err, hash) => {
+        if (err) {
+            //erreur lors du hashage
+            console.log("Err controllers/changePasswordClass.js > changementMdpClasse : bcrypt.hash " + err);
+            return cb("Erreur lors du hashage du mot de passe.")
+        }
+        Classe.update(
+            { motdepasse: hash },
+            { where: { courriel: email } }
+        ).then(() => {
+            // on envoie la classe avec le mdp modifié 
+            return cb(null, "Mot de passe changé avec succès !");
+        }).catch(err => {
+            console.log(`Err controllers/changePasswordClass.js > changementMdpClasse : update classe : ${err}`)
+            return cb("Erreur lors de la modification du mot de passe ")
+        });
+    });
 }
 
 
@@ -183,7 +198,7 @@ const changementMailClasse = (req, res) => {
             .then(classe => {
                 // s'il n'y aucune classe  qui a été trouvée alors aucun compte ne correspond à ce mail
                 if (!classe) {
-                    console.log("Err controllers/modificationClasse.js > changementMailClasse : aucune classe trouvée avec le mail "+email)
+                    console.log("Err controllers/modificationClasse.js > changementMailClasse : aucune classe trouvée avec le mail " + email)
                     return res.status(404).send("Aucun compte correspondant à cet adresse.")
                 }
                 // On vérifie que dans la table classe aucune classe ne possède déjà la nouvelle adresse mail
@@ -237,7 +252,7 @@ const changementMailClasse = (req, res) => {
                                             res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
                                             return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
                                         }).catch(err => {
-                                            console.log("Err controllers/modificationClasse.js > changementMailClasse : classe update "+err)
+                                            console.log("Err controllers/modificationClasse.js > changementMailClasse : classe update " + err)
                                             return res.status(500).send("Erreur lors de l'actualisation des données du compte classe, la sauvegarde des données est compromise.");
                                         });
 
@@ -250,10 +265,10 @@ const changementMailClasse = (req, res) => {
                     });
             })
     } else {
-        console.log('Err controllers/modificationClasse.js > changementMailClasse : role %s ou mail %s du token invalide ',role, emailToken)
+        console.log('Err controllers/modificationClasse.js > changementMailClasse : role %s ou mail %s du token invalide ', role, emailToken)
         return res.status(403).send("Accès interdit : tentative de changement de mail de classe !")
     }
 }
 
 
-module.exports = { ajoutInvitation, suppressionEleve, changementMailClasse, changementMdpClasse }
+module.exports = { ajoutInvitation, suppressionEleve, changementMailClasse, changementMdpClasse, changePasswordClass }

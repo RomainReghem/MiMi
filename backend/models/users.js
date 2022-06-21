@@ -43,6 +43,11 @@ const Eleve = db.define('eleve', {
         type: Sequelize.STRING,
         allowNull: true
     }
+    ,
+    tokenMail:{
+        type:Sequelize.STRING,
+        allowNull:true
+    }
 }, { timestamps: false, freezeTableName: true, tableName: 'eleve' });
 
 const Classe = db.define('classe', {
@@ -64,12 +69,11 @@ const Classe = db.define('classe', {
     token: {
         type: Sequelize.STRING,
         allowNull: true
-    }/*,
+    },
     tokenMail:{
         type:Sequelize.STRING,
         allowNull:true
     }
-    */
 }, { timestamps: false, freezeTableName: true, tableName: 'classe' });
 
 const Score = db.define('score',
@@ -104,12 +108,7 @@ const Score = db.define('score',
             references: 'classe',
             referencesKey: 'idclasse',
             allowNull: false
-        }/*,
-        tokenMail:{
-            type:Sequelize.STRING,
-            allowNull:true
         }
-        */
     }, { timestamps: false, freezeTableName: true, tableName: 'score' });
 
 /*const Token = db.define('token',{

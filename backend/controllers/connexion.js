@@ -66,123 +66,123 @@ const Connexion = (req, res) => {
                                 //console.log("refresh token connexion " + refreshToken)
                                 //console.log("** Connexion de l'élève effectuée **")
                                 // pour récupérer le statut de l'invitation de l'élève
-                            getInvitation(eleve.courriel, function (reponse) {
-                                     if (reponse == 404 || reponse == 400 || reponse == 520) {
-                                         console.log("Err controllers/connexion.js > Connexion : erreur lors de la récupération de l'invitation code " + reponse)
-                                         return res.sendStatus(reponse)
-                                     } else {
-                                         // pour récupérer l'avatar de l'élève
-                                         getAvatar(eleve.courriel, function (err, reponseAvatar) {
-                                             if (err) {
-                                                 return res.status(520).send(err);
-                                             }
-                                             //pour récupèrer l'image de profil de l'élève 
-                                             getImage(eleve.courriel, function (err, reponseImage) {
-                                                 if (err) {
-                                                     return res.status(520).send(err);
-                                                 }
-                                                 getAvatarAsImage(eleve.courriel, function (err, reponseAvatarAsImage) {
-                                                     if (err) {
-                                                         return res.status(520).send(err);
-                                                     }
-                                                     //console.log('envoi des infos')
-                                                     res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                                     return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseAvatarAsImage, reponseImage));
-                                                 })
- 
-                                             })
-                                         })
-                                     }
-                                 })
-                                 // Version de récupération des informations avec Promise
-                               /*Promise.all([
-                                    getImage(eleve.courriel),
-                                    getAvatarAsImage(eleve.courriel),
-                                    getAvatar(eleve.courriel),
-                                    getInvitationPromise(eleve.courriel)
-                                ])
-                                    .then((data) => {
-                                        //envoi des infos recuperees sur l'eleve
-                                        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                        return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, { image: data[0].image }, { avatarAsImg: data[1].avatarAsImg }, { avatar: data[2].avatar },{invitation:data[3]}));
+                                getInvitation(eleve.courriel, function (reponse) {
+                                    if (reponse == 404 || reponse == 400 || reponse == 520) {
+                                        console.log("Err controllers/connexion.js > Connexion : erreur lors de la récupération de l'invitation code " + reponse)
+                                        return res.sendStatus(reponse)
+                                    } else {
+                                        // pour récupérer l'avatar de l'élève
+                                        getAvatar(eleve.courriel, function (err, reponseAvatar) {
+                                            if (err) {
+                                                return res.status(520).send(err);
+                                            }
+                                            //pour récupèrer l'image de profil de l'élève 
+                                            getImage(eleve.courriel, function (err, reponseImage) {
+                                                if (err) {
+                                                    return res.status(520).send(err);
+                                                }
+                                                getAvatarAsImage(eleve.courriel, function (err, reponseAvatarAsImage) {
+                                                    if (err) {
+                                                        return res.status(520).send(err);
+                                                    }
+                                                    //console.log('envoi des infos')
+                                                    res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                                    return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, reponse, { pseudo: eleve.pseudo }, reponseAvatar, reponseAvatarAsImage, reponseImage));
+                                                })
+
+                                            })
+                                        })
                                     }
-                                    ).catch((err) => {
-                                        console.log(err)
-                                        return res.status(520).send("Erreur du serveur lors de la récupération des informations du serveur.")
-                                    })*/
+                                })
+                                // Version de récupération des informations avec Promise
+                                /*Promise.all([
+                                     getImage(eleve.courriel),
+                                     getAvatarAsImage(eleve.courriel),
+                                     getAvatar(eleve.courriel),
+                                     getInvitationPromise(eleve.courriel)
+                                 ])
+                                     .then((data) => {
+                                         //envoi des infos recuperees sur l'eleve
+                                         res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                         return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, { image: data[0].image }, { avatarAsImg: data[1].avatarAsImg }, { avatar: data[2].avatar },{invitation:data[3]}));
+                                     }
+                                     ).catch((err) => {
+                                         console.log(err)
+                                         return res.status(520).send("Erreur du serveur lors de la récupération des informations du serveur.")
+                                     })*/
 
                             })
-                    .catch(err => {
-                        console.log("Err controllers/connexion.js > Connexion : erreur lors de l'ajout de Token" + err);
-                        return res.status(520).send("Erreur lors de l'ajout de cookies.")
-                    })
-            } else {
-                console.log("Err controllers/connexion.js > Connexion : mauvais mot de passe ELEVE" + err)
-                // sinon, si ce n'est pas le bon mdp mais le bon email
-                return res.status(400).send("Ce n'est pas le bon mot de passe.")
-            }
-        });
-} else {
-    Classe.findOne({
-        attributes: ['courriel', 'motdepasse', 'idclasse'],
-        where: { courriel: email }
-    })
-        .then(classe => {
-            if (classe) {
-                bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {
-                    if (estValide) {
-                        //console.log("Création des cookies pour la classe")
-                        const accessToken = jwt.sign(
-                            {
-                                "UserInfo": {
-                                    "mail": classe.courriel,
-                                    "role": "classe"
-                                }
-                            },
-                            process.env.ACCESS_TOKEN_SECRET,
-                            { expiresIn: '20m' }
-                        );
-                        const refreshToken = jwt.sign(
-                            { "mail": classe.courriel, "role": "classe" },
-                            process.env.REFRESH_TOKEN_SECRET,
-                            { expiresIn: '1d' }
-                        );
-                        Classe.update({ token: refreshToken }, { where: { idclasse: classe.idclasse } })
-                            .then(() => {
-                                // console.log("CONNEXION de la classe OK")
-                                res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
-                                // si le mot de passe entré correspond bien au mot de passe dans la base de données
-                                //res.send(classe)
-                            }).catch(err => {
-                                console.log("Err controllers/connexion.js > Connexion : update classe " + err);
-                                return res.status(520).send("Erreur lors de l'enregistrement des cookies.")
+                            .catch(err => {
+                                console.log("Err controllers/connexion.js > Connexion : erreur lors de l'ajout de Token" + err);
+                                return res.status(520).send("Erreur lors de l'ajout de cookies.")
                             })
                     } else {
-                        console.log("Err controllers/connexion.js > Connexion : mauvais mot de passe CLASSE")
-                        // si ce n'est pas le bon mdp mais le bon email
+                        console.log("Err controllers/connexion.js > Connexion : mauvais mot de passe ELEVE" + err)
+                        // sinon, si ce n'est pas le bon mdp mais le bon email
                         return res.status(400).send("Ce n'est pas le bon mot de passe.")
                     }
                 });
             } else {
-                // Sinon c'est que l'utilisateur s'est soit trompé, soit qu'il n'existe pas
-                console.log("Err controllers/connexion.js > Connexion : Utilisateur pas trouvé.")
-                // si pour l'adresse mail donnée, aucun utilisateur ne correspond 
-                return res.status(401).send("Aucun utilisateur correspondant à cette adresse mail trouvé.");
+                Classe.findOne({
+                    attributes: ['courriel', 'motdepasse', 'idclasse'],
+                    where: { courriel: email }
+                })
+                    .then(classe => {
+                        if (classe) {
+                            bcrypt.compare(mdp, classe.motdepasse, function (err, estValide) {
+                                if (estValide) {
+                                    //console.log("Création des cookies pour la classe")
+                                    const accessToken = jwt.sign(
+                                        {
+                                            "UserInfo": {
+                                                "mail": classe.courriel,
+                                                "role": "classe"
+                                            }
+                                        },
+                                        process.env.ACCESS_TOKEN_SECRET,
+                                        { expiresIn: '20m' }
+                                    );
+                                    const refreshToken = jwt.sign(
+                                        { "mail": classe.courriel, "role": "classe" },
+                                        process.env.REFRESH_TOKEN_SECRET,
+                                        { expiresIn: '1d' }
+                                    );
+                                    Classe.update({ token: refreshToken }, { where: { idclasse: classe.idclasse } })
+                                        .then(() => {
+                                            // console.log("CONNEXION de la classe OK")
+                                            res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+                                            return res.status(201).json({ role: "classe", accessToken: accessToken, idclasse: classe.idclasse })
+                                            // si le mot de passe entré correspond bien au mot de passe dans la base de données
+                                            //res.send(classe)
+                                        }).catch(err => {
+                                            console.log("Err controllers/connexion.js > Connexion : update classe " + err);
+                                            return res.status(520).send("Erreur lors de l'enregistrement des cookies.")
+                                        })
+                                } else {
+                                    console.log("Err controllers/connexion.js > Connexion : mauvais mot de passe CLASSE")
+                                    // si ce n'est pas le bon mdp mais le bon email
+                                    return res.status(400).send("Ce n'est pas le bon mot de passe.")
+                                }
+                            });
+                        } else {
+                            // Sinon c'est que l'utilisateur s'est soit trompé, soit qu'il n'existe pas
+                            console.log("Err controllers/connexion.js > Connexion : Utilisateur pas trouvé.")
+                            // si pour l'adresse mail donnée, aucun utilisateur ne correspond 
+                            return res.status(401).send("Aucun utilisateur correspondant à cette adresse mail trouvé.");
+                        }
+                    })
+                    .catch(err => {
+                        // console.log(err);
+                        console.log("Err controllers/connexion.js > Connexion : erreur impossible de récupérer les informations de la classe: " + err)
+                        return res.status(520).send("Erreur survenue lors de la vérification du compte.")
+                    })
             }
         })
         .catch(err => {
             // console.log(err);
-            console.log("Err controllers/connexion.js > Connexion : erreur impossible de récupérer les informations de la classe: " + err)
-            return res.status(520).send("Erreur survenue lors de la vérification du compte.")
+            console.log("Err controllers/connexion.js > Connexion :  délai d'attente dépassé eleve findone " + err)
+            return res.status(504).send("Problème au niveau du serveur.");
         })
-            }
-        })
-        .catch (err => {
-    // console.log(err);
-    console.log("Err controllers/connexion.js > Connexion :  délai d'attente dépassé eleve findone " + err)
-    return res.status(504).send("Problème au niveau du serveur.");
-})
 }
 
 

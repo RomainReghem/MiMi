@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { verificationChemin } = require("./ajoutDocument")
-const sharp = require('sharp');
+// const sharp = require('sharp');
 
 
 /**
@@ -190,48 +190,48 @@ const savePicture = (req, res) => {
                 });
             }
         }
-        // si l'image est trop grande, on la reduit
-        if (img.size > 1000000) {
-            //console.log("resize de l'image "+img.originalname)
-            // avec sharp on redimensionne l'image pour avoir une image carrée.
-            // Les méta données sont importantes car elles permettent de conserver des données comme la position de l'image
-            // on l'enregistre ensuite dans le chemin donné
-            sharp(img.buffer).resize(1500).withMetadata().toFile(path + "/photo" + type)
-                .then(()=> {
-                    // on lit l'image redimensionnée pour pouvoir l'envoyer au serveur
-                    fs.readFile(path+"/photo"+type, function (err, image) {
-                        if (err) {
-                            fs.readFile("./Image/chat2.jpg", function (error, img) {
-                                if (error) {
-                                    console.log("Err controllers/image.js > savePicture : erreur recup de la photo par défaut " + error)
-                                    return res.status(520).send("Aucun trouvé pour ce compte.");
-                                } else {
-                                    console.log("Err controllers/image.js > savePicture : renvoi image par défaut " + err)
-                                    return res.status(201).json(img);
-                                }
-                            })
-                        } else {
-                            return res.status(201).json(image);
-                        }
-                    });
+        // // si l'image est trop grande, on la reduit
+        // if (img.size > 1000000) {
+        //     //console.log("resize de l'image "+img.originalname)
+        //     // avec sharp on redimensionne l'image pour avoir une image carrée.
+        //     // Les méta données sont importantes car elles permettent de conserver des données comme la position de l'image
+        //     // on l'enregistre ensuite dans le chemin donné
+        //     sharp(img.buffer).resize(1500).withMetadata().toFile(path + "/photo" + type)
+        //         .then(()=> {
+        //             // on lit l'image redimensionnée pour pouvoir l'envoyer au serveur
+        //             fs.readFile(path+"/photo"+type, function (err, image) {
+        //                 if (err) {
+        //                     fs.readFile("./Image/chat2.jpg", function (error, img) {
+        //                         if (error) {
+        //                             console.log("Err controllers/image.js > savePicture : erreur recup de la photo par défaut " + error)
+        //                             return res.status(520).send("Aucun trouvé pour ce compte.");
+        //                         } else {
+        //                             console.log("Err controllers/image.js > savePicture : renvoi image par défaut " + err)
+        //                             return res.status(201).json(img);
+        //                         }
+        //                     })
+        //                 } else {
+        //                     return res.status(201).json(image);
+        //                 }
+        //             });
 
-                })
-                .catch(err => {
-                    console.log("Err controllers/image.js > savePicture : erreur lors de la redimension de l'image " + err);
-                    return res.status(520).send("Erreur lors de l'enregistrement de l'image compressée.")
-                })
-        } else {
-            // sauvegarde image
-            fs.writeFile(path + "/photo" + type, img.buffer, 'utf8', function (err, data) {
-                if (err) {
-                    console.log("Err controllers/image.js > savePicture : erreur lors de l'enregistrement de la photo : " + err);
-                    return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
-                }
-                // console.log("La photo a bien été sauvegardée");
-                return res.status(201).json(img.buffer);
-            });
-        }
+        //         })
+        //         .catch(err => {
+        //             console.log("Err controllers/image.js > savePicture : erreur lors de la redimension de l'image " + err);
+        //             return res.status(520).send("Erreur lors de l'enregistrement de l'image compressée.")
+        //         })
+        // } else {
+        // sauvegarde image
+        fs.writeFile(path + "/photo" + type, img.buffer, 'utf8', function (err, data) {
+            if (err) {
+                console.log("Err controllers/image.js > savePicture : erreur lors de l'enregistrement de la photo : " + err);
+                return res.status(600).send("Erreur lors de l'enregistrement, réesayez.")
+            }
+            // console.log("La photo a bien été sauvegardée");
+            return res.status(201).json(img.buffer);
+        });
     })
+    // })
 }
 
 
