@@ -70,7 +70,6 @@ export default function Login() {
             toast({ title: "Bienvenue !", description: "Vous êtes connecté", status: "success", duration: 4000, isClosable: true, position: "top" })
             navigate("/profile");
 
-
         } catch (err) {
             setDisplaySpinner(false)
             if (!err?.response) {
