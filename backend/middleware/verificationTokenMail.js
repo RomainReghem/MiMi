@@ -24,7 +24,7 @@ const verifyTokenMail = (req, res, next) => {
             }
             req.mail = decoded.mail;
             req.role = decoded.role;
-            console.log("decode mail %s et role %s", req.mail, req.role)
+            //console.log("decode mail %s et role %s", req.mail, req.role)
 
             if (req.role != "eleve" && req.role != "classe") {
                 console.log("Err middleware/verificationTokenMail.js > verifyTokenMail : role pas bon")

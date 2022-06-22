@@ -43,7 +43,7 @@ const sendResetPassword = (req, res) => {
 
                 })
                 .catch(err => {
-                    console.log("Err controllers/changementMotDePasse.js : sendResetPassword, eleve.update " + err)
+                    console.log("Err controllers/reinitialisationMotDePasse.js : sendResetPassword, eleve.update " + err)
                     return res.status(520).send("Erreur lors de la tentative de création de lien pour la reinitialisation.")
                 })
         } else {
@@ -67,7 +67,7 @@ const sendResetPassword = (req, res) => {
                     });
                 })
                 .catch(err => {
-                    console.log("Err controllers/changementMotDePasse.js : sendResetPassword, classe.update " + err)
+                    console.log("Err controllers/reinitialisationMotDePasse.js : sendResetPassword, classe.update " + err)
                     return res.status(520).send("Erreur lors de la tentative de création de lien pour la reinitialisation.")
                 })
         }
@@ -76,6 +76,7 @@ const sendResetPassword = (req, res) => {
 
 /**
  * Permet de changer le mot de passe, si le token et le mot de passe donnés sont valides.
+ * Supprimer ensuite le token de la base de données.
  * @param {*} req la requête du client, contient notamment le mot de passe et le token.
  * @param {*} res la réponse du serveur
  * @returns la réponse du serveur, une erreur ou un succès, en fonction des codes http
@@ -87,7 +88,7 @@ const resetPassword = (req, res) => {
     const mdp = req.body.pwd;
 
     if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
-        console.log("Err controllers/changementMotDePasse.js > resetPassword : taille mdp pas ok")
+        console.log("Err controllers/reinitialisationMotDePasse.js > resetPassword : taille mdp pas ok")
         return res.status(400).send("Le mot de passe n'est pas de la bonne forme ! ")
     }
 
@@ -95,7 +96,7 @@ const resetPassword = (req, res) => {
         Eleve.findOne({ attributes: ['tokenMail'], where: { courriel: email } })
             .then(eleve => {
                 if (!eleve) {
-                    console.log("Err controllers/changementMotDePasse.js : resetPassword, pas d'élève trouvé avec l'adr %s", email)
+                    console.log("Err controllers/reinitialisationMotDePasse.js : resetPassword, pas d'élève trouvé avec l'adr %s", email)
                     return res.status(404).send("Le token est invalide, ce n'est pas le bon utilisateur.")
                 }
                 if (eleve.tokenMail == req.body.token) {
@@ -103,23 +104,31 @@ const resetPassword = (req, res) => {
                         if (err) {
                             return res.status(520).send(err);
                         }
-                        return res.status(201).send(msg);
+                        // on supprime le token : il est à usage unique
+                        Eleve.update({tokenMail:''}, {where:{courriel:email}})
+                        .then(()=>{
+                            return res.status(201).send(msg)
+                        })
+                        .catch(err=>{
+                            console.log("Err controllers/reinitialisationMotDePasse.js : resetPassword.js, eleve update => "+err)
+                            return res.status(520).send("Erreur lors de la suppression des informations, le mot de passe a été modifié.")
+                        })
                     })
                 } else {
-                    console.log("Err controllers/changementMotDePasse.js : le token ne correspond pas pour l'eleve")
+                    console.log("Err controllers/reinitialisationMotDePasse.js : le token ne correspond pas pour l'eleve")
                     return res.status(403).send("Tentative d'accès avec un lien incorrect");
                 }
 
             })
             .catch(err => {
-                console.log("Err controllers/changementMotDePasse.js : sendResetPassword, eleve.findOne => " + err)
+                console.log("Err controllers/reinitialisationMotDePasse.js : sendResetPassword, eleve.findOne => " + err)
                 return res.status(520).send("Il y a eu une erreur lors de la vérification du compte.")
             })
     } else {
         Classe.findOne({ attributes: ['tokenMail'], where: { courriel: email } })
             .then(classe => {
                 if (!classe) {
-                    console.log("Err controllers/changementMotDePasse.js : resetPassword, pas de classe trouvée avec l'adr %s", email)
+                    console.log("Err controllers/reinitialisationMotDePasse.js : resetPassword, pas de classe trouvée avec l'adr %s", email)
                     return res.status(404).send("Le token est invalide, ce n'est pas le bon utilisateur.")
                 }
                 if (classe.tokenMail == req.body.token) {
@@ -127,15 +136,22 @@ const resetPassword = (req, res) => {
                         if (err) {
                             return res.status(520).send(err);
                         }
-                        return res.status(201).send(msg);
+                        Classe.update({tokenMail:''}, {where:{courriel:email}})
+                        .then(()=>{
+                            return res.status(201).send(msg)
+                        })
+                        .catch(err=>{
+                            console.log("Err controllers/reinitialisationMotDePasse.js : resetPassword.js, classe update => "+err)
+                            return res.status(520).send("Erreur lors de la suppression des informations, le mot de passe a été modifié.")
+                        })
                     })
                 } else {
-                    console.log("Err controllers/changementMotDePasse.js : le token ne correspond pas pour la classe")
+                    console.log("Err controllers/reinitialisationMotDePasse.js : le token ne correspond pas pour la classe")
                     return res.status(403).send("Tentative d'accès avec un lien incorrect");
                 }
             })
             .catch(err => {
-                console.log("Err controllers/changementMotDePasse.js : sendResetPassword, classe.findOne => " + err)
+                console.log("Err controllers/changereinitialisationMotDePassementMotDePasse.js : sendResetPassword, classe.findOne => " + err)
                 return res.status(520).send("Il y a eu une erreur lors de la vérification du compte.")
             })
     }
@@ -169,8 +185,8 @@ function sendEmail(email, token, callback) {
             <br/>
             <p>
             Vous avez fait une demande de changement de mot de passe pour votre compte Mimi. <br/>
-            Pour changer votre mot de passe, <a href="https://mimi.connected-health.fr/pwdreset?token=${token}">appuyez ici</a> ou copiez le lien ci dessous dans votre navigateur : 
-            <br/>https://mimi.connected-health.fr/pwdreset?token=${token}
+            Pour changer votre mot de passe, <a href="http://localhost:3000/pwdreset?token=${token}">appuyez ici</a> ou copiez le lien ci dessous dans votre navigateur : 
+            <br/>http://localhost:3000/pwdreset?token=${token}
             <br/>
             <strong>(Attention, ce lien est valide seulement pendant 30 minutes.)</strong>
             </p>
@@ -181,10 +197,10 @@ function sendEmail(email, token, callback) {
     }
     mail.sendMail(mailOptions, function (error, info) {
         if (error) {
-            console.log("Err controllers/eleve.js > sendEmail : erreur lors de l'envoi du mail " + error)
+            console.log("Err controllers/reinitialisationMotDePasse.js > sendEmail : erreur lors de l'envoi du mail " + error)
             return callback("Erreur lors de l'envoi du mail.")
         } else {
-            console.log("mail envoyé ")
+            //console.log("mail envoyé ")
             return callback(null)
         }
     });
