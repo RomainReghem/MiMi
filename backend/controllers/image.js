@@ -73,12 +73,12 @@ const saveAvatarAsImage = (req, res) => {
  */
 function getAvatar(mail, callback) {
     const path = "Documents/" + mail + "/images";
-    /*try {
+    try {
         verificationChemin(path);
     } catch (err) {
         console.log("Err controllers/image.js > getAvatar : " + err)
         return callback(err)
-    }*/
+    }
     fs.readFile(path + "/avatar.json", 'utf-8', function (err, avatar) {
         if (err) {
             console.log('Err controllers/image.js > getAvatar :  renvoi avatar par défaut : ' + err)
@@ -243,12 +243,12 @@ const savePicture = (req, res) => {
 function getImage(email, callback) {
     const path = "./Documents/" + email + "/images";
     let file = "";
-    /*try {
+    try {
         verificationChemin(path);
     } catch (error) {
         console.log("Err controllers/image.js > getImage : verificationChemin : " + err);
         return callback("Erreur lors de la récupération de l'image.")
-    }*/
+    }
 
     fs.readdir(path, function (err, files) {
         if (err) {
