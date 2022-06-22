@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-//const protonMail = require('protonmail-api');
 const jwt = require("jsonwebtoken")
 
 const { determiningRole } = require('../middleware/verificationAccesDoc');
@@ -107,8 +106,8 @@ const resetPassword = (req, res) => {
                         return res.status(201).send(msg);
                     })
                 } else {
-                    console.log("token pas bon")
-                    return res.status(520).send("nope");
+                    console.log("Err controllers/changementMotDePasse.js : le token ne correspond pas pour l'eleve")
+                    return res.status(403).send("Tentative d'accès avec un lien incorrect");
                 }
 
             })
@@ -131,8 +130,8 @@ const resetPassword = (req, res) => {
                         return res.status(201).send(msg);
                     })
                 } else {
-                    console.log("token pas bon")
-                    return res.status(520).send("nope");
+                    console.log("Err controllers/changementMotDePasse.js : le token ne correspond pas pour la classe")
+                    return res.status(403).send("Tentative d'accès avec un lien incorrect");
                 }
             })
             .catch(err => {
@@ -152,62 +151,45 @@ const resetPassword = (req, res) => {
 function sendEmail(email, token, callback) {
     var email = email;
     var token = token;
-    // pour protonmail, nodemailer ne marche pas
-   /* if (process.env.MAIL_SERVICE == "protonmail") {
-        (async () => {
-            try{
-                const pm = await protonMail.connect({
-                    username: process.env.MAIL_ID,
-                    password: process.env.MAIL_PASSWORD
-                })
-    
-                await pm.sendEmail({
-                    to: email,
-                    subject: 'Demande de changement de mot de passe sur mimi.connected-health.fr',
-                    body: `Bonjour`
-                })
-    
-                pm.close()
-                return callback(null, "mail envoyé")
-            }catch(err){
-                console.log("Err controllers/eleve.js > sendEmail : erreur lors de l'envoi du mail avec protonmail" + err)
-                return callback("Erreur lors de l'envoi du mail.")
-            }
 
-        })()
-    } else {*/
-        var mail = nodemailer.createTransport({
-            service: process.env.MAIL_SERVICE,
-            auth: {
-                user: process.env.MAIL_ID,
-                pass: process.env.MAIL_PASSWORD,
-            }
-        });
-        // const date = new Date()
-        //console.log(date.getHours()+":"+date.getMinutes())
-        var mailOptions = {
-            from: "Projet MIMI",
-            to: email,
-            subject: "Demande de changement de mot de passe sur mimi.connected-health.fr",
-            html: `<p>Bonjour,</p>
-            <p>Vous avez fait une demande de changement de mot de passe pour votre compte Mimi. <br/>
-            Pour changer votre mot de passe, <a href="http://localhost:3000/pwdreset?token=${token}">appuyez ici</a> ou copiez le lien ci dessous dans votre navigateur : <br/> http://localhost:3000/pwdreset?token=${token}
-            <br/>
-            <strong>(Attention, ce lien est valide seulement pendant 30 minutes.)</strong></p>
-            <p>Si vous n'êtes pas à l'origine de cette demande, veuillez nous contacter à l'adresse suivante : mimi@connected-health.fr</p>
-            <p>Cordialement, l'équipe du projet MIMI </p>`
+    var mail = nodemailer.createTransport({
+        service: process.env.MAIL_SERVICE,
+        auth: {
+            user: process.env.MAIL_ID,
+            pass: process.env.MAIL_PASSWORD,
         }
-        mail.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                console.log("Err controllers/eleve.js > sendEmail : erreur lors de l'envoi du mail " + error)
-                return callback("Erreur lors de l'envoi du mail.")
-            } else {
-                console.log("mail envoyé ")
-                return callback(null)
-            }
         });
-  //  }
+    //http://localhost:3000
+    //https://mimi.connected-health.fr
+    var mailOptions = {
+        from: process.env.MAIL_ID,
+        to: email,
+        subject: "Demande de changement de mot de passe sur mimi.connected-health.fr",
+        html: `<html><body><p>Bonjour,</p>
+            <br/>
+            <p>
+            Vous avez fait une demande de changement de mot de passe pour votre compte Mimi. <br/>
+            Pour changer votre mot de passe, <a href="https://mimi.connected-health.fr/pwdreset?token=${token}">appuyez ici</a> ou copiez le lien ci dessous dans votre navigateur : 
+            <br/>https://mimi.connected-health.fr/pwdreset?token=${token}
+            <br/>
+            <strong>(Attention, ce lien est valide seulement pendant 30 minutes.)</strong>
+            </p>
+            <p>Si vous n'êtes pas à l'origine de cette demande, veuillez nous contacter à l'adresse suivante : mimi@connected-health.fr</p>
+            <br/>
+            <p>Cordialement, l'équipe du projet MIMI </p>
+            </body></html>`
+    }
+    mail.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log("Err controllers/eleve.js > sendEmail : erreur lors de l'envoi du mail " + error)
+            return callback("Erreur lors de l'envoi du mail.")
+        } else {
+            console.log("mail envoyé ")
+            return callback(null)
+        }
+    });
 }
+
 
 module.exports = {
     sendResetPassword,
