@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,6 +12,7 @@ const PDFSender = (props) => {
     const [fileUploading, setFileUploading] = useState(false)
     const axiosPrivate = useAxiosPrivate();
     const { auth } = useAuth();
+    const ref = useRef(null);
     let saveFileURL = (auth?.role == "classe" ? "/saveFileClass" : "/saveFile");
 
     const handleSubmit = async (event) => {
@@ -51,6 +52,7 @@ const PDFSender = (props) => {
             }
             console.log(error)
         }
+        ref.current.value = null
         setFileUploading(false)
     }
 
@@ -61,7 +63,7 @@ const PDFSender = (props) => {
 
     return (
             <Stack direction={"row"} spacing={'none'}>
-            <Input type="file" display={'none'} id="file" onChange={handleFileSelect} />
+            <Input type="file" ref={ref} display={'none'} id="file" onChange={handleFileSelect} />
             <FormLabel w={'75%'} p={1} htmlFor="file" border={'1px solid'} borderRight={'none'} cursor={'pointer'} borderRadius={'3px 0px 0px 3px'}>
                 <Center h={'100%'}>
                     <FontAwesomeIcon icon={faUpload}/>
