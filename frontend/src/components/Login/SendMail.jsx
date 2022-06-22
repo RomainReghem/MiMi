@@ -9,7 +9,7 @@ export default function PwdReset() {
 
     const [displaySpinner, setDisplaySpinner] = useState(false);
     const [mail, setMail] = useState('')
-    
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,18 +21,24 @@ export default function PwdReset() {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true
                 });
-            
+
             toast({ title: "Mail envoyé", description: "Cliquez sur le lien présent dans le mail", status: "success", duration: 5000, isClosable: true, position: "top" })
 
         } catch (err) {
-            setDisplaySpinner(false)
             if (!err?.response) {
                 toast({ title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 4000, isClosable: true, position: "top" })
-            } else if (err.response?.status === 400) {
-                toast({ title: "Erreur", description: "Mot de passe erroné", status: "error", duration: 4000, isClosable: true, position: "top" })
+            } else if (err.response?.status === 404) {
+                toast({ title: "Aucun utilisateur trouvé", description: "Vérifiez le lien", status: "error", duration: 4000, isClosable: true, position: "top" })
 
+            } else if (err.response?.status === 520) {
+                toast({ title: "Erreur", description: "Le mail n'a pas pu être envoyé.", status: "error", duration: 4000, isClosable: true, position: "top" })
+
+            } else {
+                toast({ title: "Erreur", description: "Vérifiez le mail et rééssayez", status: "error", duration: 4000, isClosable: true, position: "top" })
             }
         }
+
+        setDisplaySpinner(false)
     }
 
     return (
@@ -65,7 +71,7 @@ export default function PwdReset() {
                                     bg: 'cyan.700',
                                 }} onClick={handleSubmit}>
                                 {
-                                 displaySpinner ? <Spinner/> : 'Envoyer'
+                                    displaySpinner ? <Spinner /> : 'Envoyer'
                                 }
                             </Button>
                         </Stack>

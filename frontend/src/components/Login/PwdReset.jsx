@@ -36,14 +36,19 @@ export default function PwdReset() {
 
 
         } catch (err) {
-            setDisplaySpinner(false)
             if (!err?.response) {
                 toast({ title: "Erreur", description: "Pas de réponse du serveur", status: "error", duration: 4000, isClosable: true, position: "top" })
-            } else if (err.response?.status === 400) {
-                toast({ title: "Erreur", description: "Mot de passe erroné", status: "error", duration: 4000, isClosable: true, position: "top" })
+            } else if (err.response?.status === 404) {
+                toast({ title: "Aucun utilisateur trouvé", description: "Vérifiez le lien", status: "error", duration: 4000, isClosable: true, position: "top" })
 
+            } else if (err.response?.status === 403) {
+                toast({ title: "Lien erroné", description: "Vérifiez le lien", status: "error", duration: 4000, isClosable: true, position: "top" })
+            } else {
+                toast({ title: "Erreur", description: "", status: "error", duration: 4000, isClosable: true, position: "top" })
             }
         }
+
+        setDisplaySpinner(false)
     }
 
     return (
