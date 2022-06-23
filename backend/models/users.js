@@ -1,4 +1,3 @@
-const { TokenExpiredError } = require('jsonwebtoken');
 const Sequelize = require('sequelize')
 const db = require('../utils/database')
 
@@ -110,24 +109,6 @@ const Score = db.define('score',
             allowNull: false
         }
     }, { timestamps: false, freezeTableName: true, tableName: 'score' });
-
-/*const Token = db.define('token',{
-    idtoken:{
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true
-    },
-    token:{
-        type:Sequelize.STRING,
-        allowNull:false
-    },
-    courriel:{
-        type:Sequelize.STRING,
-        unique:true,
-        allowNull:false
-    }
-}, { timestamps: false, freezeTableName: true, tableName: 'token' })*/
 
 //relations
 // un eleve a une classe, une classe a un ou plusieurs élèves

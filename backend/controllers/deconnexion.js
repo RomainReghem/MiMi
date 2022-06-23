@@ -46,7 +46,7 @@ const Deconnexion = async (req, res) => {
                             return res.status(204).send("Erreur survenue lors de la déconnexion !")
                         })
                 } else if (role == "classe") {
-                    console.log("token classe")
+                    //console.log("token classe")
                     Classe.update({ token: "" }, { where: { courriel: mail } })
                         .then(() => {
                             //console.log("Déconnexion de la classe effectuée ! ")

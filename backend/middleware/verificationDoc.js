@@ -1,4 +1,3 @@
-const fs = require('fs');
 const multer = require("multer");
 const path = require("path")
 
@@ -6,12 +5,13 @@ const maxSize = 80 * 1024 * 1024;
 
 const storage = multer.memoryStorage();
 
+
 /**
  * Fonction de filtre pour multer, sert à valider le type du fichier, dans ce cas, un pdf.
  * @param {*} req la requête du client
  * @param {*} file le fichier donné par multer
  * @param {*} cb la fonction callback
- * @returns 
+ * @returns la fonction callbakc
  */
 function fileFilter(req, file, cb) {
   // console.log("** Verification de type de document **")
@@ -33,5 +33,6 @@ function fileFilter(req, file, cb) {
 }
 
 const upload = multer({ storage: storage, limits: maxSize, fileFilter: fileFilter })
+
 
 module.exports = upload;

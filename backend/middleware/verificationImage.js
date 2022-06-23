@@ -5,12 +5,13 @@ const maxSize = 80 * 1024 * 1024;
 
 const storage = multer.memoryStorage();
 
+
 /**
  * Fonction de filtre pour multer, sert à valider le type du fichier, dans ce cas, une image.
  * @param {*} req 
  * @param {*} file le fichier donné par multer
  * @param {*} cb la fonction callback
- * @returns 
+ * @returns la fonction callback, qui contient soit une erreur, soit un succès
  */
 function fileFilter(req, file, cb) {
   //console.log("** Verification de type d'image **")
@@ -34,6 +35,13 @@ function fileFilter(req, file, cb) {
 }
 
 
+/**
+ * Fonction de filtre pour l'image de l'avatar, vérifie que son type soit bien png
+ * @param {*} req la requête du client
+ * @param {*} file le fichier à analyser (la photo de l'avatar)
+ * @param {*} cb la fonction callback
+ * @returns cb, la fonction callback, contenant soit une erreur soit un succès (booléen true)
+ */
 function avatarAsImageFilter(req, file, cb) {
   //console.log("** Verification de type d'image **")
   // Les extensions/types de fichiers autorisés
@@ -51,8 +59,10 @@ function avatarAsImageFilter(req, file, cb) {
   }
 }
 
+
 const upload = multer({ storage: storage, limits: maxSize, fileFilter: fileFilter })
 const uploadAvatar = multer({ storage: storage, limits: maxSize, fileFilter: avatarAsImageFilter })
+
 
 module.exports = {
   upload,

@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken")
 
 require("dotenv").config();
 
+
 /**
  * Vérifie la validité du token, s'il est valide, enregistre dans la requete le mail et le role (eleve ou classe) de l'utilisateur dont on va changer le mdp
  * @param {*} req la requête

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>controllers/classe.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AcceptationInvitation">AcceptationInvitation</a></li><li><a href="global.html#addPartie">addPartie</a></li><li><a href="global.html#addVictory">addVictory</a></li><li><a href="global.html#ajoutInvitation">ajoutInvitation</a></li><li><a href="global.html#avatarAsImageFilter">avatarAsImageFilter</a></li><li><a href="global.html#ChangementMail">ChangementMail</a></li><li><a href="global.html#changementMailClasse">changementMailClasse</a></li><li><a href="global.html#ChangementMdp">ChangementMdp</a></li><li><a href="global.html#changementMdpClasse">changementMdpClasse</a></li><li><a href="global.html#ChangementPseudo">ChangementPseudo</a></li><li><a href="global.html#changePassword">changePassword</a></li><li><a href="global.html#changePasswordClass">changePasswordClass</a></li><li><a href="global.html#Connexion">Connexion</a></li><li><a href="global.html#Deconnexion">Deconnexion</a></li><li><a href="global.html#deleteClasse">deleteClasse</a></li><li><a href="global.html#deleteCours">deleteCours</a></li><li><a href="global.html#deleteFile">deleteFile</a></li><li><a href="global.html#deleteStudent">deleteStudent</a></li><li><a href="global.html#determiningRole">determiningRole</a></li><li><a href="global.html#fileFilter">fileFilter</a></li><li><a href="global.html#getAllStudents">getAllStudents</a></li><li><a href="global.html#getAvatar">getAvatar</a></li><li><a href="global.html#getAvatarAsImage">getAvatarAsImage</a></li><li><a href="global.html#getFile">getFile</a></li><li><a href="global.html#getFiles">getFiles</a></li><li><a href="global.html#getImage">getImage</a></li><li><a href="global.html#getInvitation">getInvitation</a></li><li><a href="global.html#getScore">getScore</a></li><li><a href="global.html#getScoreTicTacToe">getScoreTicTacToe</a></li><li><a href="global.html#getUsernameStudent">getUsernameStudent</a></li><li><a href="global.html#InscriptionClasse">InscriptionClasse</a></li><li><a href="global.html#InscriptionEleve">InscriptionEleve</a></li><li><a href="global.html#refreshToken">refreshToken</a></li><li><a href="global.html#renameDoc">renameDoc</a></li><li><a href="global.html#renameFile">renameFile</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetScore">resetScore</a></li><li><a href="global.html#saveAvatar">saveAvatar</a></li><li><a href="global.html#saveAvatarAsImage">saveAvatarAsImage</a></li><li><a href="global.html#saveFile">saveFile</a></li><li><a href="global.html#savePicture">savePicture</a></li><li><a href="global.html#sendEmail">sendEmail</a></li><li><a href="global.html#sendResetPassword">sendResetPassword</a></li><li><a href="global.html#setInvitation">setInvitation</a></li><li><a href="global.html#SuppressionClasse">SuppressionClasse</a></li><li><a href="global.html#suppressionEleve">suppressionEleve</a></li><li><a href="global.html#verificationChemin">verificationChemin</a></li><li><a href="global.html#verifNom">verifNom</a></li><li><a href="global.html#verifTaille">verifTaille</a></li><li><a href="global.html#verifyAccesGet">verifyAccesGet</a></li><li><a href="global.html#verifyAccessSave">verifyAccessSave</a></li><li><a href="global.html#verifyJWT">verifyJWT</a></li><li><a href="global.html#verifyMailBody">verifyMailBody</a></li><li><a href="global.html#verifyMailQuery">verifyMailQuery</a></li><li><a href="global.html#verifyTokenMail">verifyTokenMail</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">controllers/classe.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const fs = require('fs');
+
+const Classe = require('../models/users').Classe
+const Eleve = require('../models/users').Eleve
+const Score = require('../models/users').Score
+
+
+/**
+ * Renvoie l'adresse mail et le nom de tous les élèves qui appartenant à la classe donnée (mail)
+ * 
+ * @param {*} req la requête du client, contient mail dans les paramètres, qui correspond au mail de la classe
+ * @param {*} res la réponse du serveur
+ */
+const getAllStudents = (req, res) => {
+    //console.log("\n*** Récuperation des eleves ***")
+    //console.log("Classe.js --> getAllStudents")
+    const mail = req.query.mail
+    // on cherche tous les élèves qui appartiennent à la classe dont l'email est donné
+    // pour cela on ne prend que les élèves qui ont acceptés l'invitationt=
+    // on veut spécifiquement l'attribut courriel, nom et prénom
+    Eleve.findAll({
+        attributes: ['courriel', 'nom', 'prenom'],
+        where: { invitation: "acceptee" },
+        // jointure avec la table classe
+        include: [{
+            model: Classe,
+            attributes: [],
+            where: {
+                courriel: mail
+            }
+        }]
+    }).then(eleves => {
+        Eleve.findAll({
+            attributes: ['courriel'],
+            where: { invitation: "en attente" },
+            // jointure avec la table classe
+            include: [{
+                model: Classe,
+                attributes: [],
+                where: {
+                    courriel: mail
+                }
+            }]
+        }).then(elevesInvites => {
+            return res.json({ eleves: eleves, elevesInvites:elevesInvites })
+        }).catch(err => {
+            console.log("Err controllers/classe.js > getAllStudents :  erreur eleve findall " + err)
+            return res.status(520).send("Erreur lors de la récupèration des informations des élèves invités.")
+        });
+    }).catch(err => {
+        console.log("Err controllers/classe.js > getAllStudents :  erreur eleve findall " + err)
+        return res.status(520).send("Erreur lors de la récupèration des informations des élèves.")
+    });
+}
+
+
+/**
+ * Supprime une classe et toutes ses invitations envoyées aux élèves
+ * 
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
+ */
+const deleteClasse = (req, res) => {
+    //console.log("\n*** Suppression de la classe ***")
+    //console.log("Classe.js --> deleteClasse")
+    const mail = req.body.mail
+
+    // on récupère les infos de la bd sur la classe à partir du mail donné
+    Classe.findOne({
+        attributes: ['idclasse'],
+        where: { courriel: mail }
+    })
+        .then(classe => {
+            if (!classe) {
+                console.log("Err controllers/classe.js > deleteClasse : pas de classe trouvée à supprimer")
+                return res.status(404).send("Pas de classe trouvée à supprimer")
+            }
+            const num = classe.idclasse;
+            // on va changer toutes les invitations des élèves de la classe
+            // on cherche tous les élèves qui appartiennent à la classe dont l'id est donné
+            // on fait cela pour éviter les contraintes de clé étrangère, et qu'un élève peut exister sans classe
+            Eleve.update({ idclasse: '', invitation: "aucune" }, { where: { idclasse: num } })
+                .then(() => {
+                    // on supprime maintenant les scores pour respecter les contraintes de clé étrangère
+                    Score.destroy({
+                        where: {
+                            idclasse: num
+                        }
+                    })
+                        .then(() => {
+                            // console.log("Suppression des infos sur la classe effectué.")
+                            // Delete
+                            Classe.destroy({
+                                where: {
+                                    idclasse: num
+                                }
+                            }).then(() => {
+                                // console.log("ok")
+                                // maintenant on doit supprimer les dossiers et les documents de la classe
+                                const path = "./Documents/" + mail
+                                // supprime le dossier du chemin donné, ainsi que tout ce qui se trouve à l'intérieur
+                                fs.rmdir(path, { recursive: true }, (err) => {
+                                    if (err) {
+                                        console.log("Err controllers/classe.js > deleteClasse : erreur suppression dossiers : " + err)
+                                        return res.status(500).send("Erreur lors de la suppression de documents.")
+                                    }
+                                    // console.log("Suppression effectuée !")
+                                    return res.status(201).send("Suppression effectuée")
+                                });
+                            }).catch(err => {
+                                console.log("Err controllers/classe.js > deleteClasse : classe destroy " + err)
+                                return res.status(500).send("Erreur survenue lors de la suppression de la classe.")
+                            })
+                        })
+                        .catch(err => {
+                            console.log("Err controllers/classe.js > deleteClasse : score destroy" + err)
+                            return res.status(500).send("Erreur survenue lors de la suppression du score.")
+                        })
+                })
+                .catch(err => {
+                    console.log("Err controllers/classe.js > deleteClasse : eleve update " + err)
+                    return res.status(520).send("Erreur lors du retrait des invitations des élèves")
+                });
+        }).catch(err => {
+            console.log("Err controllers/classe.js > deleteClasse : classe findone " + err)
+            return res.status(520).send("Serveur injoignable.")
+        })
+}
+
+
+module.exports = {
+    getAllStudents,
+    deleteClasse
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu Jun 23 2022 14:55:48 GMT+0200 (heure d’été d’Europe centrale) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
