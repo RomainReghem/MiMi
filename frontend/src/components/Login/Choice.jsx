@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const Choix = () => {
     return (
-        <Center flexGrow={1}>
+        <Center flexGrow={1} p={5}>
             <Stack spacing={8} direction='column' maxW={'lg'}>
                 <Heading fontSize={'2xl'}>Choix du type de compte :</Heading>
                 <Link textDecoration={'none'} to="/register-student">

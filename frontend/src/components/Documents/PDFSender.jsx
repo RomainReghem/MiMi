@@ -39,10 +39,8 @@ const PDFSender = (props) => {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
             toast({ title: "Fichier sauvegardé", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
-
-            // Pour l'UI on remet fileWaitingToBeSent à false
+            // Pour l'animation UI
             setFileWaitingToBeSent(false);
-
             // On appelle LoadFiles pour actualiser les fichiers dans l'UI
             props.reload();
 

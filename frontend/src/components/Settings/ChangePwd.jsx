@@ -63,10 +63,7 @@ const ChangePwd = () => {
                     },
                     headers: { 'Content-Type': 'application/json' },
                 }
-            );
-            setPwd('');
-            setNewPwd('');
-            setMatchPwd('');    
+            );  
             toast({ title: "Mot de passe modifié", description: "", status: "success", duration: 3000, isClosable: true, position: "top" })
 
         } catch (err) {
