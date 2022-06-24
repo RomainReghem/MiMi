@@ -82,7 +82,7 @@ const Jutsu = () => {
     return (
         <>
             {
-                auth?.idclasse ?
+                auth?.mailclasse && auth?.invitation == "acceptee" ?
                     <Stack flexGrow={1}>
                         <Spinner position={'absolute'} top='50%' left='50%' zIndex={1} />
                         {error && <p>{error}</p>}

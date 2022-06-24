@@ -39,10 +39,12 @@ export default function Login() {
             const role = response?.data?.role;
             // Acceptee, en attente, aucune
             const invitation = response?.data?.invitation;
-            // Les classes le reçoivent toujours. L'élève le reçoit s'il est membre d'une classe
+            // Les classes le reçoivent toujours. L'élève le reçoit s'il est membre d'une classe (ou invité)
             const idclasse = response?.data?.idclasse;
-            // Les classes ne le reçoivent jamais, correspond à leur user. L'élève le reçoit s'il est membre d'une classe
+            // Les classes ne le reçoivent jamais, correspond à leur user. L'élève le reçoit s'il est membre d'une classe (ou invité)
             const mailclasse = response?.data?.mailClasse;
+
+            console.log(mailclasse)
             // Au login, si rien ne correspond dans le local storage, on attribue "avatar" à "préférence"
             // On ajoute aussi la variable au localstorage, default "avatar"
             let preference = JSON.parse(localStorage.getItem("preference" + user)) || "avatar";
