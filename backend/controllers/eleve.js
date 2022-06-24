@@ -44,50 +44,6 @@ const getUsernameStudent = (req, res) => {
 }
 
 
-// /**
-//  * Renvoie au client le nom et prénom de l'élève en fonction de son adresse mail.
-//  * 
-//  * @param {*} req la requête du client, contient le mail de l'élève
-//  * @param {*} res la réponse du serveur
-//  */
-// const getNameStudent = (req, res) => {
-//     console.log("\n*** Récupération du nom et du prénom de l'élève ***")
-//     const email = req.query.mail
-
-//     if (email == undefined) {
-//         return res.status(404).send("Pas de mail")
-//     }
-//     if (!(email.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= email.length) {
-//         return res.status(400).send("Mail incorrect")
-//     }
-
-//     const role = req.role;
-//     const emailToken = req.mail
-//     // pas d'autre utilisateur que l'élève ne peut récupèrer son propre pseudo
-//     if (role == "eleve" && emailToken == email) {
-//         Eleve.findOne({
-//             attributes: ['prenom', 'nom'],
-//             where: {
-//                 courriel: email
-//             }
-//         }).then(eleve => {
-//             if (eleve) {
-//                 console.log('prenom %s et nom %s ', eleve.prenom, eleve.nom)
-//                 return res.status(200).json({ nom: eleve.nom, prenom: eleve.prenom })
-//             } else {
-//                 return res.status(409).send("Aucun élève avec cette adresse")
-//             }
-//         })
-//             .catch(err => {
-//                 console.log(err)
-//                 return res.status(520).send(err)
-//             });
-//     } else {
-//         return res.status(403).send("Pas un élève / pas le bon élève")
-//     }
-// }
-
-
 /**
  * Supprime l'élève en fonction de son mail.
  * Supprime aussi tous ses documents.
@@ -203,62 +159,8 @@ function getInvitation(emailEleve, cb) {
 }
 
 
-function getInvitationPromise(emailEleve, cb) {
-    //console.log("\n***Récupération d'invitation.***")
-    // console.log("eleve.js => getInvitation")
-    // on vérifie que le mail soit bien présent
-    return new Promise((resolve, reject) => {
-        if (!emailEleve) {
-            console.log("Err controllers/eleve.js > getInvitation : adresse mail manquante pour la recuperation d'invitation ")
-            return reject("Aucun utilisateur trouvé : la requête est éronnée.");
-        }
-        if (!(emailEleve.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 <= emailEleve.length) {
-            console.log("Err controllers/eleve.js > getInvitation : forme mail incorrect")
-            return reject("Forme dresse mail invalide")
-        }
-
-        Eleve.findOne({
-            attributes: ['invitation', 'idclasse'],
-            where: { courriel: emailEleve }
-        })
-            .then(eleve => {
-                // si aucun élève n'a été trouvé
-                if (!eleve) {
-                    console.log("Err controllers/eleve.js > getInvitation : aucun eleve trouvé avec l'adresse %s", emailEleve)
-                    return reject('Aucun élève avec adr %s', emailEleve)
-                }
-                const invitation = eleve.invitation;
-                if (invitation != "aucune") {
-                    Classe.findOne({ attributes: ["idclasse", "courriel"], where: { idclasse: eleve.idclasse } })
-                        .then(classe => {
-                            if (!classe) {
-                                console.log(`Err controllers/eleve.js > getInvitation : aucun eleve trouvé avec l'id ${eleve.idclasse}`)
-                                return reject('Aucune classe pour eleve %s', emailEleve);
-                            }
-                            // console.log("invitation envoyée avec l'id de la classe, ainsi que le mail de la classe")
-                            return resolve({ invitation: invitation, idclasse: classe.idclasse, mailClasse: classe.courriel })
-                        })
-                        .catch(err => {
-                            console.log(`Err controllers/eleve.js > getInvitation : classe findone ${err}`)
-                            return reject("erreur serveur")
-                        });
-                } else {
-                    //console.log("aucune invitation en attente ou acceptee")
-                    return resolve({ invitation: invitation })
-                }
-            })
-            .catch(err => {
-                console.log(`Err controllers/eleve.js > getInvitation : eleve findone ${err}`)
-                return reject("Erreur serveur")
-            });
-    })
-
-}
-
-
 module.exports = {
     getUsernameStudent,
     deleteStudent,
-    getInvitation,
-    getInvitationPromise
+    getInvitation
 }

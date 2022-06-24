@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken")
 
 require("dotenv").config();
 
+
 /**
  * Vérifie la validité du token, s'il est valide, enregistre dans la requete le mail et le role (eleve ou classe) de l'utilisateur dont on va changer le mdp
  * @param {*} req la requête
@@ -24,7 +25,7 @@ const verifyTokenMail = (req, res, next) => {
             }
             req.mail = decoded.mail;
             req.role = decoded.role;
-            console.log("decode mail %s et role %s", req.mail, req.role)
+            //console.log("decode mail %s et role %s", req.mail, req.role)
 
             if (req.role != "eleve" && req.role != "classe") {
                 console.log("Err middleware/verificationTokenMail.js > verifyTokenMail : role pas bon")

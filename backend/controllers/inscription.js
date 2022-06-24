@@ -139,7 +139,7 @@ const InscriptionEleve = (req, res) => {
  * @param {*} res la réponse du serveur
  */
 const InscriptionClasse = (req, res) => {
-    console.log('\n*** Inscription de la classe ***')
+    //console.log('\n*** Inscription de la classe ***')
     const email = req.body.mail;
     const mdp = req.body.pwd;
 

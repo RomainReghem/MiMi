@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>middleware/verificationAccesDoc.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AcceptationInvitation">AcceptationInvitation</a></li><li><a href="global.html#addPartie">addPartie</a></li><li><a href="global.html#addVictory">addVictory</a></li><li><a href="global.html#ajoutInvitation">ajoutInvitation</a></li><li><a href="global.html#avatarAsImageFilter">avatarAsImageFilter</a></li><li><a href="global.html#ChangementMail">ChangementMail</a></li><li><a href="global.html#changementMailClasse">changementMailClasse</a></li><li><a href="global.html#ChangementMdp">ChangementMdp</a></li><li><a href="global.html#changementMdpClasse">changementMdpClasse</a></li><li><a href="global.html#ChangementPseudo">ChangementPseudo</a></li><li><a href="global.html#changePassword">changePassword</a></li><li><a href="global.html#changePasswordClass">changePasswordClass</a></li><li><a href="global.html#Connexion">Connexion</a></li><li><a href="global.html#Deconnexion">Deconnexion</a></li><li><a href="global.html#deleteClasse">deleteClasse</a></li><li><a href="global.html#deleteCours">deleteCours</a></li><li><a href="global.html#deleteFile">deleteFile</a></li><li><a href="global.html#deleteStudent">deleteStudent</a></li><li><a href="global.html#determiningRole">determiningRole</a></li><li><a href="global.html#fileFilter">fileFilter</a></li><li><a href="global.html#getAllStudents">getAllStudents</a></li><li><a href="global.html#getAvatar">getAvatar</a></li><li><a href="global.html#getAvatarAsImage">getAvatarAsImage</a></li><li><a href="global.html#getFile">getFile</a></li><li><a href="global.html#getFiles">getFiles</a></li><li><a href="global.html#getImage">getImage</a></li><li><a href="global.html#getInvitation">getInvitation</a></li><li><a href="global.html#getScore">getScore</a></li><li><a href="global.html#getScoreTicTacToe">getScoreTicTacToe</a></li><li><a href="global.html#getUsernameStudent">getUsernameStudent</a></li><li><a href="global.html#InscriptionClasse">InscriptionClasse</a></li><li><a href="global.html#InscriptionEleve">InscriptionEleve</a></li><li><a href="global.html#refreshToken">refreshToken</a></li><li><a href="global.html#renameDoc">renameDoc</a></li><li><a href="global.html#renameFile">renameFile</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetScore">resetScore</a></li><li><a href="global.html#saveAvatar">saveAvatar</a></li><li><a href="global.html#saveAvatarAsImage">saveAvatarAsImage</a></li><li><a href="global.html#saveFile">saveFile</a></li><li><a href="global.html#savePicture">savePicture</a></li><li><a href="global.html#sendEmail">sendEmail</a></li><li><a href="global.html#sendResetPassword">sendResetPassword</a></li><li><a href="global.html#setInvitation">setInvitation</a></li><li><a href="global.html#SuppressionClasse">SuppressionClasse</a></li><li><a href="global.html#suppressionEleve">suppressionEleve</a></li><li><a href="global.html#verificationChemin">verificationChemin</a></li><li><a href="global.html#verifNom">verifNom</a></li><li><a href="global.html#verifTaille">verifTaille</a></li><li><a href="global.html#verifyAccesGet">verifyAccesGet</a></li><li><a href="global.html#verifyAccessSave">verifyAccessSave</a></li><li><a href="global.html#verifyJWT">verifyJWT</a></li><li><a href="global.html#verifyMailBody">verifyMailBody</a></li><li><a href="global.html#verifyMailQuery">verifyMailQuery</a></li><li><a href="global.html#verifyTokenMail">verifyTokenMail</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">middleware/verificationAccesDoc.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { Eleve, Classe } = require("../models/users");
+
+
+/**
+ * Vérifie le mail et le role, afin de determiner si l'utilisateur actuel a le droit d'accèder aux fichiers
+ * @param {*} req la requête du client
+ * @param {*} res la réponse du serveur
+ * @param {*} next ce qui suit
+ * @returns une erreur, s'il y en a 
+ */
+const verifyAccesGet = (req, res, next) => {
+    // le mail de la personne a qui on veut acceder
+    const mailDossier = req.query.findMail;
+    // le mail de la personne qui est censée demander les accès
+    const mail = req.query.mail;
+    // le mail enregistré dans le cookie de la session, est censé être équivalent au mail donné
+    const mailToken = req.mail;
+    // le role enregistré dans le cookie de la session
+    const roleToken = req.role;
+
+    // On doit d'abord vérifier que l'adresse mail qu'on nous donne est correcte syntaxiquement
+    if (mail == undefined || mailDossier == undefined) {
+        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : récupération impossible sans mail!")
+        return res.status(400).send("Aucune adresse email reçue !");
+    }
+
+    if (!(mail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 &lt;= mail.length || !(mailDossier.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 &lt;= mailDossier.length) {
+        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : forme mail incorrect")
+        return res.status(400).send("L'adresse mail %s n'est pas de la bonne forme ! ", mail)
+    }
+
+    // ON STOCKE EN PREMIER LES ROLES
+    determiningRole(mail, function (err, roleDetermined) {
+        if (err) {
+            return res.status(520).send(err);
+        }
+        req.roleFound = roleDetermined;
+        // verification pour les roles
+        if (roleToken != roleDetermined) {
+            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : role %s ne correspond pas au role %s ", roleToken, roleDetermined)
+            return res.status(403).send("Le role de l'utilisateur ne correspond au role inscrit dans ses cookies !");
+        }
+        // on regarde si les deux mails donnés par le client sont équivalent
+        if (mailDossier == mail) {
+            if (mailToken == mail) {
+                //console.log('pas de problème d\'accès')
+                next()
+            } else {
+                console.log('Err middleware/verificationAccesDoc.js > verifyAccesGet : mail trouvé dans le token incorrect : %s et non %s', mailToken, mail)
+                return res.status(403).send("Le mail %s de l'utilisateur n'est pas %s", mailToken, mail)
+            }
+            // sinon ça doit être une classe qui essaie d'accèder à un compte élève ou inversement
+        } else {
+            determiningRole(mailDossier, function (err, roleDossier) {
+                if (err) {
+                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : role %s ne correspond pas au role %s ", roleToken, roleDetermined)
+                    return res.status(520).send(err);
+                }
+                // quand c'est un eleve
+                if (roleDetermined == "eleve") {
+                    // on verifie qu'il essaie d'accèder au dossier d'une classe
+                    if (roleDossier != "classe") {
+                        // ce n'est pas une classe
+                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : c'est un %s qui essaie d'accèder au dossier ", roleDossier);
+                        return res.status(403).send("Tentative d'accès aux fichiers d'un autre élève");
+                    }
+                    Eleve.findOne({ attributes: ['idclasse'], where: { courriel: mail, invitation: "acceptee" } })
+                        .then(eleve => {
+                            if (!eleve) {
+                                console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : aucune classe pour cet élève %s.", mail);
+                                return res.status(404).send("Aucune classe pour cet élève %s.", mail)
+                            }
+                            Classe.findOne({ attributes: ['courriel'], where: { idclasse: eleve.idclasse } })
+                                .then(classe => {
+                                    if (!classe) {
+                                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : la classe de l'élève n'existe pas.");
+                                        return res.status(404).send("La classe de l'élève n'existe pas.")
+                                    }
+                                    if (classe.courriel != mailDossier) {
+                                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : tentative d'accès aux fichiers d'une autre classe");
+                                        return res.status(403).send("Tentative d'accès aux fichiers d'une autre classe");
+                                    }
+                                    // console.log("tout est bon, la classe appartient à l'élève qui essaie d'y accèder")
+                                    next();
+                                })
+                                .catch(err => {
+                                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : classe findone " + err);
+                                    return res.status(520).send("Erreur lors de la vérification du compte classe.")
+                                })
+                        })
+                        .catch(err => {
+                            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : eleve findone " + err);
+                            return res.status(520).send("Erreur lors de la vérification du compte élève.")
+                        })
+                } else {
+                    // on verifie qu'on essaie d'accèder au dossier d'un élève
+                    if (roleDossier != "eleve") {
+                        // ce n'est pas une classe
+                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : tentative d'accès aux fichiers d'une autre classe");
+                        return res.status(403).send("Tentative d'accès aux fichiers d'une autre classe");
+                    }
+                    Classe.findOne({ attributes: ['idclasse'], where: { courriel: mail } })
+                        .then(classe => {
+                            if (!classe) {
+                                console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : aucune classe trouvée");
+                                return res.status(404).send("Aucune classe trouvée pour ce mail %s.", mail)
+                            }
+                            Eleve.findOne({ attributes: ['ideleve'], where: { idclasse: classe.idclasse, invitation: "acceptee", courriel: mailDossier } })
+                                .then(eleve => {
+                                    if (!eleve) {
+                                        console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : tentative d'accès aux fichiers d'un élève pas dans la classe.");
+                                        return res.status(403).send("Tentative d'accès aux fichiers d'un élève pas dans la classe.")
+                                    }
+                                    // console.log("tout est bon, l'élève appartient à la classe qui essaie d'y accèder")
+                                    next();
+                                })
+                                .catch(err => {
+                                    console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : eleve findone " + err);
+                                    return res.status(520).send("Erreur lors de la vérification du compte élève.")
+                                })
+                        })
+                        .catch(err => {
+                            console.log("Err middleware/verificationAccesDoc.js > verifyAccesGet : classe findone " + err);
+                            return res.status(520).send("Erreur lors de la vérification du compte classe.")
+                        })
+                }
+            })
+        }
+    })
+}
+
+
+/**
+ * Fonction middleware qui permet de vérifier si l'utilisateur peut sauvegarder/modifier/supprimer
+ * @param {*} req la requête du client, contient notamment le mail de l'utilisateur sur lequel on veut faire le changement de document
+ * @param {*} res la réponse du serveur
+ * @param {*} next la fonction qui suit
+ * @returns la réponse du serveur en cass d'erreur
+ */
+const verifyAccessSave = (req, res, next) => {
+    // console.log("\n*** Vérification des droits d'accès au document ***")
+    // le mail de la personne qui est censée demander les accès
+    const mail = req.body.mail;
+    // le mail enregistré dans le cookie de la session, est censé être équivalent au mail donné
+    const mailToken = req.mail;
+    // le role enregistré dans le cookie de la session
+    const roleToken = req.role;
+
+    // On doit d'abord vérifier que l'adresse mail qu'on nous donne est correcte syntaxiquement
+    if (mail == undefined) {
+        console.log("Err middleware/verificationAccesDoc.js > verifyAccesSave : pas de mail!")
+        return res.status(400).send("Aucune adresse email reçue !");
+    }
+
+    if (!(mail.match("[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+")) || 100 &lt;= mail.length) {
+        console.log("Err middleware/verificationAccesDoc.js > verifyAccesSave : forme mail incorrect")
+        return res.status(400).send("L'adresse mail %s n'est pas de la bonne forme ! ", mail)
+    }
+    // On veut le role de l'eleve qui veut sauvegarder
+    determiningRole(mail, function (err, roleDetermined) {
+        if (err) {
+            return res.status(520).send(err);
+        }
+        req.roleFound = roleDetermined;
+        // verification pour les roles
+        if (roleToken != roleDetermined) {
+            console.log("Err middleware/verificationAccesDoc.js > verifyAccesSave : role %s ne correspond pas au role %s ", roleToken, roleDetermined)
+            return res.status(403).send("Le role de l'utilisateur ne correspond pas au role inscrit dans ses cookies !");
+        }
+        // on regarde si les deux mails donnés par le client sont équivalent
+        if (mailToken == mail) {
+            // console.log('pas de problème d\'accès')
+            next()
+        } else {
+            console.log('Err middleware/verificationAccesDoc.js > verifyAccesSave : mail trouvé dans le token incorrect : %s et non %s', mailToken, mail)
+            return res.status(403).send("Le mail %s de l'utilisateur n'est pas %s", mailToken, mail)
+        }
+    })
+}
+
+
+/**
+ * Fonction qui aide à déterminer le role (eleve ou classe) d'un utilisateur en fonction de son adresse mail
+ * @param {String} email le mail de l'utilisateur dont on veut connaître le rôle.
+ * @param {*} callback la fonction qui peut contenir deux variables, une variable d'erreur ou le role
+ */
+function determiningRole(email, callback) {
+    // On va regarder si c'est un compte d'élève
+    Eleve.findOne({
+        attributes: ["ideleve"], where: { courriel: email }
+    })
+        .then(eleve => {
+            if (eleve) {
+                //console.log("Félicitation ! C'est un élève !")
+                return callback(null, "eleve");
+            }
+            // si ce n'est pas un élève,c'est probablement une classe
+            Classe.findOne({
+                attributes: ["idclasse"],
+                where: { courriel: email }
+            })
+                .then(classe => {
+                    // pas de classe, pas de chocolat !
+                    if (!classe) {
+                        console.log("Err middleware/verificationAccesDoc.js > determiningRole : aucun utilisateur avec l'adresse mail %s trouvée :( ", email);
+                        return callback("Aucun utilisateur trouvé ayant cette adresse : " + email)
+                    }
+                    //console.log("Oh... C'est une classe...")
+                    return callback(null, "classe")
+                })
+                .catch(err => {
+                    console.log("Err middleware/verificationAccesDoc.js > determiningRole : classe findone "+err);
+                    return callback("Problème lors de la vérification d'identité de compte");
+                })
+        })
+        .catch(err => {
+            console.log("Err middleware/verificationAccesDoc.js > determiningRole : eleve findone " + err)
+            return callback("Problème lors de la vérification d'identité de compte");
+        })
+}
+
+
+module.exports = {
+    verifyAccesGet,
+    determiningRole,
+    verifyAccessSave
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu Jun 23 2022 14:55:48 GMT+0200 (heure d’été d’Europe centrale) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

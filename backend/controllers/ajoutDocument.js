@@ -1,7 +1,6 @@
 const fs = require('fs');
 const fastFolderSize = require('fast-folder-size')
 
-
 /**
  * Sauvegarde sur le serveur le document de l'utilisateur dans le dossier approprié.
  * 
@@ -16,9 +15,6 @@ const saveFile = (req, res) => {
     const file = req.file
 
     if (file == null) {
-        /* for (r in req.body.formData) {
-             console.log("-" + r)
-         }*/
         console.log("Err controllers/ajoutDocument.js => saveFile : Pas de fichier " + file + " maybe " + req.files)
         return res.status(600).send("Erreur : aucun fichier n'a été trouvé")
     }
@@ -56,7 +52,6 @@ const saveFile = (req, res) => {
             return res.status(201).send("Enregistrement effectué");
         });
     })
-
 }
 
 
@@ -118,6 +113,7 @@ function verifNom(path, nom) {
     }
     return name;
 }
+
 
 /**
  * Fonction qui vérifie la taille d'un dossier, si la taille du fichier fait dépasser la taille maximale, renvoie une erreur

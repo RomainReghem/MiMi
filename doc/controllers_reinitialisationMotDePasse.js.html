@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>controllers/reinitialisationMotDePasse.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AcceptationInvitation">AcceptationInvitation</a></li><li><a href="global.html#addPartie">addPartie</a></li><li><a href="global.html#addVictory">addVictory</a></li><li><a href="global.html#ajoutInvitation">ajoutInvitation</a></li><li><a href="global.html#avatarAsImageFilter">avatarAsImageFilter</a></li><li><a href="global.html#ChangementMail">ChangementMail</a></li><li><a href="global.html#changementMailClasse">changementMailClasse</a></li><li><a href="global.html#ChangementMdp">ChangementMdp</a></li><li><a href="global.html#changementMdpClasse">changementMdpClasse</a></li><li><a href="global.html#ChangementPseudo">ChangementPseudo</a></li><li><a href="global.html#changePassword">changePassword</a></li><li><a href="global.html#changePasswordClass">changePasswordClass</a></li><li><a href="global.html#Connexion">Connexion</a></li><li><a href="global.html#Deconnexion">Deconnexion</a></li><li><a href="global.html#deleteClasse">deleteClasse</a></li><li><a href="global.html#deleteCours">deleteCours</a></li><li><a href="global.html#deleteFile">deleteFile</a></li><li><a href="global.html#deleteStudent">deleteStudent</a></li><li><a href="global.html#determiningRole">determiningRole</a></li><li><a href="global.html#fileFilter">fileFilter</a></li><li><a href="global.html#getAllStudents">getAllStudents</a></li><li><a href="global.html#getAvatar">getAvatar</a></li><li><a href="global.html#getAvatarAsImage">getAvatarAsImage</a></li><li><a href="global.html#getFile">getFile</a></li><li><a href="global.html#getFiles">getFiles</a></li><li><a href="global.html#getImage">getImage</a></li><li><a href="global.html#getInvitation">getInvitation</a></li><li><a href="global.html#getScore">getScore</a></li><li><a href="global.html#getScoreTicTacToe">getScoreTicTacToe</a></li><li><a href="global.html#getUsernameStudent">getUsernameStudent</a></li><li><a href="global.html#InscriptionClasse">InscriptionClasse</a></li><li><a href="global.html#InscriptionEleve">InscriptionEleve</a></li><li><a href="global.html#refreshToken">refreshToken</a></li><li><a href="global.html#renameDoc">renameDoc</a></li><li><a href="global.html#renameFile">renameFile</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetScore">resetScore</a></li><li><a href="global.html#saveAvatar">saveAvatar</a></li><li><a href="global.html#saveAvatarAsImage">saveAvatarAsImage</a></li><li><a href="global.html#saveFile">saveFile</a></li><li><a href="global.html#savePicture">savePicture</a></li><li><a href="global.html#sendEmail">sendEmail</a></li><li><a href="global.html#sendResetPassword">sendResetPassword</a></li><li><a href="global.html#setInvitation">setInvitation</a></li><li><a href="global.html#SuppressionClasse">SuppressionClasse</a></li><li><a href="global.html#suppressionEleve">suppressionEleve</a></li><li><a href="global.html#verificationChemin">verificationChemin</a></li><li><a href="global.html#verifNom">verifNom</a></li><li><a href="global.html#verifTaille">verifTaille</a></li><li><a href="global.html#verifyAccesGet">verifyAccesGet</a></li><li><a href="global.html#verifyAccessSave">verifyAccessSave</a></li><li><a href="global.html#verifyJWT">verifyJWT</a></li><li><a href="global.html#verifyMailBody">verifyMailBody</a></li><li><a href="global.html#verifyMailQuery">verifyMailQuery</a></li><li><a href="global.html#verifyTokenMail">verifyTokenMail</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">controllers/reinitialisationMotDePasse.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const nodemailer = require('nodemailer');
+const jwt = require("jsonwebtoken")
+
+const { determiningRole } = require('../middleware/verificationAccesDoc');
+const { Eleve, Classe } = require('../models/users');
+const { changePassword } = require("./modificationEleve")
+const { changePasswordClass } = require("./modificationClasse")
+
+
+/**
+ * Génère un token pour l'utilisateur s'il existe, et lui envoie par mail à l'aide d'une fonction.
+ * @param {*} req requête du client, doit contenir le mail de l'utilisateur.
+ * @param {*} res réponse du serveur
+ */
+const sendResetPassword = (req, res) => {
+    const email = req.body.mail;
+    determiningRole(email, function (err, role) {
+        if (err) {
+            console.log(err)
+            return res.status(404).send("Nous n'avons pas trouvé d'utilisateur avec cette adresse mail.")
+        }
+        else if (role == "eleve") {
+            // on génère un token
+            const passToken = jwt.sign(
+                { "mail": email, "role": "eleve" },
+                process.env.PASSWORD_TOKEN_SECRET,
+                { expiresIn: '1d' }
+            )
+            // on va l'ajouter dans la bd maintenant
+            Eleve.update(
+                { tokenMail: passToken },
+                { where: { courriel: email } }
+            )
+                .then(() => {
+                    // une fois que le token a été ajouté, on peut envoyer le mail contenant le token 
+                    sendEmail(email, passToken, function (err) {
+                        if (err) {
+                            return res.status(520).send(err)
+                        } else {
+                            return res.status(201).send("Vous recevrez un mail contenant les instructions de réinitialisation sous peu.")
+                        }
+                    });
+
+                })
+                .catch(err => {
+                    console.log("Err controllers/reinitialisationMotDePasse.js : sendResetPassword, eleve.update " + err)
+                    return res.status(520).send("Erreur lors de la tentative de création de lien pour la reinitialisation.")
+                })
+        } else {
+            const passToken = jwt.sign(
+                { "mail": email, "role": "classe" },
+                process.env.PASSWORD_TOKEN_SECRET,
+                { expiresIn: '30m' }
+            )
+            Classe.update(
+                { tokenMail: passToken },
+                { where: { courriel: email } }
+            )
+                .then(() => {
+                    // une fois que le token a été ajouté, on peut envoyer le mail contenant le token 
+                    sendEmail(email, passToken, function (err) {
+                        if (err) {
+                            return res.status(520).send(err)
+                        } else {
+                            return res.status(201).send("Vous recevrez un mail contenant les instructions de réinitialisation sous peu.")
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.log("Err controllers/reinitialisationMotDePasse.js : sendResetPassword, classe.update " + err)
+                    return res.status(520).send("Erreur lors de la tentative de création de lien pour la reinitialisation.")
+                })
+        }
+    })
+}
+
+
+/**
+ * Permet de changer le mot de passe, si le token et le mot de passe donnés sont valides.
+ * Supprimer ensuite le token de la base de données.
+ * @param {*} req la requête du client, contient notamment le mot de passe et le token.
+ * @param {*} res la réponse du serveur
+ * @returns la réponse du serveur, une erreur ou un succès, en fonction des codes http
+ */
+const resetPassword = (req, res) => {
+    const email = req.mail;
+    const role = req.role;
+
+    const mdp = req.body.pwd;
+
+    if (!(mdp.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$"))) {
+        console.log("Err controllers/reinitialisationMotDePasse.js > resetPassword : taille mdp pas ok")
+        return res.status(400).send("Le mot de passe n'est pas de la bonne forme ! ")
+    }
+
+    if (role == "eleve") {
+        Eleve.findOne({ attributes: ['tokenMail'], where: { courriel: email } })
+            .then(eleve => {
+                if (!eleve) {
+                    console.log("Err controllers/reinitialisationMotDePasse.js : resetPassword, pas d'élève trouvé avec l'adr %s", email)
+                    return res.status(404).send("Le token est invalide, ce n'est pas le bon utilisateur.")
+                }
+                if (eleve.tokenMail == req.body.token) {
+                    changePassword(email, mdp, function (err, msg) {
+                        if (err) {
+                            return res.status(520).send(err);
+                        }
+                        // on supprime le token : il est à usage unique
+                        Eleve.update({tokenMail:''}, {where:{courriel:email}})
+                        .then(()=>{
+                            return res.status(201).send(msg)
+                        })
+                        .catch(err=>{
+                            console.log("Err controllers/reinitialisationMotDePasse.js : resetPassword.js, eleve update => "+err)
+                            return res.status(520).send("Erreur lors de la suppression des informations, le mot de passe a été modifié.")
+                        })
+                    })
+                } else {
+                    console.log("Err controllers/reinitialisationMotDePasse.js : le token ne correspond pas pour l'eleve")
+                    return res.status(403).send("Tentative d'accès avec un lien incorrect");
+                }
+
+            })
+            .catch(err => {
+                console.log("Err controllers/reinitialisationMotDePasse.js : sendResetPassword, eleve.findOne => " + err)
+                return res.status(520).send("Il y a eu une erreur lors de la vérification du compte.")
+            })
+    } else {
+        Classe.findOne({ attributes: ['tokenMail'], where: { courriel: email } })
+            .then(classe => {
+                if (!classe) {
+                    console.log("Err controllers/reinitialisationMotDePasse.js : resetPassword, pas de classe trouvée avec l'adr %s", email)
+                    return res.status(404).send("Le token est invalide, ce n'est pas le bon utilisateur.")
+                }
+                if (classe.tokenMail == req.body.token) {
+                    changePasswordClass(email, mdp, function (err, msg) {
+                        if (err) {
+                            return res.status(520).send(err);
+                        }
+                        Classe.update({tokenMail:''}, {where:{courriel:email}})
+                        .then(()=>{
+                            return res.status(201).send(msg)
+                        })
+                        .catch(err=>{
+                            console.log("Err controllers/reinitialisationMotDePasse.js : resetPassword.js, classe update => "+err)
+                            return res.status(520).send("Erreur lors de la suppression des informations, le mot de passe a été modifié.")
+                        })
+                    })
+                } else {
+                    console.log("Err controllers/reinitialisationMotDePasse.js : le token ne correspond pas pour la classe")
+                    return res.status(403).send("Tentative d'accès avec un lien incorrect");
+                }
+            })
+            .catch(err => {
+                console.log("Err controllers/changereinitialisationMotDePassementMotDePasse.js : sendResetPassword, classe.findOne => " + err)
+                return res.status(520).send("Il y a eu une erreur lors de la vérification du compte.")
+            })
+    }
+}
+
+
+/**
+ * Fonction qui envoie un mail contenant les instructions pour la reinitialisation du mot de passe de l'utilisateur à l'aide du token donnée.
+ * @param {String} email l'email de l'utilisateur à qui on doit envoyer un lien de reinitialisation 
+ * @param {String} token le token pour la reinitialisation du mot de passe
+ * @param {*} callback la fonction callback qui permet de retourner une erreur ou rien quand la fonction a terminé de s'exécuter
+ */
+function sendEmail(email, token, callback) {
+    var email = email;
+    var token = token;
+
+    var mail = nodemailer.createTransport({
+        service: process.env.MAIL_SERVICE,
+        auth: {
+            user: process.env.MAIL_ID,
+            pass: process.env.MAIL_PASSWORD,
+        }
+        });
+    //http://localhost:3000
+    //https://mimi.connected-health.fr
+    var mailOptions = {
+        from: process.env.MAIL_ID,
+        to: email,
+        subject: "Demande de changement de mot de passe sur mimi.connected-health.fr",
+        html: `&lt;html>&lt;body>&lt;p>Bonjour,&lt;/p>
+            &lt;br/>
+            &lt;p>
+            Vous avez fait une demande de changement de mot de passe pour votre compte Mimi. &lt;br/>
+            Pour changer votre mot de passe, &lt;a href="https://mimi.connected-health.fr/pwdreset?token=${token}">appuyez ici&lt;/a> ou copiez le lien ci dessous dans votre navigateur : 
+            &lt;br/>https://mimi.connected-health.fr/pwdreset?token=${token}
+            &lt;br/>
+            &lt;strong>(Attention, ce lien est valide seulement pendant 30 minutes.)&lt;/strong>
+            &lt;/p>
+            &lt;p>Si vous n'êtes pas à l'origine de cette demande, veuillez nous contacter à l'adresse suivante : mimi@connected-health.fr&lt;/p>
+            &lt;br/>
+            &lt;p>Cordialement, l'équipe du projet MIMI &lt;/p>
+            &lt;/body>&lt;/html>`
+    }
+    mail.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log("Err controllers/reinitialisationMotDePasse.js > sendEmail : erreur lors de l'envoi du mail " + error)
+            return callback("Erreur lors de l'envoi du mail.")
+        } else {
+            //console.log("mail envoyé ")
+            return callback(null)
+        }
+    });
+}
+
+
+module.exports = {
+    sendResetPassword,
+    resetPassword
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu Jun 23 2022 14:55:48 GMT+0200 (heure d’été d’Europe centrale) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

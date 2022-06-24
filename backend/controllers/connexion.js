@@ -4,8 +4,7 @@ const jwt = require("jsonwebtoken")
 
 const Users = require('../models/users');
 const { getAvatar, getImage, getAvatarAsImage } = require("./image")
-//const { getAvatar, getImage, getAvatarAsImage } = require("./imagePromise")
-const { getInvitation, getInvitationPromise } = require('./eleve');
+const { getInvitation } = require('./eleve');
 const Eleve = Users.Eleve;
 const Classe = Users.Classe;
 
@@ -94,23 +93,6 @@ const Connexion = (req, res) => {
                                         })
                                     }
                                 })
-                                // Version de récupération des informations avec Promise
-                                /*Promise.all([
-                                     getImage(eleve.courriel),
-                                     getAvatarAsImage(eleve.courriel),
-                                     getAvatar(eleve.courriel),
-                                     getInvitationPromise(eleve.courriel)
-                                 ])
-                                     .then((data) => {
-                                         //envoi des infos recuperees sur l'eleve
-                                         res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-                                         return res.status(200).json(Object.assign({ role: "eleve", accessToken: accessToken }, { image: data[0].image }, { avatarAsImg: data[1].avatarAsImg }, { avatar: data[2].avatar },{invitation:data[3]}));
-                                     }
-                                     ).catch((err) => {
-                                         console.log(err)
-                                         return res.status(520).send("Erreur du serveur lors de la récupération des informations du serveur.")
-                                     })*/
-
                             })
                             .catch(err => {
                                 console.log("Err controllers/connexion.js > Connexion : erreur lors de l'ajout de Token" + err);

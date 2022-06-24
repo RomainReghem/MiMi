@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>middleware/verificationTokenMail.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AcceptationInvitation">AcceptationInvitation</a></li><li><a href="global.html#addPartie">addPartie</a></li><li><a href="global.html#addVictory">addVictory</a></li><li><a href="global.html#ajoutInvitation">ajoutInvitation</a></li><li><a href="global.html#avatarAsImageFilter">avatarAsImageFilter</a></li><li><a href="global.html#ChangementMail">ChangementMail</a></li><li><a href="global.html#changementMailClasse">changementMailClasse</a></li><li><a href="global.html#ChangementMdp">ChangementMdp</a></li><li><a href="global.html#changementMdpClasse">changementMdpClasse</a></li><li><a href="global.html#ChangementPseudo">ChangementPseudo</a></li><li><a href="global.html#changePassword">changePassword</a></li><li><a href="global.html#changePasswordClass">changePasswordClass</a></li><li><a href="global.html#Connexion">Connexion</a></li><li><a href="global.html#Deconnexion">Deconnexion</a></li><li><a href="global.html#deleteClasse">deleteClasse</a></li><li><a href="global.html#deleteCours">deleteCours</a></li><li><a href="global.html#deleteFile">deleteFile</a></li><li><a href="global.html#deleteStudent">deleteStudent</a></li><li><a href="global.html#determiningRole">determiningRole</a></li><li><a href="global.html#fileFilter">fileFilter</a></li><li><a href="global.html#getAllStudents">getAllStudents</a></li><li><a href="global.html#getAvatar">getAvatar</a></li><li><a href="global.html#getAvatarAsImage">getAvatarAsImage</a></li><li><a href="global.html#getFile">getFile</a></li><li><a href="global.html#getFiles">getFiles</a></li><li><a href="global.html#getImage">getImage</a></li><li><a href="global.html#getInvitation">getInvitation</a></li><li><a href="global.html#getScore">getScore</a></li><li><a href="global.html#getScoreTicTacToe">getScoreTicTacToe</a></li><li><a href="global.html#getUsernameStudent">getUsernameStudent</a></li><li><a href="global.html#InscriptionClasse">InscriptionClasse</a></li><li><a href="global.html#InscriptionEleve">InscriptionEleve</a></li><li><a href="global.html#refreshToken">refreshToken</a></li><li><a href="global.html#renameDoc">renameDoc</a></li><li><a href="global.html#renameFile">renameFile</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetScore">resetScore</a></li><li><a href="global.html#saveAvatar">saveAvatar</a></li><li><a href="global.html#saveAvatarAsImage">saveAvatarAsImage</a></li><li><a href="global.html#saveFile">saveFile</a></li><li><a href="global.html#savePicture">savePicture</a></li><li><a href="global.html#sendEmail">sendEmail</a></li><li><a href="global.html#sendResetPassword">sendResetPassword</a></li><li><a href="global.html#setInvitation">setInvitation</a></li><li><a href="global.html#SuppressionClasse">SuppressionClasse</a></li><li><a href="global.html#suppressionEleve">suppressionEleve</a></li><li><a href="global.html#verificationChemin">verificationChemin</a></li><li><a href="global.html#verifNom">verifNom</a></li><li><a href="global.html#verifTaille">verifTaille</a></li><li><a href="global.html#verifyAccesGet">verifyAccesGet</a></li><li><a href="global.html#verifyAccessSave">verifyAccessSave</a></li><li><a href="global.html#verifyJWT">verifyJWT</a></li><li><a href="global.html#verifyMailBody">verifyMailBody</a></li><li><a href="global.html#verifyMailQuery">verifyMailQuery</a></li><li><a href="global.html#verifyTokenMail">verifyTokenMail</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">middleware/verificationTokenMail.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const jwt = require("jsonwebtoken")
+
+require("dotenv").config();
+
+
+/**
+ * Vérifie la validité du token, s'il est valide, enregistre dans la requete le mail et le role (eleve ou classe) de l'utilisateur dont on va changer le mdp
+ * @param {*} req la requête
+ * @param {*} res la réponse
+ * @param {*} next ce qui suit
+ * @returns une erreur, s'il y en a 
+ */
+const verifyTokenMail = (req, res, next) => {
+    // le token est en deuxième position
+    const token = req.body.token;
+    //console.log("token : "+token)
+    // vérification du token
+    jwt.verify(
+        token,
+        process.env.PASSWORD_TOKEN_SECRET,
+        (err, decoded) => {
+            if (err) {
+                console.log("Err middleware/verificationTokenMail.js > verifyTokenMail : token pas bon : " + err)
+                return res.status(403).send("Le token n'est pas défini.")
+            }
+            req.mail = decoded.mail;
+            req.role = decoded.role;
+            //console.log("decode mail %s et role %s", req.mail, req.role)
+
+            if (req.role != "eleve" &amp;&amp; req.role != "classe") {
+                console.log("Err middleware/verificationTokenMail.js > verifyTokenMail : role pas bon")
+                return res.status(403).send("Le role précisé dans le token n'existe pas : %s", req.role)
+            }
+            // passe au back, ce qui vient après, la fonction pour réinitialiser le mdp
+            next();
+        }
+    )
+}
+
+module.exports = { verifyTokenMail }</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu Jun 23 2022 14:55:48 GMT+0200 (heure d’été d’Europe centrale) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
