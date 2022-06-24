@@ -73,7 +73,7 @@ const Jutsu = () => {
         if (jitsi) {
             jitsi.addEventListeners({
                 videoConferenceJoined: confJoined,
-                raiseHandUpdated: handleRaiseHandStatus,                
+                raiseHandUpdated: handleRaiseHandStatus,
                 videoConferenceLeft: handleVideoConferenceLeft,
             });
         }
@@ -81,17 +81,21 @@ const Jutsu = () => {
 
     return (
         <>
-            <Stack flexGrow={1}>
-                <Spinner position={'absolute'} top='50%' left='50%' zIndex={1} />
-                {error && <p>{error}</p>}
-                {loading && <Spinner />}
-                <Stack flexGrow={1} h='xl' id={jitsiConfig.parentNode} zIndex={99} />
-                <Stack direction={'row'} justify='center' pb='2'>
-                    <Button colorScheme={selected[0] ? 'darkblue' : 'blue'} onClick={() => switchCamera(0)}>Cam1</Button>
-                    <Button colorScheme={selected[1] ? 'darkblue' : 'blue'} onClick={() => switchCamera(1)}>Cam2</Button>
-                    <Button colorScheme={selected[2] ? 'darkblue' : 'blue'} onClick={() => switchCamera(2)}>Cam3</Button>
-                </Stack>
-            </Stack>
+            {
+                auth?.idclasse ?
+                    <Stack flexGrow={1}>
+                        <Spinner position={'absolute'} top='50%' left='50%' zIndex={1} />
+                        {error && <p>{error}</p>}
+                        {loading && <Spinner />}
+                        <Stack flexGrow={1} h='xl' id={jitsiConfig.parentNode} zIndex={99} />
+                        <Stack direction={'row'} justify='center' pb='2'>
+                            <Button colorScheme={selected[0] ? 'darkblue' : 'blue'} onClick={() => switchCamera(0)}>Cam1</Button>
+                            <Button colorScheme={selected[1] ? 'darkblue' : 'blue'} onClick={() => switchCamera(1)}>Cam2</Button>
+                            <Button colorScheme={selected[2] ? 'darkblue' : 'blue'} onClick={() => switchCamera(2)}>Cam3</Button>
+                        </Stack>
+                    </Stack>
+                    : <Center flexGrow={1} p={5}><Text fontFamily={'mono'} fontSize='sm'>Rejoignez une classe pour accéder à cette page. La classe doit vous inviter depuis son tableau de bord.</Text></Center>
+            }
 
         </>);
 }

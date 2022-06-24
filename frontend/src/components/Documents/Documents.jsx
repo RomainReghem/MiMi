@@ -24,7 +24,6 @@ const Documents = () => {
     const [myFiles, setMyFiles] = useState([]);
     const [sharedFiles, setSharedFiles] = useState();
 
-    const [menuSelection, setMenuSelection] = useState(myFiles);
     const [selectedUI, setSelectedUI] = useState("my");
 
     // Le fichier actuellement séléctionné dans la liste. On le passera à PDFViewer.
@@ -73,8 +72,6 @@ const Documents = () => {
                             setSharedFiles(array)
                             console.log(array)
                         }))
-
-
             }
             // Si l'élève possède une classe
             else if (auth?.mailclasse) {
@@ -83,7 +80,6 @@ const Documents = () => {
                 });
                 setSharedFiles([{ mail: auth?.mailclasse, files: shared.data.files }])
             }
-
         }
         catch (error) {
             console.log(error)
@@ -166,7 +162,7 @@ const Documents = () => {
                         }
 
                         {selectedUI == "shared" &&
-                            sharedFiles?.length > 0 && sharedFiles.map((stud, i) =>
+                            (sharedFiles?.length > 0 ? sharedFiles.map((stud, i) =>
                                 <Stack key={i} w={'100%'} mb={3}>
                                     <Text>Documents de <Badge colorScheme={'blue'}>{stud.mail}</Badge></Text>
                                     {stud.files.length > 0 ? stud.files.map((file, i) =>
@@ -180,12 +176,8 @@ const Documents = () => {
                                         </Stack>
                                     ) : <Text fontFamily={'mono'} fontSize='xs'>Aucun document</Text>}
                                 </Stack>
-                            )
+                            ) : <Text fontFamily={'mono'} fontSize='xs'>Aucun document</Text>)
                         }
-
-
-
-
 
                     </Stack>
                     <Stack w={'100%'}>

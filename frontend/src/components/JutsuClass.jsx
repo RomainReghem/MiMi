@@ -81,25 +81,24 @@ const Jutsu = () => {
 
     return (
         <>
-            <Stack flexGrow={1}>
-                <Spinner position={'absolute'} top='50%' left='50%' zIndex={1} />
-                {
-                    handRaised &&
-                    <Alert onClick={() => setHandRaised(false)} h='70vh' status='success' variant='subtle' flexDirection='column' alignItems='center' justifyContent='space-evenly' textAlign='center' zIndex={99} >
-                        <Stack alignItems={'center'}>
-                        <AlertIcon mr={0} />
-                        <AlertTitle mt={4} fontSize='lg'>
-                            Un élève souhaite prendre la parole
-                        </AlertTitle>
-                        <AlertDescription mb={'36'}>Cliquer pour fermer</AlertDescription></Stack>
-                        <FontAwesomeIcon icon={faHand} size='10x' color='#F8AE1A' bounce />
-                    </Alert>
-                }
-                {error && <p>{error}</p>}
-                {loading && <Spinner />}
-                <Stack flexGrow={1} h='xl' id={jitsiConfig.parentNode} zIndex={99} />
-            </Stack>
-
+                <Stack flexGrow={1}>
+                    <Spinner position={'absolute'} top='50%' left='50%' zIndex={1} />
+                    {
+                        handRaised &&
+                        <Alert onClick={() => setHandRaised(false)} h='70vh' status='success' variant='subtle' flexDirection='column' alignItems='center' justifyContent='space-evenly' textAlign='center' zIndex={99} >
+                            <Stack alignItems={'center'}>
+                                <AlertIcon mr={0} />
+                                <AlertTitle mt={4} fontSize='lg'>
+                                    Un élève souhaite prendre la parole
+                                </AlertTitle>
+                                <AlertDescription mb={'36'}>Cliquer pour fermer</AlertDescription></Stack>
+                            <FontAwesomeIcon icon={faHand} size='10x' color='#F8AE1A' bounce />
+                        </Alert>
+                    }
+                    {error && <p>{error}</p>}
+                    {loading && <Spinner />}
+                    <Stack flexGrow={1} h='xl' id={jitsiConfig.parentNode} zIndex={99} />
+                </Stack>
         </>);
 }
 
